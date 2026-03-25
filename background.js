@@ -1146,7 +1146,7 @@ function clickToStartOverlay() {
 // PREVIEW — Show captured HTML in overlay using Shadow DOM (same page context)
 // This ensures fonts, SVGs, and color context render correctly
 // ============================================================================
-function showPreview(html) {
+function showPreview(html, jsxCode) {
   return new Promise((resolve) => {
     const backdrop = document.createElement("div");
     backdrop.id = "ui2code-preview-backdrop";
@@ -1243,26 +1243,41 @@ function showPreview(html) {
     Object.assign(zoomLabelText.style, { color: "rgba(255,255,255,0.4)", fontSize: "12px" });
     zoomLabelText.textContent = "Zoom:";
 
+    // Tab bar: Visual Preview | React JSX
+    const tabBar = document.createElement("div");
+    Object.assign(tabBar.style, { display: "flex", gap: "0", borderBottom: "1px solid rgba(255,255,255,0.08)", flexShrink: "0" });
+
+    let activeTab = "visual";
+    function makeTab(label, id) {
+      const tab = document.createElement("button");
+      Object.assign(tab.style, { background: "none", border: "none", borderBottom: "2px solid transparent", color: "rgba(255,255,255,0.5)", cursor: "pointer", fontSize: "13px", fontWeight: "500", padding: "10px 20px", fontFamily: "inherit", transition: "all 150ms ease" });
+      tab.textContent = label;
+      tab.dataset.tab = id;
+      tab.addEventListener("click", () => switchTab(id));
+      return tab;
+    }
+    const visualTab = makeTab("Visual Preview", "visual");
+    const jsxTab = makeTab("React JSX", "jsx");
+    tabBar.append(visualTab, jsxTab);
+
+    // Zoom toolbar (only visible in visual tab)
     toolbar.append(zoomLabelText, zoomOutBtn, zoomLabel, zoomInBtn, fitBtn);
 
-    // Preview container using Shadow DOM for style isolation
+    // Visual preview container
     const previewScroller = document.createElement("div");
     Object.assign(previewScroller.style, { flex: "1", overflow: "auto", position: "relative", background: "#1a1a1a" });
 
     const previewHost = document.createElement("div");
     Object.assign(previewHost.style, { minHeight: "100%", display: "flex", justifyContent: "center", alignItems: "flex-start", padding: "24px", boxSizing: "border-box", transition: "transform 150ms ease" });
     const shadow = previewHost.attachShadow({ mode: "open" });
-    // Detect page's color-scheme to match dark/light mode rendering
     const pageColorScheme = window.getComputedStyle(document.documentElement).colorScheme ||
                             window.getComputedStyle(document.body).colorScheme || "normal";
-    // Inject the serialized HTML into the shadow DOM
     shadow.innerHTML = `<style>
       :host { display: contents; color-scheme: ${pageColorScheme}; }
       *, *::before, *::after { box-sizing: border-box; }
     </style>${html}`;
     previewScroller.appendChild(previewHost);
 
-    // Scroll wheel zoom
     previewScroller.addEventListener("wheel", (e) => {
       if (e.ctrlKey || e.metaKey) {
         e.preventDefault();
@@ -1271,12 +1286,35 @@ function showPreview(html) {
       }
     }, { passive: false });
 
+    // JSX code preview container
+    const jsxScroller = document.createElement("div");
+    Object.assign(jsxScroller.style, { flex: "1", overflow: "auto", position: "relative", background: "#0d1117", display: "none" });
+
+    const jsxPre = document.createElement("pre");
+    Object.assign(jsxPre.style, { margin: "0", padding: "20px", color: "#e6edf3", fontFamily: "'SF Mono', 'Fira Code', 'Fira Mono', Menlo, Consolas, monospace", fontSize: "12px", lineHeight: "1.6", whiteSpace: "pre-wrap", wordBreak: "break-all", tabSize: "2" });
+    jsxPre.textContent = jsxCode || "(JSX code will appear here)";
+    jsxScroller.appendChild(jsxPre);
+
+    function switchTab(tab) {
+      activeTab = tab;
+      if (tab === "visual") {
+        previewScroller.style.display = ""; jsxScroller.style.display = "none"; toolbar.style.display = "flex";
+        visualTab.style.color = "rgba(255,255,255,0.9)"; visualTab.style.borderBottomColor = "#6366f1";
+        jsxTab.style.color = "rgba(255,255,255,0.5)"; jsxTab.style.borderBottomColor = "transparent";
+      } else {
+        previewScroller.style.display = "none"; jsxScroller.style.display = ""; toolbar.style.display = "none";
+        jsxTab.style.color = "rgba(255,255,255,0.9)"; jsxTab.style.borderBottomColor = "#6366f1";
+        visualTab.style.color = "rgba(255,255,255,0.5)"; visualTab.style.borderBottomColor = "transparent";
+      }
+    }
+    switchTab("visual"); // Set initial state
+
     // Footer
     const footer = document.createElement("div");
     Object.assign(footer.style, { padding: "10px 20px", borderTop: "1px solid rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.35)", fontSize: "12px", textAlign: "center", flexShrink: "0" });
-    footer.textContent = "Paste into Claude Code \u2192 ask to convert to React component  \u00b7  Ctrl+scroll to zoom";
+    footer.textContent = "Ctrl+scroll to zoom  \u00b7  Enter to copy for Claude/v0";
 
-    panel.append(header, toolbar, previewScroller, footer);
+    panel.append(header, tabBar, toolbar, previewScroller, jsxScroller, footer);
     backdrop.appendChild(panel);
     document.body.appendChild(backdrop);
 
@@ -1384,7 +1422,7 @@ chrome.action.onClicked.addListener(async (tab) => {
               const [previewResult] = await chrome.scripting.executeScript({
                 target: { tabId: tab.id },
                 func: showPreview,
-                args: [serializationResult.html],
+                args: [serializationResult.rawHtml, serializationResult.html],
               });
 
               const action = previewResult?.result;
