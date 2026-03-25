@@ -1201,7 +1201,8 @@ chrome.action.onClicked.addListener(async (tab) => {
   chrome.scripting.executeScript(
     { target: { tabId: tab.id, allFrames: true }, func: elementPicker },
     async (results) => {
-      const result = results.find((res) => !!res.result);
+      try {
+      const result = results?.find((res) => !!res.result);
 
       if (result) {
         const frameId = result.frameId;
@@ -1228,9 +1229,9 @@ chrome.action.onClicked.addListener(async (tab) => {
           new Promise((resolve) => setTimeout(resolve, 500)),
         ]);
 
-        const serializationResult = serializedHTML[0]?.result;
+        const serializationResult = serializedHTML?.[0]?.result;
 
-        if (serializationResult.status === "success") {
+        if (serializationResult?.status === "success") {
           // Dismiss capturing toast before showing preview
           await chrome.scripting.executeScript({
             target: { tabId: tab.id },
@@ -1264,17 +1265,26 @@ chrome.action.onClicked.addListener(async (tab) => {
               args: ["Cancelled", { iconColor: "#CCCCCC", dismissTimeout: 2000 }],
             });
           }
-        } else if (serializationResult.status === "error") {
+        } else if (serializationResult?.status === "error") {
+          console.error("Serialization error:", serializationResult.error);
           await chrome.scripting.executeScript({
             target: { tabId: tab.id },
             func: showToast,
             args: ["An error occurred", { iconColor: "#CCCCCC" }],
           });
-        } else {
+        } else if (serializationResult?.status === "aborted") {
           await chrome.scripting.executeScript({
             target: { tabId: tab.id },
             func: dismissToast,
             args: [{ immediate: true }],
+          });
+        } else {
+          // serializationResult is null/undefined — scripting failed
+          console.error("Serialization failed — no result returned");
+          await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: showToast,
+            args: ["Capture failed. Try selecting a different element.", { iconColor: "#CCCCCC" }],
           });
         }
 
@@ -1289,6 +1299,10 @@ chrome.action.onClicked.addListener(async (tab) => {
         func: dismissToast,
       });
       await chrome.action.enable(tab.id);
+      } catch (err) {
+        console.error("UI to Code Snapshot error:", err);
+        await chrome.action.enable(tab.id);
+      }
     }
   );
 });
