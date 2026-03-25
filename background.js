@@ -653,10 +653,14 @@ async function elementSerializer(selector) {
       attributesToSerialize.push(["style", toInlineStyles(styles)]);
     }
 
-    // Preserve original class names for Claude Code to understand component structure
+    // Preserve original class names:
+    // - "class" for hover/focus CSS rules to work
+    // - "data-class" for Claude Code to understand component structure
     const originalClass = target.getAttribute("class");
     if (originalClass) {
-      attributesToSerialize.push(["data-class", originalClass.replaceAll('"', "'")]);
+      const safeClass = originalClass.replaceAll('"', "'");
+      attributesToSerialize.push(["class", safeClass]);
+      attributesToSerialize.push(["data-class", safeClass]);
     }
 
     const isElementVisible = isChildOfSVG(target) || (target.checkVisibility() && styles.display !== "contents");
@@ -699,66 +703,64 @@ async function elementSerializer(selector) {
 
   return { status: "error", error: "Element not found" };
 
-  // Scan all stylesheets for :hover, :focus, :active, :focus-visible, :focus-within rules
-  // that apply to elements within the captured subtree
+  // Scan stylesheets for :hover, :focus, :active rules that apply to captured elements.
+  // Uses element.matches() for precise matching instead of class-name guessing.
   function extractInteractiveStyles(rootEl) {
     const interactivePseudos = [":hover", ":focus", ":active", ":focus-visible", ":focus-within"];
     const collectedRules = [];
-
-    // Get all elements in the subtree with their class names
     const allElements = [rootEl, ...rootEl.querySelectorAll("*")];
-    const classSet = new Set();
-    allElements.forEach((el) => {
-      if (el.className && typeof el.className === "string") {
-        el.className.split(/\s+/).forEach((c) => { if (c) classSet.add(c); });
-      }
-    });
+    const seen = new Set();
 
     for (const sheet of document.styleSheets) {
       try {
         for (const rule of sheet.cssRules) {
           if (!(rule instanceof CSSStyleRule)) continue;
           const sel = rule.selectorText;
-          if (!sel) continue;
+          if (!sel || seen.has(sel)) continue;
 
-          // Check if rule has interactive pseudo-class
+          // Must contain an interactive pseudo-class
           const hasInteractive = interactivePseudos.some((p) => sel.includes(p));
           if (!hasInteractive) continue;
 
-          // Check if rule references any class from our captured subtree
-          const classesInSelector = sel.match(/\.[\w-]+/g);
-          if (!classesInSelector) continue;
-          const matches = classesInSelector.some((c) => classSet.has(c.slice(1)));
+          // Strip pseudo-classes to get the base selector for matching
+          let baseSelector = sel;
+          for (const p of interactivePseudos) {
+            baseSelector = baseSelector.replaceAll(p, "");
+          }
+          // Clean up double colons, empty parens
+          baseSelector = baseSelector.replace(/::?(?=[,\s{]|$)/g, "").trim();
+          if (!baseSelector) continue;
+
+          // Check if any element in our subtree matches the base selector
+          let matches = false;
+          try {
+            for (const el of allElements) {
+              if (el.matches && el.matches(baseSelector)) {
+                matches = true;
+                break;
+              }
+            }
+          } catch (e) {
+            // Invalid selector — skip
+            continue;
+          }
           if (!matches) continue;
 
-          // Rewrite selector to use data-class attribute instead of class
-          let newSelector = sel;
-          for (const cls of classesInSelector) {
-            const className = cls.slice(1);
-            if (classSet.has(className)) {
-              newSelector = newSelector.replaceAll(cls, `[data-class~="${className}"]`);
-            }
-          }
+          seen.add(sel);
+          // Keep original selector with class names (data-class won't work for hover in CSS)
+          // Instead, re-add class attributes temporarily when rendering preview
+          collectedRules.push(`${sel} { ${rule.style.cssText} }`);
 
-          collectedRules.push(`${newSelector} { ${rule.style.cssText} }`);
+          // Cap at 50 rules to avoid bloating the output
+          if (collectedRules.length >= 50) break;
         }
       } catch (e) {
         // Cross-origin stylesheet — skip
       }
+      if (collectedRules.length >= 50) break;
     }
 
-    // Also extract CSS transition/animation definitions from elements
-    allElements.forEach((el) => {
-      const cs = window.getComputedStyle(el);
-      if (cs.transitionProperty && cs.transitionProperty !== "none" && cs.transitionProperty !== "all") {
-        const className = el.className && typeof el.className === "string" ? el.className.split(/\s+/)[0] : null;
-        if (className) {
-          collectedRules.push(`/* transition on .${className}: ${cs.transitionProperty} ${cs.transitionDuration} ${cs.transitionTimingFunction} */`);
-        }
-      }
-    });
-
-    return collectedRules.length > 0 ? collectedRules.join("\n") : "";
+    return collectedRules.length > 0 ? collectedRules.join(" ") : "";
   }
 }
 
