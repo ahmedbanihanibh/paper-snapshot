@@ -299,64 +299,57 @@ async function pickElement() {
 }
 
 // ============================================================================
-// DOM SERIALIZER: Converts DOM subtree to HTML with computed inline styles
+// DOM SERIALIZER: 1:1 port of Paper Snapshot's serialization logic
 // ============================================================================
 async function serializeElement(selector) {
-  // Properties that always should be captured even if they match defaults
   const alwaysCapture = ["display"];
-
-  // Get all CSS property names from computed style
+  const toastEl = document.getElementsByTagName("ui2code-toast")[0];
   const allProps = Array.from(window.getComputedStyle(document.body));
   allProps.push("aspect-ratio", "text-underline-offset", "text-decoration-thickness", "transform-box");
-
   let totalNodes = 0;
 
-  // Progress reporting via toast
   function updateProgress(current) {
-    const toast = document.getElementsByTagName("ui2code-toast")[0];
-    if (!toast) return;
-    if (current === null) {
-      const shadowRoot = toast?.shadowRoot;
-      if (shadowRoot && toast) {
-        const bar = shadowRoot.querySelector(".toast__progress");
+    if (current === null || !toastEl) {
+      const shadow = toastEl?.shadowRoot;
+      if (shadow && toastEl) {
+        const bar = shadow.querySelector(".toast__progress");
         if (bar) {
           bar.classList.add("no-transition");
-          toast.style.setProperty("--progress", "0");
+          toastEl.style.setProperty("--progress", "0");
           requestAnimationFrame(() => {
             bar.classList.remove("no-transition");
-            toast?.style.removeProperty("--progress");
+            toastEl?.style.removeProperty("--progress");
           });
         } else {
-          toast.style.removeProperty("--progress");
+          toastEl.style.removeProperty("--progress");
         }
+      } else if (toastEl) {
+        toastEl.style.removeProperty("--progress");
       }
-      toast?.style.removeProperty("--suffix");
-      toast?.style.removeProperty("--suffix-width");
+      toastEl?.style.removeProperty("--suffix");
+      toastEl?.style.removeProperty("--suffix-width");
       return;
     }
-    if (!toast) return;
+    if (!toastEl) return;
     const pct = Math.min(Math.ceil((current / totalNodes) * 100), 100);
     if (totalNodes > 50) {
-      toast.style.setProperty("--progress", pct.toString());
+      toastEl.style.setProperty("--progress", pct.toString());
       if (totalNodes > 100) {
-        toast.style.setProperty("--suffix", `"${pct}%"`);
-        toast.style.setProperty("--suffix-width", "48px");
+        toastEl.style.setProperty("--suffix", `"${pct.toString()}%"`);
+        toastEl.style.setProperty("--suffix-width", "48px");
       }
     } else {
-      toast.style.removeProperty("--suffix-width");
+      toastEl.style.removeProperty("--suffix-width");
     }
   }
 
-  // Check if element is collapsed/invisible via transform
   function isCollapsedByTransform(styles) {
     return (
-      ["matrix(0, 0, 0, 1, 0, 0)", "matrix(0, 0, 0, 0, 0, 0)", "scaleX(0)", "scale(0)", "scaleY(0)"].includes(
-        styles.transform || ""
-      ) && ["absolute", "fixed"].includes(styles.position || "")
+      ["matrix(0, 0, 0, 1, 0, 0)", "matrix(0, 0, 0, 0, 0, 0)", "scaleX(0)", "scale(0)", "scaleY(0)"].includes(styles.transform || "") &&
+      ["absolute", "fixed"].includes(styles.position || "")
     );
   }
 
-  // Check if element is inside an SVG
   function isInsideSVG(el) {
     let parent = el.parentElement;
     while (parent) {
@@ -366,19 +359,16 @@ async function serializeElement(selector) {
     return false;
   }
 
-  // Serialize style object to inline CSS string
   function stylesToString(styles) {
     return Object.entries(styles)
-      .map(([prop, val]) => `${prop}: ${val.replaceAll('"', "'")};`)
+      .map(([k, v]) => `${k}: ${v.replaceAll('"', "'")};`)
       .join(" ");
   }
 
-  // Escape HTML special characters
   function escapeHtml(str) {
     return str.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
   }
 
-  // Find nearest non-transparent background color from ancestors
   function findBackgroundColor(el) {
     const parent = el?.parentElement;
     if (parent) {
@@ -389,26 +379,21 @@ async function serializeElement(selector) {
     return "";
   }
 
-  // Extract computed styles that differ from defaults (the key trick!)
   function extractStyles(el, { isRoot = false, pseudo } = {}) {
     const result = {};
     const computedMap = new Map();
 
-    // Get computed styles for the element (or pseudo-element)
     if (pseudo) {
-      const computed = window.getComputedStyle(el, pseudo);
-      for (const prop of allProps) {
-        computedMap.set(prop, computed.getPropertyValue(prop));
-      }
+      const cs = window.getComputedStyle(el, pseudo);
+      for (const prop of allProps) computedMap.set(prop, cs.getPropertyValue(prop));
     } else {
-      const styleMap = el.computedStyleMap();
+      const sm = el.computedStyleMap();
       for (const prop of allProps) {
-        const val = styleMap.get(prop);
+        const val = sm.get(prop);
         if (val) computedMap.set(prop, val.toString());
       }
     }
 
-    // Create a temporary "blank" element to get browser defaults
     const defaultMap = new Map();
     const temp = document.createElement("link");
     temp.textContent = el.textContent;
@@ -430,29 +415,24 @@ async function serializeElement(selector) {
       temp.style.listStyleType = "initial";
     }
 
-    // Insert temp element adjacent to the real element
     if (el.parentElement?.lastElementChild === el) {
       el.insertAdjacentElement("afterend", temp);
     } else {
       el.insertAdjacentElement("beforebegin", temp);
     }
 
-    // Get default styles
     if (pseudo) {
-      const computed = window.getComputedStyle(temp, pseudo);
-      for (const prop of allProps) {
-        defaultMap.set(prop, computed.getPropertyValue(prop));
-      }
+      const cs = window.getComputedStyle(temp, pseudo);
+      for (const prop of allProps) defaultMap.set(prop, cs.getPropertyValue(prop));
     } else {
-      const styleMap = temp.computedStyleMap();
+      const sm = temp.computedStyleMap();
       for (const prop of allProps) {
-        const val = styleMap.get(prop);
+        const val = sm.get(prop);
         if (val) defaultMap.set(prop, val.toString());
       }
     }
     temp.remove();
 
-    // Compare: only keep properties that differ from defaults
     for (const prop of allProps) {
       const actual = computedMap.get(prop);
       const defaultVal = defaultMap.get(prop);
@@ -461,7 +441,6 @@ async function serializeElement(selector) {
       }
     }
 
-    // For root element: set explicit dimensions
     if (isRoot) {
       const rect = el.getBoundingClientRect();
       const w = Math.ceil(rect.width) + "px";
@@ -472,43 +451,34 @@ async function serializeElement(selector) {
       }
     }
 
-    // For root element: inherit background from parent if transparent
-    if (isRoot && el instanceof Element) {
-      if (!computedMap.get("background-color") || computedMap.get("background-color") === "rgba(0, 0, 0, 0)") {
-        result["background-color"] = findBackgroundColor(el);
-      }
+    if (isRoot && el instanceof Element && (!computedMap.get("background-color") || computedMap.get("background-color") === "rgba(0, 0, 0, 0)")) {
+      result["background-color"] = findBackgroundColor(el);
     }
 
-    // Handle scrollbar-gutter padding compensation
     if (result["scrollbar-gutter"]?.includes("stable") && el instanceof HTMLElement) {
-      const borderLeft = parseFloat(computedMap.get("border-left-width") || "0");
-      const borderRight = parseFloat(computedMap.get("border-right-width") || "0");
-      const scrollbarWidth = el.offsetWidth - el.clientWidth - borderLeft - borderRight;
-      if (scrollbarWidth > 0) {
-        const bothSides = result["scrollbar-gutter"].includes("both");
-        const direction = computedMap.get("direction") || "ltr";
-        const paddingRight = parseFloat(result["padding-right"] || "0");
-        const paddingLeft = parseFloat(result["padding-left"] || "0");
-        if (direction === "rtl") {
-          result["padding-left"] = paddingLeft + scrollbarWidth + "px";
-          if (bothSides) result["padding-right"] = paddingRight + scrollbarWidth + "px";
+      const bl = parseFloat(computedMap.get("border-left-width") || "0");
+      const br = parseFloat(computedMap.get("border-right-width") || "0");
+      const scrollbarW = el.offsetWidth - el.clientWidth - bl - br;
+      if (scrollbarW > 0) {
+        const both = result["scrollbar-gutter"].includes("both");
+        const dir = computedMap.get("direction") || "ltr";
+        const pr = parseFloat(result["padding-right"] || "0");
+        const pl = parseFloat(result["padding-left"] || "0");
+        if (dir === "rtl") {
+          result["padding-left"] = pl + scrollbarW + "px";
+          if (both) result["padding-right"] = pr + scrollbarW + "px";
         } else {
-          result["padding-right"] = paddingRight + scrollbarWidth + "px";
-          if (bothSides) result["padding-left"] = paddingLeft + scrollbarWidth + "px";
+          result["padding-right"] = pr + scrollbarW + "px";
+          if (both) result["padding-left"] = pl + scrollbarW + "px";
         }
       }
     }
 
-    // For pseudo-elements: skip if no content
-    if ((pseudo === "::after" || pseudo === "::before") && !result.content) {
-      return {};
-    }
+    if ((pseudo === "::after" || pseudo === "::before") && !result.content) return {};
     if (Object.keys(result).length === 0) return {};
-
     return result;
   }
 
-  // Extract visible text from a text node, preserving meaningful whitespace
   function extractText(textNode) {
     const text = textNode.textContent;
     if (!text) return "";
@@ -546,140 +516,131 @@ async function serializeElement(selector) {
     return range.getBoundingClientRect().width === 0 ? "" : " ";
   }
 
-  // Main recursive serializer
+  // Main recursive serializer — 1:1 match with Paper Snapshot's logic
   async function serialize(el, { abortSignal, dryRun = false, __isRoot = true, __processedNodes = 0 } = {}) {
     if (abortSignal?.aborted) return { html: "", processedNodes: 0 };
-
     if (!dryRun) updateProgress(__processedNodes + 1);
 
-    // Text nodes
     if (!(el instanceof Element || el instanceof SVGElement)) {
-      if (!dryRun && el instanceof Text) {
-        const text = extractText(el);
-        return { html: escapeHtml(text), processedNodes: 1 };
+      if (dryRun) return { html: "", processedNodes: 1 };
+      if (el instanceof Text) {
+        const t = extractText(el);
+        return { html: escapeHtml(t), processedNodes: 1 };
       }
       return { html: "", processedNodes: 1 };
     }
 
     const tagName = el.tagName.toLowerCase();
-    const computed = window.getComputedStyle(el);
-    const isAbsOrFixed = ["absolute", "fixed"].includes(computed.position);
+    const cs = window.getComputedStyle(el);
+    const isAbsFixed = ["absolute", "fixed"].includes(cs.position);
     const parentIsBlock = !!el.parentElement && ["block", "inline-block"].includes(window.getComputedStyle(el.parentElement).display);
+    const isZeroDim = (parseFloat(cs.height) === 0 || parseFloat(cs.width) === 0) && (isAbsFixed || parentIsBlock);
+    const isHidden = cs.display === "none";
+    const isInvisible = cs.opacity === "0" && isAbsFixed;
 
-    // Skip invisible elements
-    const isZeroDimension = (parseFloat(computed.height) === 0 || parseFloat(computed.width) === 0) && (isAbsOrFixed || parentIsBlock);
-    const isDisplayNone = computed.display === "none";
-    const isInvisible = computed.opacity === "0" && isAbsOrFixed;
-
-    if (isZeroDimension || isDisplayNone || isInvisible) {
-      return { html: "", processedNodes: 1 };
-    }
+    if (isZeroDim || isHidden || isInvisible) return { html: "", processedNodes: 1 };
 
     let processedNodes = 1;
     const children = [];
     let styles = {};
 
     if (!dryRun) {
-      // Capture ::before pseudo-element
       const beforeStyles = extractStyles(el, { pseudo: "::before" });
       if (Object.keys(beforeStyles).length && !isCollapsedByTransform(beforeStyles)) {
         children.push(`<div style="${stylesToString(beforeStyles)}"></div>`);
       }
-
       styles = extractStyles(el, { isRoot: __isRoot });
     }
 
-    // Collect attributes
-    const attrs = el.getAttributeNames().map((name) => [name, el.getAttribute(name) || ""]);
+    const attrs = el.getAttributeNames().map((n) => [n, el.getAttribute(n) || ""]);
 
-    // Process child nodes
     for (let i = 0; i < el.childNodes.length; i++) {
       const child = el.childNodes[i];
-      const nodesToProcess = [];
+      const nodes = [];
 
-      // Handle SVG <use> elements
       if (child instanceof SVGElement && child.tagName === "use") {
         const href = child.getAttribute("href") || child.getAttribute("xlink:href");
-        const referenced = document.getElementById(href?.replace("#", "") || "");
-        if (referenced) {
-          if (["symbol", "svg"].includes(referenced.tagName)) {
-            for (const attrName of referenced.getAttributeNames()) {
-              if (!["id", "class", "style"].includes(attrName) && !el.hasAttribute(attrName)) {
-                attrs.push([attrName, referenced.getAttribute(attrName)]);
+        const ref = document.getElementById(href?.replace("#", "") || "");
+        if (ref) {
+          if (["symbol", "svg"].includes(ref.tagName)) {
+            for (const an of ref.getAttributeNames()) {
+              if (!["id", "class", "style"].includes(an) && !el.hasAttribute(an)) {
+                attrs.push([an, ref.getAttribute(an)]);
               }
             }
-            nodesToProcess.push(...Array.from(referenced.childNodes));
+            nodes.push(...Array.from(ref.childNodes));
           } else {
-            nodesToProcess.push(referenced);
+            nodes.push(ref);
           }
         }
       } else if (!(el instanceof HTMLSelectElement) && child) {
-        nodesToProcess.push(child);
+        nodes.push(child);
       }
 
-      for (const node of nodesToProcess) {
-        if (!dryRun) await new Promise((r) => requestAnimationFrame(r));
-        const result = await serialize(node, {
-          abortSignal,
-          dryRun,
-          __isRoot: false,
-          __processedNodes: __processedNodes + processedNodes,
-        });
-        processedNodes += result.processedNodes;
-        if (!dryRun) children.push(result.html);
+      if (nodes.length) {
+        for (const node of nodes) {
+          if (!dryRun) await new Promise((r) => requestAnimationFrame(r));
+          const res = await serialize(node, {
+            abortSignal,
+            dryRun,
+            __isRoot: false,
+            __processedNodes: __processedNodes + processedNodes,
+          });
+          processedNodes += res.processedNodes;
+          if (!dryRun) children.push(res.html);
+        }
       }
     }
 
     if (dryRun) return { html: "", processedNodes };
 
-    // Handle input/textarea/select elements
+    // Handle form elements
     if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || el instanceof HTMLSelectElement) {
       const isInline = el instanceof HTMLInputElement || el instanceof HTMLSelectElement;
       const placeholder = el instanceof HTMLSelectElement ? el.firstElementChild?.textContent : el.placeholder;
 
       if (el.type === "text" && el.value !== "") {
-        children.push(`<div style="height: fit-content;">${el.value}</div>`);
+        const s = { height: "fit-content" };
+        children.push(`<div style="${stylesToString(s)}">${el.value}</div>`);
         if (isInline) styles["align-content"] = "center";
       } else if (placeholder) {
-        const placeholderStyles = extractStyles(el, { pseudo: "::placeholder" });
-        placeholderStyles.width = "100%";
-        placeholderStyles.height = "fit-content";
+        const ps = extractStyles(el, { pseudo: "::placeholder" });
+        ps.width = "100%";
+        ps.height = "fit-content";
         if (isInline) {
           styles["align-content"] = "center";
-          placeholderStyles["align-self"] = "center";
+          ps["align-self"] = "center";
         }
-        children.push(`<div style="${stylesToString(placeholderStyles)}">${placeholder}</div>`);
+        children.push(`<div style="${stylesToString(ps)}">${placeholder}</div>`);
       }
     }
 
-    // Capture ::after pseudo-element
+    // ::after pseudo-element
     const afterStyles = extractStyles(el, { pseudo: "::after" });
     if (Object.keys(afterStyles).length && !isCollapsedByTransform(afterStyles)) {
       children.push(`<div style="${stylesToString(afterStyles)}"></div>`);
     }
 
-    // Handle images
+    // Extra attributes (images, SVG attrs)
     const extraAttrs = [];
+
     if (el instanceof HTMLImageElement) {
       extraAttrs.push(["src", el.src]);
       if (!styles.width && !styles.height) {
-        const imgComputed = window.getComputedStyle(el);
-        styles.width = imgComputed.width;
-        styles.height = imgComputed.height;
+        const imgCs = window.getComputedStyle(el);
+        styles.width = imgCs.width;
+        styles.height = imgCs.height;
       }
     }
 
-    // Handle <br>
-    if (el instanceof HTMLBRElement) {
-      return { html: "<br>", processedNodes };
-    }
+    if (el instanceof HTMLBRElement) return { html: "<br>", processedNodes };
 
-    // Normalize tag names (table elements → div)
-    const tableElements = ["table", "thead", "tbody", "tfoot", "tr", "td", "th", "caption", "colgroup", "col"];
-    const formElements = ["input", "textarea"];
-    const outputTag = [...tableElements, ...formElements].includes(tagName) ? "div" : tagName;
+    // Normalize tag names
+    const tableTags = ["table", "thead", "tbody", "tfoot", "tr", "td", "th", "caption", "colgroup", "col"];
+    const formTags = ["input", "textarea"];
+    const outputTag = [...tableTags, ...formTags].includes(tagName) ? "div" : tagName;
 
-    // Handle SVG attributes
+    // SVG attribute handling — exact match with Paper Snapshot
     if (el instanceof SVGElement) {
       attrs.forEach(([name, val]) => {
         if (["class", "style", "display", "overflow"].includes(name) || !val) return;
@@ -699,7 +660,7 @@ async function serializeElement(selector) {
       }
     }
 
-    // Build final attributes
+    // Build style attribute
     if (Object.keys(styles).length > 0) {
       if (styles.width || styles.height) {
         styles.width ??= "auto";
@@ -708,12 +669,10 @@ async function serializeElement(selector) {
       extraAttrs.push(["style", stylesToString(styles)]);
     }
 
-    // If element is invisible in SVG context or has display:contents, unwrap children
-    if (isInsideSVG(el) || (el.checkVisibility() && styles.display === "contents")) {
-      // keep as-is with tag
-    }
-
-    if (!isInsideSVG(el) && el.checkVisibility() && styles.display !== "contents") {
+    // KEY LOGIC — exact match with Paper Snapshot:
+    // Render with tag if: isInsideSVG OR (element is visible AND not display:contents)
+    // Otherwise: just output children (unwrap the element)
+    if (isInsideSVG(el) || (el.checkVisibility() && styles.display !== "contents")) {
       return {
         html: `<${outputTag} ${extraAttrs.map(([k, v]) => `${k}="${v}"`).join(" ")}>${children.join("")}</${outputTag}>`,
         processedNodes,
@@ -723,12 +682,11 @@ async function serializeElement(selector) {
     return { html: children.join(""), processedNodes };
   }
 
-  // Find the target element and serialize
+  // Execute serialization
   const target = document.querySelector(selector);
   if (!target) return { status: "error", error: "Element not found" };
 
   const abortController = new AbortController();
-
   function onEscapeKey(e) {
     if (e.key === "Escape") {
       e.preventDefault();
@@ -738,14 +696,13 @@ async function serializeElement(selector) {
   }
   window.addEventListener("keydown", onEscapeKey, { capture: true });
 
-  // Dry run to count total nodes (for progress bar)
+  // Dry run to count nodes for progress
   updateProgress(null);
   totalNodes = (await serialize(target, { dryRun: true })).processedNodes;
   updateProgress(0);
-
   await new Promise((r) => setTimeout(r, 500));
 
-  // Actual serialization
+  // Real serialization
   const result = await serialize(target, { abortSignal: abortController.signal });
   window.removeEventListener("keydown", onEscapeKey, { capture: true });
 
