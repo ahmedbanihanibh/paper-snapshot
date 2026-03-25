@@ -653,6 +653,12 @@ async function elementSerializer(selector) {
       attributesToSerialize.push(["style", toInlineStyles(styles)]);
     }
 
+    // Preserve original class names for Claude Code to understand component structure
+    const originalClass = target.getAttribute("class");
+    if (originalClass) {
+      attributesToSerialize.push(["data-class", originalClass.replaceAll('"', "'")]);
+    }
+
     const isElementVisible = isChildOfSVG(target) || (target.checkVisibility() && styles.display !== "contents");
     if (isElementVisible) {
       const html = `<${finalTagName} ${attributesToSerialize.map(([key, value]) => `${key}="${value}"`).join(" ")}>${children.join("")}</${finalTagName}>`;
@@ -681,10 +687,79 @@ async function elementSerializer(selector) {
     window.removeEventListener("keydown", keyDownHandler, { capture: true });
 
     if (abortController.signal.aborted) return { status: "aborted" };
-    return { status: "success", html: result.html };
+
+    // Extract interactive CSS rules (hover, focus, active, transitions)
+    const interactiveCSS = extractInteractiveStyles(elementToSerialize);
+    const finalHtml = interactiveCSS
+      ? `<style>${interactiveCSS}</style>${result.html}`
+      : result.html;
+
+    return { status: "success", html: finalHtml };
   }
 
   return { status: "error", error: "Element not found" };
+
+  // Scan all stylesheets for :hover, :focus, :active, :focus-visible, :focus-within rules
+  // that apply to elements within the captured subtree
+  function extractInteractiveStyles(rootEl) {
+    const interactivePseudos = [":hover", ":focus", ":active", ":focus-visible", ":focus-within"];
+    const collectedRules = [];
+
+    // Get all elements in the subtree with their class names
+    const allElements = [rootEl, ...rootEl.querySelectorAll("*")];
+    const classSet = new Set();
+    allElements.forEach((el) => {
+      if (el.className && typeof el.className === "string") {
+        el.className.split(/\s+/).forEach((c) => { if (c) classSet.add(c); });
+      }
+    });
+
+    for (const sheet of document.styleSheets) {
+      try {
+        for (const rule of sheet.cssRules) {
+          if (!(rule instanceof CSSStyleRule)) continue;
+          const sel = rule.selectorText;
+          if (!sel) continue;
+
+          // Check if rule has interactive pseudo-class
+          const hasInteractive = interactivePseudos.some((p) => sel.includes(p));
+          if (!hasInteractive) continue;
+
+          // Check if rule references any class from our captured subtree
+          const classesInSelector = sel.match(/\.[\w-]+/g);
+          if (!classesInSelector) continue;
+          const matches = classesInSelector.some((c) => classSet.has(c.slice(1)));
+          if (!matches) continue;
+
+          // Rewrite selector to use data-class attribute instead of class
+          let newSelector = sel;
+          for (const cls of classesInSelector) {
+            const className = cls.slice(1);
+            if (classSet.has(className)) {
+              newSelector = newSelector.replaceAll(cls, `[data-class~="${className}"]`);
+            }
+          }
+
+          collectedRules.push(`${newSelector} { ${rule.style.cssText} }`);
+        }
+      } catch (e) {
+        // Cross-origin stylesheet — skip
+      }
+    }
+
+    // Also extract CSS transition/animation definitions from elements
+    allElements.forEach((el) => {
+      const cs = window.getComputedStyle(el);
+      if (cs.transitionProperty && cs.transitionProperty !== "none" && cs.transitionProperty !== "all") {
+        const className = el.className && typeof el.className === "string" ? el.className.split(/\s+/)[0] : null;
+        if (className) {
+          collectedRules.push(`/* transition on .${className}: ${cs.transitionProperty} ${cs.transitionDuration} ${cs.transitionTimingFunction} */`);
+        }
+      }
+    });
+
+    return collectedRules.length > 0 ? collectedRules.join("\n") : "";
+  }
 }
 
 // ============================================================================
@@ -958,15 +1033,17 @@ function showPreview(html) {
     Object.assign(previewScroller.style, { flex: "1", overflow: "auto", position: "relative", background: "#1a1a1a" });
 
     const previewHost = document.createElement("div");
-    Object.assign(previewHost.style, { minHeight: "100%", display: "flex", justifyContent: "center", alignItems: "flex-start", padding: "24px" });
+    Object.assign(previewHost.style, { minHeight: "100%", display: "flex", justifyContent: "center", alignItems: "center", padding: "24px", boxSizing: "border-box" });
     const shadow = previewHost.attachShadow({ mode: "open" });
     // Detect page's color-scheme to match dark/light mode rendering
     const pageColorScheme = window.getComputedStyle(document.documentElement).colorScheme ||
                             window.getComputedStyle(document.body).colorScheme || "normal";
     // Inject the serialized HTML into the shadow DOM
-    // This renders in the same page context (fonts, resources available)
-    // but isolated from page styles (shadow DOM boundary)
-    shadow.innerHTML = `<style>:host { display: contents; color-scheme: ${pageColorScheme}; }</style>${html}`;
+    // Reset all UA defaults inside shadow, inherit page fonts/color-scheme
+    shadow.innerHTML = `<style>
+      :host { display: contents; color-scheme: ${pageColorScheme}; }
+      *, *::before, *::after { box-sizing: border-box; }
+    </style>${html}`;
     previewScroller.appendChild(previewHost);
 
     // Footer
