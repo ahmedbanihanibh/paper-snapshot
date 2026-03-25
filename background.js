@@ -39,6 +39,8 @@ async function elementPicker() {
   blanket.style.inset = "0";
   blanket.style.zIndex = "2147483646";
   blanket.style.overflow = "hidden";
+  // Start with pointerEvents:none to avoid triggering popover outside-click handlers
+  blanket.style.pointerEvents = "none";
   ignoredElementsFromHitTesting.push(blanket);
 
   const outlineContainer = document.createElement("div");
@@ -111,7 +113,9 @@ async function elementPicker() {
       selectedElement = null;
     }
 
-    if (document.hasFocus() === false || document.activeElement === null || document.activeElement.tagName === "IFRAME") {
+    // Only force focus if document has no focus AND no active element
+    // Avoid calling window.focus() when popovers/dialogs are open as it triggers blur→close
+    if (document.hasFocus() === false && document.activeElement === document.body) {
       window.focus();
     }
 
@@ -163,7 +167,12 @@ async function elementPicker() {
     }
 
     function pointerDownHandler(e) {
-      if (nextTickState !== "complete" && nextTickState !== "completing") { e.preventDefault(); e.stopPropagation(); }
+      // Only intercept events when picker is active (not in 'wait' state)
+      // During 'wait', let events pass through so popovers stay open
+      if (nextTickState !== "complete" && nextTickState !== "completing" && nextTickState !== "wait") {
+        e.preventDefault();
+        e.stopPropagation();
+      }
     }
 
     function completeSelectionHandler(e) {
@@ -1358,18 +1367,8 @@ chrome.action.onClicked.addListener(async (tab) => {
   await chrome.action.disable(tab.id);
 
   try {
-    const [focusResult] = await chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      func: () => document.hasFocus(),
-    });
-
-    if (focusResult?.result === false) {
-      await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        func: clickToStartOverlay,
-      });
-    }
-
+    // Skip the click-to-focus overlay — it closes popovers.
+    // Instead, just show the toast (which doesn't steal focus) and start the picker.
     await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       func: showToast,
