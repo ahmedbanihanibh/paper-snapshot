@@ -714,9 +714,15 @@ async function elementSerializer(selector) {
       return `${before}style="${cleaned}"`;
     });
 
-    const finalHtml = interactiveCSS
-      ? `<style>${interactiveCSS}</style>${rootHtml}`
-      : rootHtml;
+    // Structure output for Claude Code readability:
+    // 1. Instruction header
+    // 2. Component HTML with inline styles (the main content)
+    // 3. Interactive CSS rules at the end as reference
+    let finalHtml = `<!-- UI SNAPSHOT: Convert this captured HTML to a React component.\n     All visual styles are inline. Original CSS classes are in data-class attributes.\n     Implement hover/focus/active states based on the interactive CSS below. -->\n`;
+    finalHtml += rootHtml;
+    if (interactiveCSS) {
+      finalHtml += `\n<!-- INTERACTIVE STYLES (hover/focus/active) for reference: -->\n<style>${interactiveCSS}</style>`;
+    }
 
     return { status: "success", html: finalHtml };
   }
