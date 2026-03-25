@@ -1080,6 +1080,349 @@ function showFocusPrompt() {
 }
 
 // ============================================================================
+// PREVIEW: Show captured HTML in a preview overlay with iframe
+// ============================================================================
+function showPreview(html) {
+  return new Promise((resolve) => {
+    // Backdrop
+    const backdrop = document.createElement("div");
+    backdrop.id = "ui2code-preview-backdrop";
+    Object.assign(backdrop.style, {
+      position: "fixed",
+      inset: "0",
+      zIndex: "2147483647",
+      background: "rgba(0, 0, 0, 0.6)",
+      backdropFilter: "blur(4px)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif",
+      opacity: "0",
+      transition: "opacity 200ms ease-out",
+    });
+
+    // Panel
+    const panel = document.createElement("div");
+    Object.assign(panel.style, {
+      background: "#1c1c1e",
+      borderRadius: "16px",
+      boxShadow: "0 24px 80px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08)",
+      display: "flex",
+      flexDirection: "column",
+      maxWidth: "90vw",
+      maxHeight: "90vh",
+      minWidth: "480px",
+      minHeight: "360px",
+      width: "75vw",
+      height: "80vh",
+      overflow: "hidden",
+      transform: "scale(0.96) translateY(8px)",
+      transition: "transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1)",
+    });
+
+    // Header bar
+    const header = document.createElement("div");
+    Object.assign(header.style, {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      padding: "16px 20px",
+      borderBottom: "1px solid rgba(255,255,255,0.08)",
+      flexShrink: "0",
+    });
+
+    const title = document.createElement("div");
+    Object.assign(title.style, {
+      color: "rgba(255,255,255,0.9)",
+      fontSize: "14px",
+      fontWeight: "600",
+      letterSpacing: "-0.01em",
+    });
+    title.textContent = "Preview Captured Element";
+
+    const headerRight = document.createElement("div");
+    Object.assign(headerRight.style, {
+      display: "flex",
+      gap: "8px",
+      alignItems: "center",
+    });
+
+    // Size info label
+    const sizeLabel = document.createElement("div");
+    Object.assign(sizeLabel.style, {
+      color: "rgba(255,255,255,0.4)",
+      fontSize: "12px",
+      fontVariantNumeric: "tabular-nums",
+      marginRight: "8px",
+    });
+    const htmlSizeKB = (new Blob([html]).size / 1024).toFixed(1);
+    sizeLabel.textContent = `${htmlSizeKB} KB`;
+
+    // Cancel button
+    const cancelBtn = document.createElement("button");
+    Object.assign(cancelBtn.style, {
+      background: "rgba(255,255,255,0.08)",
+      border: "1px solid rgba(255,255,255,0.1)",
+      borderRadius: "8px",
+      color: "rgba(255,255,255,0.7)",
+      cursor: "pointer",
+      fontSize: "13px",
+      fontWeight: "500",
+      padding: "6px 16px",
+      fontFamily: "inherit",
+      transition: "all 150ms ease",
+    });
+    cancelBtn.textContent = "Cancel";
+    cancelBtn.addEventListener("mouseenter", () => {
+      cancelBtn.style.background = "rgba(255,255,255,0.12)";
+      cancelBtn.style.color = "rgba(255,255,255,0.9)";
+    });
+    cancelBtn.addEventListener("mouseleave", () => {
+      cancelBtn.style.background = "rgba(255,255,255,0.08)";
+      cancelBtn.style.color = "rgba(255,255,255,0.7)";
+    });
+
+    // Copy button
+    const copyBtn = document.createElement("button");
+    Object.assign(copyBtn.style, {
+      background: "#6366f1",
+      border: "1px solid rgba(255,255,255,0.1)",
+      borderRadius: "8px",
+      color: "#fff",
+      cursor: "pointer",
+      fontSize: "13px",
+      fontWeight: "600",
+      padding: "6px 20px",
+      fontFamily: "inherit",
+      transition: "all 150ms ease",
+      boxShadow: "0 1px 3px rgba(99,102,241,0.3)",
+    });
+    copyBtn.textContent = "Copy to Clipboard";
+    copyBtn.addEventListener("mouseenter", () => {
+      copyBtn.style.background = "#818cf8";
+    });
+    copyBtn.addEventListener("mouseleave", () => {
+      copyBtn.style.background = "#6366f1";
+    });
+
+    headerRight.appendChild(sizeLabel);
+    headerRight.appendChild(cancelBtn);
+    headerRight.appendChild(copyBtn);
+    header.appendChild(title);
+    header.appendChild(headerRight);
+
+    // Toolbar: background toggle + zoom
+    const toolbar = document.createElement("div");
+    Object.assign(toolbar.style, {
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",
+      padding: "8px 20px",
+      borderBottom: "1px solid rgba(255,255,255,0.06)",
+      flexShrink: "0",
+    });
+
+    let currentBg = "#1a1a1a";
+    const bgOptions = [
+      { label: "Dark", value: "#1a1a1a" },
+      { label: "Light", value: "#ffffff" },
+      { label: "Checkerboard", value: "checkerboard" },
+    ];
+
+    const bgLabel = document.createElement("span");
+    Object.assign(bgLabel.style, { color: "rgba(255,255,255,0.4)", fontSize: "12px" });
+    bgLabel.textContent = "Background:";
+    toolbar.appendChild(bgLabel);
+
+    const bgBtns = [];
+    bgOptions.forEach((opt) => {
+      const btn = document.createElement("button");
+      Object.assign(btn.style, {
+        background: opt.value === "checkerboard"
+          ? "repeating-conic-gradient(#808080 0% 25%, #c0c0c0 0% 50%) 50%/12px 12px"
+          : opt.value,
+        border: opt.value === currentBg ? "2px solid #6366f1" : "2px solid rgba(255,255,255,0.15)",
+        borderRadius: "6px",
+        width: "24px",
+        height: "24px",
+        cursor: "pointer",
+        transition: "border-color 150ms ease",
+        padding: "0",
+        flexShrink: "0",
+      });
+      btn.title = opt.label;
+      btn.addEventListener("click", () => {
+        currentBg = opt.value;
+        bgBtns.forEach((b) => (b.style.border = "2px solid rgba(255,255,255,0.15)"));
+        btn.style.border = "2px solid #6366f1";
+        updateIframeBg();
+      });
+      bgBtns.push(btn);
+      toolbar.appendChild(btn);
+    });
+
+    // Zoom controls
+    const zoomSpacer = document.createElement("div");
+    zoomSpacer.style.flex = "1";
+    toolbar.appendChild(zoomSpacer);
+
+    let zoom = 100;
+    const zoomLabel = document.createElement("span");
+    Object.assign(zoomLabel.style, {
+      color: "rgba(255,255,255,0.5)",
+      fontSize: "12px",
+      fontVariantNumeric: "tabular-nums",
+      minWidth: "36px",
+      textAlign: "center",
+    });
+    zoomLabel.textContent = "100%";
+
+    function makeZoomBtn(text) {
+      const btn = document.createElement("button");
+      Object.assign(btn.style, {
+        background: "rgba(255,255,255,0.08)",
+        border: "1px solid rgba(255,255,255,0.1)",
+        borderRadius: "6px",
+        color: "rgba(255,255,255,0.7)",
+        cursor: "pointer",
+        fontSize: "14px",
+        fontWeight: "600",
+        width: "28px",
+        height: "28px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "0",
+        fontFamily: "inherit",
+        transition: "all 150ms ease",
+      });
+      btn.textContent = text;
+      btn.addEventListener("mouseenter", () => { btn.style.background = "rgba(255,255,255,0.14)"; });
+      btn.addEventListener("mouseleave", () => { btn.style.background = "rgba(255,255,255,0.08)"; });
+      return btn;
+    }
+
+    const zoomOutBtn = makeZoomBtn("−");
+    const zoomInBtn = makeZoomBtn("+");
+
+    function updateZoom() {
+      zoomLabel.textContent = `${zoom}%`;
+      const iframeDoc = iframe.contentDocument;
+      if (iframeDoc?.body) {
+        iframeDoc.body.style.transform = `scale(${zoom / 100})`;
+        iframeDoc.body.style.transformOrigin = "top left";
+      }
+    }
+
+    zoomOutBtn.addEventListener("click", () => {
+      zoom = Math.max(25, zoom - 25);
+      updateZoom();
+    });
+    zoomInBtn.addEventListener("click", () => {
+      zoom = Math.min(200, zoom + 25);
+      updateZoom();
+    });
+
+    toolbar.appendChild(zoomOutBtn);
+    toolbar.appendChild(zoomLabel);
+    toolbar.appendChild(zoomInBtn);
+
+    // Iframe container
+    const iframeContainer = document.createElement("div");
+    Object.assign(iframeContainer.style, {
+      flex: "1",
+      overflow: "auto",
+      position: "relative",
+    });
+
+    const iframe = document.createElement("iframe");
+    Object.assign(iframe.style, {
+      border: "none",
+      width: "100%",
+      height: "100%",
+    });
+    iframe.sandbox = "allow-same-origin";
+
+    function updateIframeBg() {
+      const iframeDoc = iframe.contentDocument;
+      if (!iframeDoc?.body) return;
+      if (currentBg === "checkerboard") {
+        iframeDoc.body.style.background = "repeating-conic-gradient(#e0e0e0 0% 25%, #ffffff 0% 50%) 50%/20px 20px";
+      } else {
+        iframeDoc.body.style.background = currentBg;
+      }
+    }
+
+    iframeContainer.appendChild(iframe);
+
+    // Footer with hint
+    const footer = document.createElement("div");
+    Object.assign(footer.style, {
+      padding: "10px 20px",
+      borderTop: "1px solid rgba(255,255,255,0.06)",
+      color: "rgba(255,255,255,0.35)",
+      fontSize: "12px",
+      textAlign: "center",
+      flexShrink: "0",
+    });
+    footer.textContent = "Paste into Claude Code → ask to convert to React component";
+
+    // Assemble
+    panel.appendChild(header);
+    panel.appendChild(toolbar);
+    panel.appendChild(iframeContainer);
+    panel.appendChild(footer);
+    backdrop.appendChild(panel);
+    document.body.appendChild(backdrop);
+
+    // Write HTML into iframe
+    requestAnimationFrame(() => {
+      const iframeDoc = iframe.contentDocument;
+      if (iframeDoc) {
+        iframeDoc.open();
+        iframeDoc.write(`<!DOCTYPE html><html><head><style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { display: flex; align-items: flex-start; justify-content: center; padding: 24px; min-height: 100vh; }
+        </style></head><body>${html}</body></html>`);
+        iframeDoc.close();
+        updateIframeBg();
+      }
+
+      // Animate in
+      backdrop.style.opacity = "1";
+      panel.style.transform = "scale(1) translateY(0)";
+    });
+
+    // Cleanup function
+    function close(action) {
+      backdrop.style.opacity = "0";
+      panel.style.transform = "scale(0.96) translateY(8px)";
+      panel.style.transition = "transform 150ms ease-in";
+      backdrop.style.transition = "opacity 150ms ease-in";
+      setTimeout(() => { backdrop.remove(); resolve(action); }, 160);
+    }
+
+    cancelBtn.addEventListener("click", () => close("cancel"));
+    copyBtn.addEventListener("click", () => close("copy"));
+    backdrop.addEventListener("click", (e) => {
+      if (e.target === backdrop) close("cancel");
+    });
+    document.addEventListener("keydown", function onKey(e) {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        document.removeEventListener("keydown", onKey, { capture: true });
+        close("cancel");
+      }
+      if (e.key === "Enter") {
+        e.preventDefault();
+        document.removeEventListener("keydown", onKey, { capture: true });
+        close("copy");
+      }
+    }, { capture: true });
+  });
+}
+
+// ============================================================================
 // BACKGROUND SERVICE WORKER: Orchestrates the full flow
 // ============================================================================
 chrome.action.onClicked.addListener(async (tab) => {
@@ -1144,18 +1487,43 @@ chrome.action.onClicked.addListener(async (tab) => {
         const data = serializeResult[0]?.result;
 
         if (data.status === "success") {
-          // Copy to clipboard as plain text HTML
+          // Dismiss the capturing toast before showing preview
           await chrome.scripting.executeScript({
             target: { tabId: tab.id },
-            func: copyToClipboard,
+            func: dismissToast,
+            args: [{ immediate: true }],
+          });
+
+          // Show preview overlay with iframe
+          const [previewResult] = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: showPreview,
             args: [data.html],
           });
 
-          await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            func: showToast,
-            args: ["Copied! Paste the HTML into Claude Code to generate React components."],
-          });
+          const action = previewResult?.result;
+
+          if (action === "copy") {
+            // User confirmed — copy to clipboard
+            await chrome.scripting.executeScript({
+              target: { tabId: tab.id },
+              func: copyToClipboard,
+              args: [data.html],
+            });
+
+            await chrome.scripting.executeScript({
+              target: { tabId: tab.id },
+              func: showToast,
+              args: ["Copied! Paste the HTML into Claude Code to generate React components."],
+            });
+          } else {
+            // User cancelled
+            await chrome.scripting.executeScript({
+              target: { tabId: tab.id },
+              func: showToast,
+              args: ["Cancelled", { iconColor: "#CCCCCC", dismissTimeout: 2000 }],
+            });
+          }
         } else if (data.status === "error") {
           await chrome.scripting.executeScript({
             target: { tabId: tab.id },
