@@ -700,11 +700,10 @@ async function elementSerializer(selector) {
 
     if (abortController.signal.aborted) return { status: "aborted" };
 
-    // Extract interactive CSS rules (hover, focus, active, transitions)
+    // Extract interactive CSS rules
     const interactiveCSS = extractInteractiveStyles(elementToSerialize);
 
-    // Strip positioning styles from the root element that only make sense
-    // in the original page context (z-index, pointer-events)
+    // Strip page-only positioning from root
     let rootHtml = result.html;
     rootHtml = rootHtml.replace(/^(<\w+\s[^>]*?)style="([^"]*)"/, (match, before, styleStr) => {
       const cleaned = styleStr
@@ -714,20 +713,87 @@ async function elementSerializer(selector) {
       return `${before}style="${cleaned}"`;
     });
 
-    // Structure output for Claude Code readability:
-    // 1. Instruction header
-    // 2. Component HTML with inline styles (the main content)
-    // 3. Interactive CSS rules at the end as reference
-    let finalHtml = `<!-- UI SNAPSHOT: Convert this captured HTML to a React component.\n     All visual styles are inline. Original CSS classes are in data-class attributes.\n     Implement hover/focus/active states based on the interactive CSS below. -->\n`;
-    finalHtml += rootHtml;
+    // RAW HTML version (for HTML viewers, paper.design, etc.)
+    const rawHtml = rootHtml;
+
+    // CLAUDE CODE version: simplify CSS for AI readability
+    const simplifiedHtml = simplifyStyles(rootHtml);
+    let claudeHtml = `<!-- UI SNAPSHOT: Recreate this component as a React component with Tailwind CSS.\n     Match the EXACT visual appearance: colors, spacing, typography, icons, layout.\n     Each element has inline styles showing the exact computed values.\n     Original CSS classes are in data-class attributes for reference. -->\n`;
+    claudeHtml += simplifiedHtml;
     if (interactiveCSS) {
-      finalHtml += `\n<!-- INTERACTIVE STYLES (hover/focus/active) for reference: -->\n<style>${interactiveCSS}</style>`;
+      claudeHtml += `\n<!-- HOVER/FOCUS/ACTIVE states: -->\n<style>${interactiveCSS}</style>`;
     }
 
-    return { status: "success", html: finalHtml };
+    return { status: "success", html: claudeHtml, rawHtml: rawHtml };
   }
 
   return { status: "error", error: "Element not found" };
+
+  // Remove redundant CSS properties that duplicate shorthands or inherit from color
+  function simplifyStyles(html) {
+    // Properties to remove (they duplicate shorthand or are browser-internal)
+    const redundantProps = new Set([
+      "border-block-end-color", "border-block-start-color",
+      "border-inline-end-color", "border-inline-start-color",
+      "border-end-end-radius", "border-end-start-radius",
+      "border-start-end-radius", "border-start-start-radius",
+      "padding-block-end", "padding-block-start",
+      "padding-inline-end", "padding-inline-start",
+      "margin-block-end", "margin-block-start",
+      "margin-inline-end", "margin-inline-start",
+      "inline-size", "block-size",
+      "caret-color", "column-rule-color", "text-emphasis-color",
+      "-webkit-text-fill-color", "-webkit-text-stroke-color",
+      "unicode-bidi", "-webkit-tap-highlight-color",
+    ]);
+
+    // Properties that duplicate `color` value — remove if same as color
+    const colorDupes = new Set([
+      "outline-color", "text-decoration-color",
+    ]);
+
+    return html.replace(/style="([^"]*)"/g, (match, styleStr) => {
+      const props = {};
+      let colorVal = null;
+
+      // Parse into map
+      for (const part of styleStr.split(";")) {
+        const idx = part.indexOf(":");
+        if (idx < 0) continue;
+        const name = part.slice(0, idx).trim();
+        const val = part.slice(idx + 1).trim();
+        if (!name) continue;
+        if (name === "color") colorVal = val;
+        props[name] = val;
+      }
+
+      // Remove redundant
+      for (const name of redundantProps) {
+        delete props[name];
+      }
+
+      // Remove color duplicates that match `color`
+      if (colorVal) {
+        for (const name of colorDupes) {
+          if (props[name] === colorVal) delete props[name];
+        }
+      }
+
+      // Consolidate border-radius if all 4 corners are the same
+      const br = ["border-top-left-radius", "border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius"];
+      const brVals = br.map((p) => props[p]).filter(Boolean);
+      if (brVals.length === 4 && new Set(brVals).size === 1) {
+        props["border-radius"] = brVals[0];
+        br.forEach((p) => delete props[p]);
+      }
+
+      // Rebuild
+      const simplified = Object.entries(props)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join("; ");
+      return `style="${simplified}"`;
+    });
+  }
 
   // Scan stylesheets for :hover, :focus, :active rules that apply to captured elements.
   // Uses element.matches() for precise matching instead of class-name guessing.
@@ -1047,13 +1113,21 @@ function showPreview(html) {
     cancelBtn.onmouseenter = () => { cancelBtn.style.background = "rgba(255,255,255,0.12)"; cancelBtn.style.color = "rgba(255,255,255,0.9)"; };
     cancelBtn.onmouseleave = () => { cancelBtn.style.background = "rgba(255,255,255,0.08)"; cancelBtn.style.color = "rgba(255,255,255,0.7)"; };
 
-    const copyBtn = document.createElement("button");
-    Object.assign(copyBtn.style, { background: "#6366f1", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#fff", cursor: "pointer", fontSize: "13px", fontWeight: "600", padding: "6px 20px", fontFamily: "inherit", transition: "all 150ms ease", boxShadow: "0 1px 3px rgba(99,102,241,0.3)" });
-    copyBtn.textContent = "Copy to Clipboard";
-    copyBtn.onmouseenter = () => { copyBtn.style.background = "#818cf8"; };
-    copyBtn.onmouseleave = () => { copyBtn.style.background = "#6366f1"; };
+    const copyRawBtn = document.createElement("button");
+    Object.assign(copyRawBtn.style, { background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "12px", fontWeight: "500", padding: "6px 12px", fontFamily: "inherit", transition: "all 150ms ease" });
+    copyRawBtn.textContent = "Copy HTML";
+    copyRawBtn.title = "Copy raw HTML source (for HTML viewers, paper.design)";
+    copyRawBtn.onmouseenter = () => { copyRawBtn.style.background = "rgba(255,255,255,0.14)"; copyRawBtn.style.color = "rgba(255,255,255,0.9)"; };
+    copyRawBtn.onmouseleave = () => { copyRawBtn.style.background = "rgba(255,255,255,0.08)"; copyRawBtn.style.color = "rgba(255,255,255,0.7)"; };
 
-    headerRight.append(sizeLabel, cancelBtn, copyBtn);
+    const copyAIBtn = document.createElement("button");
+    Object.assign(copyAIBtn.style, { background: "#6366f1", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#fff", cursor: "pointer", fontSize: "12px", fontWeight: "600", padding: "6px 14px", fontFamily: "inherit", transition: "all 150ms ease", boxShadow: "0 1px 3px rgba(99,102,241,0.3)" });
+    copyAIBtn.textContent = "Copy for Claude/v0";
+    copyAIBtn.title = "Copy simplified + annotated HTML for AI tools";
+    copyAIBtn.onmouseenter = () => { copyAIBtn.style.background = "#818cf8"; };
+    copyAIBtn.onmouseleave = () => { copyAIBtn.style.background = "#6366f1"; };
+
+    headerRight.append(sizeLabel, cancelBtn, copyRawBtn, copyAIBtn);
     header.append(title, headerRight);
 
     // Toolbar with zoom controls
@@ -1160,12 +1234,13 @@ function showPreview(html) {
     }
 
     cancelBtn.addEventListener("click", () => close("cancel"));
-    copyBtn.addEventListener("click", () => close("copy"));
+    copyRawBtn.addEventListener("click", () => close("copy-raw"));
+    copyAIBtn.addEventListener("click", () => close("copy-ai"));
     backdrop.addEventListener("click", (e) => { if (e.target === backdrop) close("cancel"); });
 
     function onKey(e) {
       if (e.key === "Escape") { e.preventDefault(); document.removeEventListener("keydown", onKey, { capture: true }); close("cancel"); }
-      if (e.key === "Enter") { e.preventDefault(); document.removeEventListener("keydown", onKey, { capture: true }); close("copy"); }
+      if (e.key === "Enter") { e.preventDefault(); document.removeEventListener("keydown", onKey, { capture: true }); close("copy-ai"); }
     }
     document.addEventListener("keydown", onKey, { capture: true });
   });
@@ -1253,7 +1328,7 @@ chrome.action.onClicked.addListener(async (tab) => {
               });
 
               const action = previewResult?.result;
-              if (action === "copy") {
+              if (action === "copy-ai") {
                 await chrome.scripting.executeScript({
                   target: { tabId: tab.id },
                   func: copyToClipboard,
@@ -1262,7 +1337,18 @@ chrome.action.onClicked.addListener(async (tab) => {
                 await chrome.scripting.executeScript({
                   target: { tabId: tab.id },
                   func: showToast,
-                  args: ["Copied! Paste the HTML into Claude Code to generate React components."],
+                  args: ["Copied for Claude/v0! Paste to generate React components."],
+                });
+              } else if (action === "copy-raw") {
+                await chrome.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  func: copyToClipboard,
+                  args: [serializationResult.rawHtml],
+                });
+                await chrome.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  func: showToast,
+                  args: ["Copied raw HTML!"],
                 });
               } else {
                 await chrome.scripting.executeScript({
