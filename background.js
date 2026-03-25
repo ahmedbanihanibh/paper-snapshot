@@ -146,11 +146,18 @@ async function elementPicker() {
 
   return new Promise((resolve) => {
     function cleanup() {
-      setTimeout(() => { blanket.remove(); outline.remove(); outlineContainer.remove(); }, 21);
+      // DON'T remove blanket/outline yet — keep them alive to prevent
+      // popovers from closing before serialization completes.
+      // The processing indicator's blanket will take over, and
+      // hideProcessingIndicator will clean up everything.
+      // Only hide the outline visually.
+      outline.style.opacity = "0";
       disposables.forEach((dispose) => dispose());
       window.removeEventListener("pointermove", onPointerMove);
       notifyOtherDocuments("TRANSFER_PAPER_COMPLETED");
       nextTickState = "complete";
+      // Schedule a delayed cleanup as fallback (in case serialization doesn't run)
+      setTimeout(() => { blanket.remove(); outline.remove(); outlineContainer.remove(); }, 10000);
     }
 
     const disposables = [
@@ -167,9 +174,7 @@ async function elementPicker() {
     }
 
     function pointerDownHandler(e) {
-      // Only intercept events when picker is active (not in 'wait' state)
-      // During 'wait', let events pass through so popovers stay open
-      if (nextTickState !== "complete" && nextTickState !== "completing" && nextTickState !== "wait") {
+      if (nextTickState !== "complete" && nextTickState !== "completing") {
         e.preventDefault();
         e.stopPropagation();
       }
@@ -1128,10 +1133,18 @@ function showProcessingIndicator(selector) {
 
 function hideProcessingIndicator() {
   const indicator = document.getElementById("ui2code-indicator");
-  if (!indicator) return;
-  indicator.style.animation = "__ui2code-fade-out 200ms ease-in forwards";
-  const cleanup = () => { ["ui2code-blanket", "ui2code-indicator", "ui2code-picker-outline", "ui2code-indicator-styles"].forEach((id) => document.getElementById(id)?.remove()); };
-  indicator.addEventListener("transitionend", cleanup, { once: true });
+  if (indicator) {
+    indicator.style.animation = "__ui2code-fade-out 200ms ease-in forwards";
+  }
+  // Clean up both processing indicator AND leftover picker elements
+  const cleanup = () => {
+    ["ui2code-blanket", "ui2code-indicator", "ui2code-picker-outline", "ui2code-indicator-styles"].forEach((id) => document.getElementById(id)?.remove());
+    // Also remove any leftover picker blanket/outline elements
+    document.querySelectorAll("[data-ui2code-picker]").forEach((el) => el.removeAttribute("data-ui2code-picker"));
+  };
+  if (indicator) {
+    indicator.addEventListener("transitionend", cleanup, { once: true });
+  }
   setTimeout(cleanup, 300);
 }
 
