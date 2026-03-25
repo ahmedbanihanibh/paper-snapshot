@@ -696,28 +696,19 @@ async function elementSerializer(selector) {
     const interactiveCSS = extractInteractiveStyles(elementToSerialize);
 
     // Strip positioning styles from the root element that only make sense
-    // in the original page context (position, z-index, pointer-events, inset)
+    // in the original page context (z-index, pointer-events)
     let rootHtml = result.html;
     rootHtml = rootHtml.replace(/^(<\w+\s[^>]*?)style="([^"]*)"/, (match, before, styleStr) => {
       const cleaned = styleStr
         .replace(/\bz-index:\s*[^;]+;?\s*/g, "")
         .replace(/\bpointer-events:\s*[^;]+;?\s*/g, "")
-        .replace(/\binset[^:]*:\s*[^;]+;?\s*/g, "")
-        .replace(/\btop:\s*[^;]+;?\s*/g, "")
-        .replace(/\bleft:\s*[^;]+;?\s*/g, "")
-        .replace(/\bright:\s*[^;]+;?\s*/g, "")
-        .replace(/\bbottom:\s*[^;]+;?\s*/g, "")
         .trim();
       return `${before}style="${cleaned}"`;
     });
 
-    // Wrap in a centering container so it renders correctly in any HTML viewer
-    const pageColorScheme = window.getComputedStyle(document.documentElement).colorScheme || "";
-    const wrapper = `<div style="display:flex;justify-content:center;align-items:flex-start;padding:24px;min-height:100vh;${pageColorScheme ? `color-scheme:${pageColorScheme};` : ""}">${rootHtml}</div>`;
-
     const finalHtml = interactiveCSS
-      ? `<style>${interactiveCSS}</style>${wrapper}`
-      : wrapper;
+      ? `<style>${interactiveCSS}</style>${rootHtml}`
+      : rootHtml;
 
     return { status: "success", html: finalHtml };
   }
@@ -1051,30 +1042,93 @@ function showPreview(html) {
     headerRight.append(sizeLabel, cancelBtn, copyBtn);
     header.append(title, headerRight);
 
+    // Toolbar with zoom controls
+    const toolbar = document.createElement("div");
+    Object.assign(toolbar.style, { display: "flex", alignItems: "center", gap: "8px", padding: "8px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: "0" });
+
+    let zoom = 100;
+    const zoomLabel = document.createElement("span");
+    Object.assign(zoomLabel.style, { color: "rgba(255,255,255,0.5)", fontSize: "12px", fontVariantNumeric: "tabular-nums", minWidth: "40px", textAlign: "center" });
+    zoomLabel.textContent = "100%";
+
+    function makeBtn(text, title) {
+      const btn = document.createElement("button");
+      Object.assign(btn.style, { background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "6px", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "13px", fontWeight: "600", width: "28px", height: "28px", display: "flex", alignItems: "center", justifyContent: "center", padding: "0", fontFamily: "inherit", transition: "all 150ms ease" });
+      btn.textContent = text;
+      btn.title = title;
+      btn.onmouseenter = () => { btn.style.background = "rgba(255,255,255,0.14)"; };
+      btn.onmouseleave = () => { btn.style.background = "rgba(255,255,255,0.08)"; };
+      return btn;
+    }
+
+    const zoomOutBtn = makeBtn("\u2212", "Zoom out");
+    const zoomInBtn = makeBtn("+", "Zoom in");
+    const fitBtn = makeBtn("\u2922", "Fit to view");
+
+    function updateZoom() {
+      zoomLabel.textContent = `${zoom}%`;
+      previewHost.style.transform = `scale(${zoom / 100})`;
+      previewHost.style.transformOrigin = "top center";
+    }
+
+    zoomOutBtn.addEventListener("click", () => { zoom = Math.max(25, zoom - 25); updateZoom(); });
+    zoomInBtn.addEventListener("click", () => { zoom = Math.min(300, zoom + 25); updateZoom(); });
+    fitBtn.addEventListener("click", () => {
+      // Auto-fit: calculate zoom to fit content in view
+      const scrollerRect = previewScroller.getBoundingClientRect();
+      const hostRect = previewHost.getBoundingClientRect();
+      if (hostRect.width > 0 && hostRect.height > 0) {
+        const currentScale = zoom / 100;
+        const realW = hostRect.width / currentScale;
+        const realH = hostRect.height / currentScale;
+        const fitW = (scrollerRect.width - 48) / realW;
+        const fitH = (scrollerRect.height - 48) / realH;
+        zoom = Math.round(Math.min(fitW, fitH, 1) * 100 / 25) * 25;
+        zoom = Math.max(25, Math.min(300, zoom));
+      } else {
+        zoom = 100;
+      }
+      updateZoom();
+    });
+
+    const zoomLabelText = document.createElement("span");
+    Object.assign(zoomLabelText.style, { color: "rgba(255,255,255,0.4)", fontSize: "12px" });
+    zoomLabelText.textContent = "Zoom:";
+
+    toolbar.append(zoomLabelText, zoomOutBtn, zoomLabel, zoomInBtn, fitBtn);
+
     // Preview container using Shadow DOM for style isolation
     const previewScroller = document.createElement("div");
     Object.assign(previewScroller.style, { flex: "1", overflow: "auto", position: "relative", background: "#1a1a1a" });
 
     const previewHost = document.createElement("div");
-    Object.assign(previewHost.style, { minHeight: "100%", display: "flex", justifyContent: "center", alignItems: "center", padding: "24px", boxSizing: "border-box" });
+    Object.assign(previewHost.style, { minHeight: "100%", display: "flex", justifyContent: "center", alignItems: "flex-start", padding: "24px", boxSizing: "border-box", transition: "transform 150ms ease" });
     const shadow = previewHost.attachShadow({ mode: "open" });
     // Detect page's color-scheme to match dark/light mode rendering
     const pageColorScheme = window.getComputedStyle(document.documentElement).colorScheme ||
                             window.getComputedStyle(document.body).colorScheme || "normal";
     // Inject the serialized HTML into the shadow DOM
-    // Reset all UA defaults inside shadow, inherit page fonts/color-scheme
     shadow.innerHTML = `<style>
       :host { display: contents; color-scheme: ${pageColorScheme}; }
       *, *::before, *::after { box-sizing: border-box; }
     </style>${html}`;
     previewScroller.appendChild(previewHost);
 
+    // Scroll wheel zoom
+    previewScroller.addEventListener("wheel", (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        zoom = Math.max(25, Math.min(300, zoom + (e.deltaY < 0 ? 10 : -10)));
+        updateZoom();
+      }
+    }, { passive: false });
+
     // Footer
     const footer = document.createElement("div");
     Object.assign(footer.style, { padding: "10px 20px", borderTop: "1px solid rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.35)", fontSize: "12px", textAlign: "center", flexShrink: "0" });
-    footer.textContent = "Paste into Claude Code \u2192 ask to convert to React component";
+    footer.textContent = "Paste into Claude Code \u2192 ask to convert to React component  \u00b7  Ctrl+scroll to zoom";
 
-    panel.append(header, previewScroller, footer);
+    panel.append(header, toolbar, previewScroller, footer);
     backdrop.appendChild(panel);
     document.body.appendChild(backdrop);
 
