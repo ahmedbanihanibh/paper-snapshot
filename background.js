@@ -1175,134 +1175,143 @@ function showPreview(html) {
 // BACKGROUND SERVICE WORKER — Orchestration
 // ============================================================================
 chrome.action.onClicked.addListener(async (tab) => {
-  await chrome.action.disable(tab.id);
-
-  const [focusResult] = await chrome.scripting.executeScript({
-    target: { tabId: tab.id },
-    func: () => document.hasFocus(),
-  });
-
-  if (focusResult?.result === false) {
-    await chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      func: clickToStartOverlay,
-    });
+  // Guard: skip restricted URLs that extensions can't access
+  const url = tab.url || "";
+  if (url.startsWith("chrome://") || url.startsWith("edge://") || url.startsWith("about:") || url.startsWith("chrome-extension://") || url.startsWith("extension://")) {
+    console.warn("UI to Code Snapshot: Cannot run on restricted page:", url);
+    return;
   }
 
-  await chrome.scripting.executeScript({
-    target: { tabId: tab.id },
-    func: showToast,
-    args: [
-      'Click or <kbd>\u21b5</kbd> to capture <span class="dot">\u00b7</span> <span><kbd>\u2191</kbd><kbd>\u2193</kbd></span> to fine-tune <span class="dot">\u00b7</span> <kbd>esc</kbd> to cancel',
-      { dismissTimeout: 0, hideOnHover: true, messageClassName: "initial" },
-    ],
-  });
+  await chrome.action.disable(tab.id);
 
-  chrome.scripting.executeScript(
-    { target: { tabId: tab.id, allFrames: true }, func: elementPicker },
-    async (results) => {
-      try {
-      const result = results?.find((res) => !!res.result);
+  try {
+    const [focusResult] = await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: () => document.hasFocus(),
+    });
 
-      if (result) {
-        const frameId = result.frameId;
-        const selector = result.result;
-
-        await chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          func: showProcessingIndicator,
-          args: [selector],
-        });
-
-        await chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          func: showToast,
-          args: ["Capturing selection...", { iconColor: "#CCCCCC", showProgressBar: true, messageClassName: "capturing" }],
-        });
-
-        const [serializedHTML] = await Promise.all([
-          chrome.scripting.executeScript({
-            target: { tabId: tab.id, frameIds: [frameId] },
-            func: elementSerializer,
-            args: [selector],
-          }),
-          new Promise((resolve) => setTimeout(resolve, 500)),
-        ]);
-
-        const serializationResult = serializedHTML?.[0]?.result;
-
-        if (serializationResult?.status === "success") {
-          // Dismiss capturing toast before showing preview
-          await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            func: dismissToast,
-            args: [{ immediate: true }],
-          });
-
-          // Show preview
-          const [previewResult] = await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            func: showPreview,
-            args: [serializationResult.html],
-          });
-
-          const action = previewResult?.result;
-          if (action === "copy") {
-            await chrome.scripting.executeScript({
-              target: { tabId: tab.id },
-              func: copyToClipboard,
-              args: [serializationResult.html],
-            });
-            await chrome.scripting.executeScript({
-              target: { tabId: tab.id },
-              func: showToast,
-              args: ["Copied! Paste the HTML into Claude Code to generate React components."],
-            });
-          } else {
-            await chrome.scripting.executeScript({
-              target: { tabId: tab.id },
-              func: showToast,
-              args: ["Cancelled", { iconColor: "#CCCCCC", dismissTimeout: 2000 }],
-            });
-          }
-        } else if (serializationResult?.status === "error") {
-          console.error("Serialization error:", serializationResult.error);
-          await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            func: showToast,
-            args: ["An error occurred", { iconColor: "#CCCCCC" }],
-          });
-        } else if (serializationResult?.status === "aborted") {
-          await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            func: dismissToast,
-            args: [{ immediate: true }],
-          });
-        } else {
-          // serializationResult is null/undefined — scripting failed
-          console.error("Serialization failed — no result returned");
-          await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            func: showToast,
-            args: ["Capture failed. Try selecting a different element.", { iconColor: "#CCCCCC" }],
-          });
-        }
-
-        await chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          func: hideProcessingIndicator,
-        });
-      }
-
+    if (focusResult?.result === false) {
       await chrome.scripting.executeScript({
         target: { tabId: tab.id },
-        func: dismissToast,
+        func: clickToStartOverlay,
       });
-      await chrome.action.enable(tab.id);
-      } catch (err) {
-        console.error("UI to Code Snapshot error:", err);
-        await chrome.action.enable(tab.id);
-      }
     }
-  );
+
+    await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: showToast,
+      args: [
+        'Click or <kbd>\u21b5</kbd> to capture <span class="dot">\u00b7</span> <span><kbd>\u2191</kbd><kbd>\u2193</kbd></span> to fine-tune <span class="dot">\u00b7</span> <kbd>esc</kbd> to cancel',
+        { dismissTimeout: 0, hideOnHover: true, messageClassName: "initial" },
+      ],
+    });
+
+    chrome.scripting.executeScript(
+      { target: { tabId: tab.id, allFrames: true }, func: elementPicker },
+      async (results) => {
+        try {
+          const result = results?.find((res) => !!res.result);
+
+          if (result) {
+            const frameId = result.frameId;
+            const selector = result.result;
+
+            await chrome.scripting.executeScript({
+              target: { tabId: tab.id },
+              func: showProcessingIndicator,
+              args: [selector],
+            });
+
+            await chrome.scripting.executeScript({
+              target: { tabId: tab.id },
+              func: showToast,
+              args: ["Capturing selection...", { iconColor: "#CCCCCC", showProgressBar: true, messageClassName: "capturing" }],
+            });
+
+            const [serializedHTML] = await Promise.all([
+              chrome.scripting.executeScript({
+                target: { tabId: tab.id, frameIds: [frameId] },
+                func: elementSerializer,
+                args: [selector],
+              }),
+              new Promise((resolve) => setTimeout(resolve, 500)),
+            ]);
+
+            const serializationResult = serializedHTML?.[0]?.result;
+
+            if (serializationResult?.status === "success") {
+              await chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                func: dismissToast,
+                args: [{ immediate: true }],
+              });
+
+              const [previewResult] = await chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                func: showPreview,
+                args: [serializationResult.html],
+              });
+
+              const action = previewResult?.result;
+              if (action === "copy") {
+                await chrome.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  func: copyToClipboard,
+                  args: [serializationResult.html],
+                });
+                await chrome.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  func: showToast,
+                  args: ["Copied! Paste the HTML into Claude Code to generate React components."],
+                });
+              } else {
+                await chrome.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  func: showToast,
+                  args: ["Cancelled", { iconColor: "#CCCCCC", dismissTimeout: 2000 }],
+                });
+              }
+            } else if (serializationResult?.status === "error") {
+              console.error("Serialization error:", serializationResult.error);
+              await chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                func: showToast,
+                args: ["An error occurred", { iconColor: "#CCCCCC" }],
+              });
+            } else if (serializationResult?.status === "aborted") {
+              await chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                func: dismissToast,
+                args: [{ immediate: true }],
+              });
+            } else {
+              console.error("Serialization failed — no result returned");
+              await chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                func: showToast,
+                args: ["Capture failed. Try selecting a different element.", { iconColor: "#CCCCCC" }],
+              });
+            }
+
+            await chrome.scripting.executeScript({
+              target: { tabId: tab.id },
+              func: hideProcessingIndicator,
+            });
+          }
+
+          await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: dismissToast,
+          });
+        } catch (err) {
+          console.error("UI to Code Snapshot error:", err);
+        } finally {
+          await chrome.action.enable(tab.id);
+        }
+      }
+    );
+  } catch (err) {
+    console.error("UI to Code Snapshot: Cannot access page:", err.message);
+    await chrome.action.enable(tab.id);
+  }
 });
