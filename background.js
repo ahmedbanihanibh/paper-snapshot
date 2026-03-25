@@ -1,357 +1,299 @@
 "use strict";
 
 // ============================================================================
-// CLIPBOARD: Copy serialized HTML as plain text for Claude Code
+// CLIPBOARD — Direct port from Paper Snapshot: copy-to-clipboard.ts
+// Modified: copies as both text/plain and text/html (no x-paper-html wrapper)
 // ============================================================================
-async function copyToClipboard(html) {
-  // Wait for window focus (required for clipboard API)
-  if (!document.hasFocus()) {
-    await new Promise((resolve) => {
+async function copyToClipboard(text) {
+  function waitForFocus() {
+    if (document.hasFocus()) {
+      return Promise.resolve();
+    }
+    return new Promise((resolve) => {
       window.addEventListener("focus", () => resolve(), { once: true });
     });
   }
 
-  // Copy as both plain text (for pasting into Claude Code / terminal)
-  // and HTML (for pasting into rich text editors)
+  await waitForFocus();
   await navigator.clipboard.write([
     new ClipboardItem({
-      "text/plain": new Blob([html], { type: "text/plain" }),
-      "text/html": new Blob([html], { type: "text/html" }),
+      "text/plain": new Blob([text], { type: "text/plain" }),
+      "text/html": new Blob([text], { type: "text/html" }),
     }),
   ]);
 }
 
 // ============================================================================
-// ELEMENT PICKER: Overlay UI for selecting DOM elements
+// ELEMENT PICKER — Direct port from Paper Snapshot: element-picker.ts
+// Only change: "x-paper-toast" → "ui2code-toast", attribute name
 // ============================================================================
-async function pickElement() {
-  const mouse = { x: 0, y: 0 };
-  const skipElements = [document.body, document.documentElement, "ui2code-toast"];
-  const childStack = []; // for arrow down (undo)
-  const parentStack = []; // for arrow up (undo)
-  const childFrames = [];
+async function elementPicker() {
+  const pointer = { x: 0, y: 0 };
+  const ignoredElementsFromHitTesting = [document.body, document.documentElement, "ui2code-toast"];
+  const elementsUpPath = [];
+  const elementsDownPath = [];
+  const registeredChildDocuments = [];
 
-  // Create overlay to intercept clicks
-  const overlay = document.createElement("div");
-  overlay.style.position = "fixed";
-  overlay.style.inset = "0";
-  overlay.style.zIndex = "2147483646";
-  overlay.style.overflow = "hidden";
-  skipElements.push(overlay);
+  const blanket = document.createElement("div");
+  blanket.style.position = "fixed";
+  blanket.style.inset = "0";
+  blanket.style.zIndex = "2147483646";
+  blanket.style.overflow = "hidden";
+  ignoredElementsFromHitTesting.push(blanket);
 
-  // Create highlight box
-  const highlightContainer = document.createElement("div");
-  highlightContainer.style.position = "fixed";
-  highlightContainer.style.inset = "0";
-  highlightContainer.style.overflow = "hidden";
-  highlightContainer.style.pointerEvents = "none";
-  highlightContainer.style.zIndex = "2147483645";
+  const outlineContainer = document.createElement("div");
+  outlineContainer.style.position = "fixed";
+  outlineContainer.style.inset = "0";
+  outlineContainer.style.overflow = "hidden";
+  outlineContainer.style.pointerEvents = "none";
+  outlineContainer.style.zIndex = "2147483645";
 
-  const highlight = document.createElement("div");
-  highlight.style.position = "absolute";
-  highlight.style.border = "2px solid #6366f1";
-  highlight.style.boxSizing = "border-box";
-  highlight.style.top = "0";
-  highlight.style.left = "0";
-  highlight.style.borderRadius = "2px";
-  highlightContainer.appendChild(highlight);
+  const outline = document.createElement("div");
+  outline.style.position = "absolute";
+  outline.style.border = "2px solid oklch(0.7 0.15 258)";
+  outline.style.boxSizing = "border-box";
+  outline.style.top = "0";
+  outline.style.left = "0";
+  outlineContainer.appendChild(outline);
 
-  let currentEl = null;
-  let inputMode = "mouse"; // "mouse" or "keyboard"
-  let state = "wait"; // wait, continue, move-to-child-document, clear-outline, completing, complete
+  let selectedElement = null;
+  let modality = "mouse";
+  let nextTickState = "wait";
 
-  function broadcast(msg, target = "both") {
-    if (state === "complete") return;
-    if (target === "children" || target === "both") {
-      childFrames.forEach((f) => f.postMessage(msg, "*"));
+  function notifyOtherDocuments(id, direction = "both") {
+    if (nextTickState === "complete") return;
+    if (direction === "children" || direction === "both") {
+      registeredChildDocuments.forEach((doc) => doc.postMessage(id, "*"));
     }
-    if (target === "parent" || target === "both") {
-      window.parent.postMessage(msg, "*");
+    if (direction === "parent" || direction === "both") {
+      window.parent.postMessage(id, "*");
     }
   }
 
-  function onMessage(msg, callback) {
-    const handler = (e) => {
-      if (e.data === msg && e.source !== window) callback(e);
+  function listenForOtherDocuments(id, callback) {
+    const onMessageHandler = (event) => {
+      if (event.data === id && event.source !== window) callback(event);
     };
-    window.addEventListener("message", handler);
-    return () => window.removeEventListener("message", handler);
+    window.addEventListener("message", onMessageHandler);
+    return () => window.removeEventListener("message", onMessageHandler);
   }
 
-  function getElementUnderMouse() {
-    return document
-      .elementsFromPoint(mouse.x, mouse.y)
-      .filter((el) => {
-        if (!(el instanceof HTMLElement)) return false;
-        return !skipElements.some((skip) =>
-          skip instanceof Element ? el === skip : el.tagName.toLowerCase() === skip
-        );
-      })
-      .at(0);
+  function hitTest() {
+    const hits = document.elementsFromPoint(pointer.x, pointer.y).filter((el) => {
+      if (el instanceof HTMLElement) {
+        return !ignoredElementsFromHitTesting.some((ignored) => {
+          if (ignored instanceof Element) return el === ignored;
+          return el.tagName.toLowerCase() === ignored;
+        });
+      }
+      return false;
+    });
+    return hits.at(0);
   }
 
-  function animationLoop() {
-    if (state === "complete") return;
-    requestAnimationFrame(animationLoop);
+  function tick() {
+    if (nextTickState === "complete") return;
+    requestAnimationFrame(tick);
 
-    if (state === "completing") {
-      highlight.style.opacity = "0";
-      return;
-    }
-    if (state === "wait") {
-      highlight.style.opacity = "0";
-      currentEl = null;
-      return;
-    }
-    if (state === "move-to-child-document") {
-      highlight.style.opacity = "0";
-      overlay.style.pointerEvents = "none";
-      state = "continue";
-      currentEl = null;
-    }
-    if (state === "clear-outline") {
-      highlight.style.opacity = "0";
-      state = "continue";
-      currentEl = null;
+    if (nextTickState === "completing") { outline.style.opacity = "0"; return; }
+    if (nextTickState === "wait") { outline.style.opacity = "0"; selectedElement = null; return; }
+
+    if (nextTickState === "move-to-child-document") {
+      outline.style.opacity = "0";
+      blanket.style.pointerEvents = "none";
+      nextTickState = "continue";
+      selectedElement = null;
     }
 
-    // Keep focus on main window
-    if (!document.hasFocus() || !document.activeElement || document.activeElement.tagName === "IFRAME") {
+    if (nextTickState === "clear-outline") {
+      outline.style.opacity = "0";
+      nextTickState = "continue";
+      selectedElement = null;
+    }
+
+    if (document.hasFocus() === false || document.activeElement === null || document.activeElement.tagName === "IFRAME") {
       window.focus();
     }
 
-    const el = inputMode === "keyboard" ? currentEl : getElementUnderMouse();
-    if (!el) {
-      highlight.style.opacity = "0";
-      return;
-    }
+    const element = modality === "keyboard" ? selectedElement : hitTest();
+    if (!element) { outline.style.opacity = "0"; return; }
+    if (element.tagName === "IFRAME") { nextTickState = "move-to-child-document"; return; }
 
-    if (el.tagName === "IFRAME") {
-      state = "move-to-child-document";
-      return;
-    }
-
-    overlay.style.pointerEvents = "auto";
-    const rect = el.getBoundingClientRect();
-    highlight.style.opacity = "1";
-    highlight.style.translate = `${rect.left}px ${rect.top}px`;
-    highlight.style.width = `${rect.width}px`;
-    highlight.style.height = `${rect.height}px`;
-    currentEl = el;
-    broadcast("TRANSFER_HIGHLIGHTED", "children");
+    blanket.style.pointerEvents = "auto";
+    const rect = element.getBoundingClientRect();
+    outline.style.opacity = "1";
+    outline.style.translate = `${rect.left}px ${rect.top}px`;
+    outline.style.width = `${rect.width}px`;
+    outline.style.height = `${rect.height}px`;
+    selectedElement = element;
+    notifyOtherDocuments("TRANSFER_PAPER_HIGHLIGHTED", "children");
   }
 
-  function onPointerMove(e) {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
-    if (state === "wait") state = "continue";
+  function onPointerMove(event) {
+    pointer.x = event.clientX;
+    pointer.y = event.clientY;
+    if (nextTickState === "wait") nextTickState = "continue";
   }
 
   window.addEventListener("pointermove", onPointerMove);
-  document.body.appendChild(overlay);
-  document.body.appendChild(highlightContainer);
-  animationLoop();
+  document.body.appendChild(blanket);
+  document.body.appendChild(outlineContainer);
+  tick();
 
   return new Promise((resolve) => {
     function cleanup() {
-      setTimeout(() => {
-        overlay.remove();
-        highlight.remove();
-        highlightContainer.remove();
-      }, 21);
-      cleanupListeners.forEach((fn) => fn());
+      setTimeout(() => { blanket.remove(); outline.remove(); outlineContainer.remove(); }, 21);
+      disposables.forEach((dispose) => dispose());
       window.removeEventListener("pointermove", onPointerMove);
-      broadcast("TRANSFER_COMPLETED");
-      state = "complete";
+      notifyOtherDocuments("TRANSFER_PAPER_COMPLETED");
+      nextTickState = "complete";
     }
 
-    const cleanupListeners = [
-      onMessage("TRANSFER_COMPLETED", () => {
-        removeEventHandlers();
-        cleanup();
-        resolve(null);
-      }),
-      onMessage("TRANSFER_HIGHLIGHTED", () => {
-        state = "wait";
-      }),
-      onMessage("TRANSFER_REGISTER_CHILD", (e) => {
-        childFrames.push(e.source);
-      }),
+    const disposables = [
+      listenForOtherDocuments("TRANSFER_PAPER_COMPLETED", () => { cleanupEvents(); cleanup(); resolve(null); }),
+      listenForOtherDocuments("TRANSFER_PAPER_HIGHLIGHTED", () => { nextTickState = "wait"; }),
+      listenForOtherDocuments("TRANSFER_PAPER_REGISTER_CHILD_DOCUMENT", (event) => { registeredChildDocuments.push(event.source); }),
     ];
 
-    function removeEventHandlers() {
-      window.removeEventListener("click", onClick, { capture: true });
-      window.removeEventListener("pointerdown", onPointerDown, { capture: true });
-      window.removeEventListener("pointermove", onPointerMoveCapture, { capture: true });
-      window.removeEventListener("keydown", onKeyDown, { capture: true });
+    function cleanupEvents() {
+      window.removeEventListener("click", completeSelectionHandler, { capture: true });
+      window.removeEventListener("pointerdown", pointerDownHandler, { capture: true });
+      window.removeEventListener("pointermove", pointerMoveCaptureHandler, { capture: true });
+      window.removeEventListener("keydown", keyDownHandler, { capture: true });
     }
 
-    function onPointerDown(e) {
-      if (state !== "complete" && state !== "completing") {
-        e.preventDefault();
-        e.stopPropagation();
-      }
+    function pointerDownHandler(e) {
+      if (nextTickState !== "complete" && nextTickState !== "completing") { e.preventDefault(); e.stopPropagation(); }
     }
 
-    function onClick(e) {
+    function completeSelectionHandler(e) {
       e.stopPropagation();
-      removeEventHandlers();
-      state = "completing";
+      cleanupEvents();
+      nextTickState = "completing";
 
-      if (currentEl) {
-        const attr = "data-ui2code-picker";
-        const timestamp = Date.now();
-        currentEl.setAttribute(attr, `${timestamp}`);
-        resolve(`[${attr}="${timestamp}"]`);
+      if (selectedElement) {
+        const key = "data-ui2code-picker";
+        const value = Date.now();
+        selectedElement.setAttribute(key, `${value}`);
+        resolve(`[${key}="${value}"]`);
       } else {
         resolve(null);
       }
       cleanup();
     }
 
-    function onPointerMoveCapture() {
-      inputMode = "mouse";
-      childStack.length = 0;
-      parentStack.length = 0;
+    function pointerMoveCaptureHandler() {
+      modality = "mouse";
+      elementsUpPath.length = 0;
+      elementsDownPath.length = 0;
     }
 
-    function onKeyDown(e) {
-      function getParent(el) {
-        const parent = el.parentElement;
-        if (parent && parent.checkVisibility() && parent.clientWidth && parent.clientHeight && !skipElements.includes(parent)) {
-          return parent;
+    function keyDownHandler(e) {
+      function nextTopElement(element) {
+        const nextElement = element.parentElement;
+        if (nextElement && nextElement.checkVisibility() && nextElement.clientWidth && nextElement.clientHeight && !ignoredElementsFromHitTesting.includes(nextElement)) {
+          return nextElement;
         }
-        return parent?.parentElement ? getParent(parent.parentElement) : null;
+        if (nextElement?.parentElement) return nextTopElement(nextElement.parentElement);
+        return null;
       }
 
-      function getChild(el) {
-        let child = el.firstElementChild;
-        while (child) {
-          if (child.checkVisibility() && child.clientWidth && child.clientHeight && !skipElements.includes(child) && child instanceof HTMLElement) {
-            return child;
-          }
-          child = child.nextElementSibling;
+      function nextBottomElement(element) {
+        let nextSiblingElement = element.nextElementSibling;
+        while (nextSiblingElement) {
+          if (nextSiblingElement.checkVisibility() && nextSiblingElement.clientWidth && nextSiblingElement.clientHeight && !ignoredElementsFromHitTesting.includes(nextSiblingElement) && nextSiblingElement instanceof HTMLElement) return nextSiblingElement;
         }
-        const children = Array.from(el.children);
-        for (const c of children) {
-          if (c instanceof HTMLElement && c.checkVisibility() && c.clientWidth && c.clientHeight && !skipElements.includes(c)) {
-            return c;
-          }
+        const children = Array.from(element.children);
+        for (const child of children) {
+          if (child instanceof HTMLElement && child.checkVisibility() && child.clientWidth && child.clientHeight && !ignoredElementsFromHitTesting.includes(child)) return child;
         }
         return null;
       }
 
-      if (currentEl && e.key.startsWith("Arrow")) {
-        e.preventDefault();
-        e.stopPropagation();
-        inputMode = "keyboard";
-
+      if (selectedElement && e.key.startsWith("Arrow")) {
+        e.preventDefault(); e.stopPropagation(); modality = "keyboard";
         switch (e.key) {
-          case "ArrowUp": {
-            if (parentStack.length > 0) {
-              currentEl = parentStack.pop();
-            } else {
-              const parent = getParent(currentEl);
-              if (parent) {
-                childStack.push(currentEl);
-                currentEl = parent;
-              }
-            }
+          case "ArrowUp":
+            if (elementsDownPath.length > 0) { selectedElement = elementsDownPath.pop(); }
+            else { const next = nextTopElement(selectedElement); if (next) { elementsUpPath.push(selectedElement); selectedElement = next; } }
             break;
-          }
-          case "ArrowDown": {
-            if (childStack.length > 0) {
-              currentEl = childStack.pop();
-            } else if (currentEl.children[0] instanceof HTMLElement) {
-              const child = getChild(currentEl);
-              if (child) {
-                parentStack.push(currentEl);
-                currentEl = child;
-              }
-            }
+          case "ArrowDown":
+            if (elementsUpPath.length > 0) { selectedElement = elementsUpPath.pop(); }
+            else if (selectedElement.children[0] instanceof HTMLElement) { const next = nextBottomElement(selectedElement.children[0]); if (next) { elementsDownPath.push(selectedElement); selectedElement = next; } }
             break;
-          }
         }
         return;
       }
 
-      if (e.key === "Escape") {
-        e.preventDefault();
-        e.stopPropagation();
-        removeEventHandlers();
-        cleanup();
-        resolve(null);
-      }
-
-      if (e.key === "Enter") {
-        e.preventDefault();
-        e.stopPropagation();
-        onClick(e);
-      }
+      if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); cleanupEvents(); cleanup(); resolve(null); }
+      if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); completeSelectionHandler(e); }
     }
 
-    window.addEventListener("click", onClick, { capture: true });
-    window.addEventListener("pointerdown", onPointerDown, { capture: true });
-    window.addEventListener("pointermove", onPointerMoveCapture, { capture: true });
-    window.addEventListener("keydown", onKeyDown, { capture: true });
-    broadcast("TRANSFER_REGISTER_CHILD", "parent");
+    window.addEventListener("click", completeSelectionHandler, { capture: true });
+    window.addEventListener("pointerdown", pointerDownHandler, { capture: true });
+    window.addEventListener("pointermove", pointerMoveCaptureHandler, { capture: true });
+    window.addEventListener("keydown", keyDownHandler, { capture: true });
+    notifyOtherDocuments("TRANSFER_PAPER_REGISTER_CHILD_DOCUMENT", "parent");
   });
 }
 
 // ============================================================================
-// DOM SERIALIZER: 1:1 port of Paper Snapshot's serialization logic
+// ELEMENT SERIALIZER — Direct port from Paper Snapshot: element-serializer.ts
+// Only change: toast element name "x-paper-toast" → "ui2code-toast"
+//              CSS var names "--x-paper-*" → "--ui2code-*"
 // ============================================================================
-async function serializeElement(selector) {
-  const alwaysCapture = ["display"];
-  const toastEl = document.getElementsByTagName("ui2code-toast")[0];
-  const allProps = Array.from(window.getComputedStyle(document.body));
-  allProps.push("aspect-ratio", "text-underline-offset", "text-decoration-thickness", "transform-box");
-  let totalNodes = 0;
+async function elementSerializer(selector) {
+  const alwaysSerialize = ["display"];
+  const toast = document.getElementsByTagName("ui2code-toast")[0];
+  const styleNames = Array.from(window.getComputedStyle(document.body));
+  styleNames.push("aspect-ratio", "text-underline-offset", "text-decoration-thickness", "transform-box");
 
-  function updateProgress(current) {
-    if (current === null || !toastEl) {
-      const shadow = toastEl?.shadowRoot;
-      if (shadow && toastEl) {
-        const bar = shadow.querySelector(".toast__progress");
-        if (bar) {
-          bar.classList.add("no-transition");
-          toastEl.style.setProperty("--progress", "0");
+  let totalNodesToProcess = 0;
+
+  function setToastProgress(processedNodesCount) {
+    if (processedNodesCount === null || !toast) {
+      const shadowRoot = toast?.shadowRoot;
+      if (shadowRoot && toast) {
+        const progressEl = shadowRoot.querySelector(".toast__progress");
+        if (progressEl) {
+          progressEl.classList.add("no-transition");
+          toast.style.setProperty("--ui2code-progress", "0");
           requestAnimationFrame(() => {
-            bar.classList.remove("no-transition");
-            toastEl?.style.removeProperty("--progress");
+            progressEl.classList.remove("no-transition");
+            toast?.style.removeProperty("--ui2code-progress");
           });
         } else {
-          toastEl.style.removeProperty("--progress");
+          toast.style.removeProperty("--ui2code-progress");
         }
-      } else if (toastEl) {
-        toastEl.style.removeProperty("--progress");
+      } else if (toast) {
+        toast.style.removeProperty("--ui2code-progress");
       }
-      toastEl?.style.removeProperty("--suffix");
-      toastEl?.style.removeProperty("--suffix-width");
+      toast?.style.removeProperty("--ui2code-suffix");
+      toast?.style.removeProperty("--ui2code-suffix-width");
       return;
     }
-    if (!toastEl) return;
-    const pct = Math.min(Math.ceil((current / totalNodes) * 100), 100);
-    if (totalNodes > 50) {
-      toastEl.style.setProperty("--progress", pct.toString());
-      if (totalNodes > 100) {
-        toastEl.style.setProperty("--suffix", `"${pct.toString()}%"`);
-        toastEl.style.setProperty("--suffix-width", "48px");
+    if (!toast) return;
+    const percentage = Math.min(Math.ceil((processedNodesCount / totalNodesToProcess) * 100), 100);
+    if (totalNodesToProcess > 50) {
+      toast.style.setProperty("--ui2code-progress", percentage.toString());
+      if (totalNodesToProcess > 100) {
+        toast.style.setProperty("--ui2code-suffix", `"${percentage.toString()}%"`);
+        toast.style.setProperty("--ui2code-suffix-width", "48px");
       }
     } else {
-      toastEl.style.removeProperty("--suffix-width");
+      toast.style.removeProperty("--ui2code-suffix-width");
     }
   }
 
-  function isCollapsedByTransform(styles) {
+  function isScaledToZeroAndOutOfFlow(styles) {
     return (
       ["matrix(0, 0, 0, 1, 0, 0)", "matrix(0, 0, 0, 0, 0, 0)", "scaleX(0)", "scale(0)", "scaleY(0)"].includes(styles.transform || "") &&
       ["absolute", "fixed"].includes(styles.position || "")
     );
   }
 
-  function isInsideSVG(el) {
-    let parent = el.parentElement;
+  function isChildOfSVG(node) {
+    let parent = node.parentElement;
     while (parent) {
       if (parent instanceof SVGElement) return true;
       parent = parent.parentElement;
@@ -359,382 +301,385 @@ async function serializeElement(selector) {
     return false;
   }
 
-  function stylesToString(styles) {
-    return Object.entries(styles)
-      .map(([k, v]) => `${k}: ${v.replaceAll('"', "'")};`)
-      .join(" ");
+  function toInlineStyles(styles) {
+    return Object.entries(styles).map(([key, value]) => `${key}: ${value.replaceAll('"', "'")};`).join(" ");
   }
 
-  function escapeHtml(str) {
+  function encodeHTML(str) {
     return str.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
   }
 
-  function findBackgroundColor(el) {
-    const parent = el?.parentElement;
+  function resolveParentBgColor(element) {
+    const parent = element?.parentElement;
     if (parent) {
-      const bg = window.getComputedStyle(parent).backgroundColor;
-      if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") return bg;
-      return findBackgroundColor(parent);
+      const backgroundColor = window.getComputedStyle(parent).backgroundColor;
+      if (backgroundColor && backgroundColor !== "rgba(0, 0, 0, 0)" && backgroundColor !== "transparent") return backgroundColor;
+      return resolveParentBgColor(parent);
     }
     return "";
   }
 
-  function extractStyles(el, { isRoot = false, pseudo } = {}) {
-    const result = {};
-    const computedMap = new Map();
+  function resolveComputedStyles(element, { isRoot = false, pseudo } = {}) {
+    const styles = {};
+    const computedStylesValues = new Map();
 
     if (pseudo) {
-      const cs = window.getComputedStyle(el, pseudo);
-      for (const prop of allProps) computedMap.set(prop, cs.getPropertyValue(prop));
+      const computedStyles = window.getComputedStyle(element, pseudo);
+      for (const key of styleNames) {
+        computedStylesValues.set(key, computedStyles.getPropertyValue(key));
+      }
     } else {
-      const sm = el.computedStyleMap();
-      for (const prop of allProps) {
-        const val = sm.get(prop);
-        if (val) computedMap.set(prop, val.toString());
+      const computedStyles = element.computedStyleMap();
+      for (const key of styleNames) {
+        const value = computedStyles.get(key);
+        if (value) computedStylesValues.set(key, value.toString());
       }
     }
 
-    const defaultMap = new Map();
-    const temp = document.createElement("link");
-    temp.textContent = el.textContent;
-    temp.style.margin = "0";
-    temp.style.fill = "black";
-    temp.style.color = "black";
-    temp.style.fontSize = "1px";
-    temp.style.width = "auto";
-    temp.style.height = "auto";
-    temp.style.textAlign = "initial";
-    temp.style.borderColor = "hotpink";
-    temp.style.setProperty("z-index", "auto", "important");
-    temp.style.setProperty("border-width", "0px", "important");
+    const referenceStyleValues = new Map();
+    const referenceElement = document.createElement("link");
+    referenceElement.textContent = element.textContent;
+    referenceElement.style.margin = "0";
+    referenceElement.style.fill = "black";
+    referenceElement.style.color = "black";
+    referenceElement.style.fontSize = "1px";
+    referenceElement.style.width = "auto";
+    referenceElement.style.height = "auto";
+    referenceElement.style.textAlign = "initial";
+    referenceElement.style.borderColor = "hotpink";
+    referenceElement.style.setProperty("z-index", "auto", "important");
+    referenceElement.style.setProperty("border-width", "0px", "important");
 
     if (isRoot) {
-      temp.style.color = "hotpink";
-      temp.style.lineHeight = "0.1234";
-      temp.style.fontFamily = '"Papyrus"';
-      temp.style.listStyleType = "initial";
+      referenceElement.style.color = "hotpink";
+      referenceElement.style.lineHeight = "0.1234";
+      referenceElement.style.fontFamily = '"Papyrus"';
+      referenceElement.style.listStyleType = "initial";
     }
 
-    if (el.parentElement?.lastElementChild === el) {
-      el.insertAdjacentElement("afterend", temp);
+    if (element.parentElement?.lastElementChild === element) {
+      element.insertAdjacentElement("afterend", referenceElement);
     } else {
-      el.insertAdjacentElement("beforebegin", temp);
+      element.insertAdjacentElement("beforebegin", referenceElement);
     }
 
     if (pseudo) {
-      const cs = window.getComputedStyle(temp, pseudo);
-      for (const prop of allProps) defaultMap.set(prop, cs.getPropertyValue(prop));
+      const referenceComputedStyles = window.getComputedStyle(referenceElement, pseudo);
+      for (const key of styleNames) {
+        referenceStyleValues.set(key, referenceComputedStyles.getPropertyValue(key));
+      }
     } else {
-      const sm = temp.computedStyleMap();
-      for (const prop of allProps) {
-        const val = sm.get(prop);
-        if (val) defaultMap.set(prop, val.toString());
+      const referenceComputedStyles = referenceElement.computedStyleMap();
+      for (const key of styleNames) {
+        const value = referenceComputedStyles.get(key);
+        if (value) referenceStyleValues.set(key, value.toString());
       }
     }
-    temp.remove();
+    referenceElement.remove();
 
-    for (const prop of allProps) {
-      const actual = computedMap.get(prop);
-      const defaultVal = defaultMap.get(prop);
-      if (actual && !actual.startsWith("--") && (actual !== defaultVal || alwaysCapture.includes(prop))) {
-        result[prop] = actual.replaceAll('"', "'");
+    for (const key of styleNames) {
+      const value = computedStylesValues.get(key);
+      const referenceValue = referenceStyleValues.get(key);
+      if (value && !value.startsWith("--") && (value !== referenceValue || alwaysSerialize.includes(key))) {
+        styles[key] = value.replaceAll('"', "'");
       }
     }
 
     if (isRoot) {
-      const rect = el.getBoundingClientRect();
-      const w = Math.ceil(rect.width) + "px";
-      const h = Math.ceil(rect.height) + "px";
-      if (rect.width > 200 || rect.height > 200 || result.width?.includes("%") || result.height?.includes("%")) {
-        result.width = w;
-        result.height = h;
+      const box = element.getBoundingClientRect();
+      const width = Math.ceil(box.width) + "px";
+      const height = Math.ceil(box.height) + "px";
+      if (box.width > 200 || box.height > 200 || styles.width?.includes("%") || styles.height?.includes("%")) {
+        styles.width = width;
+        styles.height = height;
       }
     }
 
-    if (isRoot && el instanceof Element && (!computedMap.get("background-color") || computedMap.get("background-color") === "rgba(0, 0, 0, 0)")) {
-      result["background-color"] = findBackgroundColor(el);
+    const rootBackgroundInvisible =
+      isRoot && element instanceof Element &&
+      (!computedStylesValues.get("background-color") || computedStylesValues.get("background-color") === "rgba(0, 0, 0, 0)");
+
+    if (rootBackgroundInvisible) {
+      styles["background-color"] = resolveParentBgColor(element);
     }
 
-    if (result["scrollbar-gutter"]?.includes("stable") && el instanceof HTMLElement) {
-      const bl = parseFloat(computedMap.get("border-left-width") || "0");
-      const br = parseFloat(computedMap.get("border-right-width") || "0");
-      const scrollbarW = el.offsetWidth - el.clientWidth - bl - br;
-      if (scrollbarW > 0) {
-        const both = result["scrollbar-gutter"].includes("both");
-        const dir = computedMap.get("direction") || "ltr";
-        const pr = parseFloat(result["padding-right"] || "0");
-        const pl = parseFloat(result["padding-left"] || "0");
-        if (dir === "rtl") {
-          result["padding-left"] = pl + scrollbarW + "px";
-          if (both) result["padding-right"] = pr + scrollbarW + "px";
+    if (styles["scrollbar-gutter"]?.includes("stable") && element instanceof HTMLElement) {
+      const borderLeft = parseFloat(computedStylesValues.get("border-left-width") || "0");
+      const borderRight = parseFloat(computedStylesValues.get("border-right-width") || "0");
+      const scrollbarWidth = element.offsetWidth - element.clientWidth - borderLeft - borderRight;
+      if (scrollbarWidth > 0) {
+        const isBothSides = styles["scrollbar-gutter"].includes("both");
+        const direction = computedStylesValues.get("direction") || "ltr";
+        const currentPaddingRight = parseFloat(styles["padding-right"] || "0");
+        const currentPaddingLeft = parseFloat(styles["padding-left"] || "0");
+        if (direction === "rtl") {
+          styles["padding-left"] = currentPaddingLeft + scrollbarWidth + "px";
+          if (isBothSides) styles["padding-right"] = currentPaddingRight + scrollbarWidth + "px";
         } else {
-          result["padding-right"] = pr + scrollbarW + "px";
-          if (both) result["padding-left"] = pl + scrollbarW + "px";
+          styles["padding-right"] = currentPaddingRight + scrollbarWidth + "px";
+          if (isBothSides) styles["padding-left"] = currentPaddingLeft + scrollbarWidth + "px";
         }
       }
     }
 
-    if ((pseudo === "::after" || pseudo === "::before") && !result.content) return {};
-    if (Object.keys(result).length === 0) return {};
-    return result;
+    if (((pseudo === "::after" || pseudo === "::before") && !styles.content) || Object.keys(styles).length === 0) {
+      return {};
+    }
+
+    return styles;
   }
 
-  function extractText(textNode) {
-    const text = textNode.textContent;
+  function collapseWhiteSpace(node) {
+    const text = node.textContent;
     if (!text) return "";
 
-    if (textNode.parentElement) {
-      const ws = window.getComputedStyle(textNode.parentElement).whiteSpace;
-      if (ws === "pre" || ws === "pre-wrap") return text;
-      if (ws === "pre-line") return text.replace(/[^\S\n]+/g, " ");
+    if (node.parentElement) {
+      const whiteSpace = window.getComputedStyle(node.parentElement).whiteSpace;
+      if (whiteSpace === "pre" || whiteSpace === "pre-wrap") return text;
+      if (whiteSpace === "pre-line") return text.replace(/[^\S\n]+/g, " ");
     }
 
     const trimmed = text.replace(/\s+/g, " ").trim();
     if (trimmed) {
-      const leadingLen = text.length - text.trimStart().length;
-      const trailingLen = text.length - text.trimEnd().length;
-      let hasLeading = false;
-      let hasTrailing = false;
+      const leadingLength = text.length - text.trimStart().length;
+      const trailingLength = text.length - text.trimEnd().length;
+      let preserveLeading = false;
+      let preserveTrailing = false;
 
-      if (leadingLen > 0) {
+      if (leadingLength > 0) {
         const range = document.createRange();
-        range.setStart(textNode, 0);
-        range.setEnd(textNode, leadingLen);
-        hasLeading = range.getBoundingClientRect().width > 0;
+        range.setStart(node, 0);
+        range.setEnd(node, leadingLength);
+        preserveLeading = range.getBoundingClientRect().width > 0;
       }
-      if (trailingLen > 0) {
+      if (trailingLength > 0) {
         const range = document.createRange();
-        range.setStart(textNode, text.length - trailingLen);
-        range.setEnd(textNode, text.length);
-        hasTrailing = range.getBoundingClientRect().width > 0;
+        range.setStart(node, text.length - trailingLength);
+        range.setEnd(node, text.length);
+        preserveTrailing = range.getBoundingClientRect().width > 0;
       }
-      return (hasLeading ? " " : "") + trimmed + (hasTrailing ? " " : "");
+      return (preserveLeading ? " " : "") + trimmed + (preserveTrailing ? " " : "");
     }
 
     const range = document.createRange();
-    range.selectNode(textNode);
-    return range.getBoundingClientRect().width === 0 ? "" : " ";
+    range.selectNode(node);
+    if (range.getBoundingClientRect().width === 0) return "";
+    return " ";
   }
 
-  // Main recursive serializer — 1:1 match with Paper Snapshot's logic
-  async function serialize(el, { abortSignal, dryRun = false, __isRoot = true, __processedNodes = 0 } = {}) {
+  async function serialize(target, { abortSignal, dryRun = false, __isRoot = true, __processedNodes = 0 } = {}) {
     if (abortSignal?.aborted) return { html: "", processedNodes: 0 };
-    if (!dryRun) updateProgress(__processedNodes + 1);
+    if (!dryRun) setToastProgress(__processedNodes + 1);
 
-    if (!(el instanceof Element || el instanceof SVGElement)) {
+    if (!(target instanceof Element || target instanceof SVGElement)) {
       if (dryRun) return { html: "", processedNodes: 1 };
-      if (el instanceof Text) {
-        const t = extractText(el);
-        return { html: escapeHtml(t), processedNodes: 1 };
+      if (target instanceof Text) {
+        const normalizedText = collapseWhiteSpace(target);
+        return { html: encodeHTML(normalizedText), processedNodes: 1 };
       }
       return { html: "", processedNodes: 1 };
     }
 
-    const tagName = el.tagName.toLowerCase();
-    const cs = window.getComputedStyle(el);
-    const isAbsFixed = ["absolute", "fixed"].includes(cs.position);
-    const parentIsBlock = !!el.parentElement && ["block", "inline-block"].includes(window.getComputedStyle(el.parentElement).display);
-    const isZeroDim = (parseFloat(cs.height) === 0 || parseFloat(cs.width) === 0) && (isAbsFixed || parentIsBlock);
-    const isHidden = cs.display === "none";
-    const isInvisible = cs.opacity === "0" && isAbsFixed;
+    const tagName = target.tagName.toLowerCase();
+    const targetComputedStyles = window.getComputedStyle(target);
+    const isOutOfFlow = ["absolute", "fixed"].includes(targetComputedStyles.position);
+    const isNormalFlowChild = !!target.parentElement && ["block", "inline-block"].includes(window.getComputedStyle(target.parentElement).display);
+    const hasVerySmallDimensions = parseFloat(targetComputedStyles.height) === 0 || parseFloat(targetComputedStyles.width) === 0;
+    const isHiddenPixelOutOfFlow = hasVerySmallDimensions && (isOutOfFlow || isNormalFlowChild);
+    const isDisplayNone = targetComputedStyles.display === "none";
+    const isTransparentAndOutOfFlow = targetComputedStyles.opacity === "0" && isOutOfFlow;
 
-    if (isZeroDim || isHidden || isInvisible) return { html: "", processedNodes: 1 };
+    if (isHiddenPixelOutOfFlow || isDisplayNone || isTransparentAndOutOfFlow) {
+      return { html: "", processedNodes: 1 };
+    }
 
     let processedNodes = 1;
     const children = [];
     let styles = {};
 
     if (!dryRun) {
-      const beforeStyles = extractStyles(el, { pseudo: "::before" });
-      if (Object.keys(beforeStyles).length && !isCollapsedByTransform(beforeStyles)) {
-        children.push(`<div style="${stylesToString(beforeStyles)}"></div>`);
+      const beforeStyles = resolveComputedStyles(target, { pseudo: "::before" });
+      if (Object.keys(beforeStyles).length && !isScaledToZeroAndOutOfFlow(beforeStyles)) {
+        children.push(`<div style="${toInlineStyles(beforeStyles)}"></div>`);
       }
-      styles = extractStyles(el, { isRoot: __isRoot });
+      styles = resolveComputedStyles(target, { isRoot: __isRoot });
     }
 
-    const attrs = el.getAttributeNames().map((n) => [n, el.getAttribute(n) || ""]);
+    const targetAttributes = target.getAttributeNames().map((name) => [name, target.getAttribute(name) || ""]);
 
-    for (let i = 0; i < el.childNodes.length; i++) {
-      const child = el.childNodes[i];
-      const nodes = [];
+    for (let i = 0; i < target.childNodes.length; i++) {
+      const child = target.childNodes[i];
+      const childrenToTraverse = [];
 
       if (child instanceof SVGElement && child.tagName === "use") {
         const href = child.getAttribute("href") || child.getAttribute("xlink:href");
-        const ref = document.getElementById(href?.replace("#", "") || "");
-        if (ref) {
-          if (["symbol", "svg"].includes(ref.tagName)) {
-            for (const an of ref.getAttributeNames()) {
-              if (!["id", "class", "style"].includes(an) && !el.hasAttribute(an)) {
-                attrs.push([an, ref.getAttribute(an)]);
+        const referencedElement = document.getElementById(href?.replace("#", "") || "");
+        if (referencedElement) {
+          if (["symbol", "svg"].includes(referencedElement.tagName)) {
+            for (const name of referencedElement.getAttributeNames()) {
+              if (["id", "class", "style"].includes(name)) continue;
+              if (!target.hasAttribute(name)) {
+                targetAttributes.push([name, referencedElement.getAttribute(name)]);
               }
             }
-            nodes.push(...Array.from(ref.childNodes));
+            childrenToTraverse.push(...Array.from(referencedElement.childNodes));
           } else {
-            nodes.push(ref);
+            childrenToTraverse.push(referencedElement);
           }
         }
-      } else if (!(el instanceof HTMLSelectElement) && child) {
-        nodes.push(child);
+      } else if (target instanceof HTMLSelectElement) {
+        // Don't collect children of selects.
+      } else if (child) {
+        childrenToTraverse.push(child);
       }
 
-      if (nodes.length) {
-        for (const node of nodes) {
-          if (!dryRun) await new Promise((r) => requestAnimationFrame(r));
-          const res = await serialize(node, {
+      if (childrenToTraverse.length) {
+        for (const traverseChild of childrenToTraverse) {
+          if (!dryRun) await new Promise((resolve) => requestAnimationFrame(resolve));
+          const result = await serialize(traverseChild, {
             abortSignal,
             dryRun,
             __isRoot: false,
             __processedNodes: __processedNodes + processedNodes,
           });
-          processedNodes += res.processedNodes;
-          if (!dryRun) children.push(res.html);
+          processedNodes += result.processedNodes;
+          if (!dryRun) children.push(result.html);
         }
       }
     }
 
     if (dryRun) return { html: "", processedNodes };
 
-    // Handle form elements
-    if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || el instanceof HTMLSelectElement) {
-      const isInline = el instanceof HTMLInputElement || el instanceof HTMLSelectElement;
-      const placeholder = el instanceof HTMLSelectElement ? el.firstElementChild?.textContent : el.placeholder;
+    if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) {
+      const shouldVerticallyCenterText = target instanceof HTMLInputElement || target instanceof HTMLSelectElement;
+      const placeholder = target instanceof HTMLSelectElement ? target.firstElementChild?.textContent : target.placeholder;
 
-      if (el.type === "text" && el.value !== "") {
-        const s = { height: "fit-content" };
-        children.push(`<div style="${stylesToString(s)}">${el.value}</div>`);
-        if (isInline) styles["align-content"] = "center";
+      if (target.type === "text" && target.value !== "") {
+        const valueStyles = { height: "fit-content" };
+        children.push(`<div style="${toInlineStyles(valueStyles)}">${target.value}</div>`);
+        if (shouldVerticallyCenterText) styles["align-content"] = "center";
       } else if (placeholder) {
-        const ps = extractStyles(el, { pseudo: "::placeholder" });
-        ps.width = "100%";
-        ps.height = "fit-content";
-        if (isInline) {
+        const placeholderStyles = resolveComputedStyles(target, { pseudo: "::placeholder" });
+        placeholderStyles.width = "100%";
+        placeholderStyles.height = "fit-content";
+        if (shouldVerticallyCenterText) {
           styles["align-content"] = "center";
-          ps["align-self"] = "center";
+          placeholderStyles["align-self"] = "center";
         }
-        children.push(`<div style="${stylesToString(ps)}">${placeholder}</div>`);
+        children.push(`<div style="${toInlineStyles(placeholderStyles)}">${placeholder}</div>`);
       }
     }
 
-    // ::after pseudo-element
-    const afterStyles = extractStyles(el, { pseudo: "::after" });
-    if (Object.keys(afterStyles).length && !isCollapsedByTransform(afterStyles)) {
-      children.push(`<div style="${stylesToString(afterStyles)}"></div>`);
+    const afterStyles = resolveComputedStyles(target, { pseudo: "::after" });
+    if (Object.keys(afterStyles).length && !isScaledToZeroAndOutOfFlow(afterStyles)) {
+      children.push(`<div style="${toInlineStyles(afterStyles)}"></div>`);
     }
 
-    // Extra attributes (images, SVG attrs)
-    const extraAttrs = [];
+    const attributesToSerialize = [];
 
-    if (el instanceof HTMLImageElement) {
-      extraAttrs.push(["src", el.src]);
+    if (target instanceof HTMLImageElement) {
+      attributesToSerialize.push(["src", target.src]);
       if (!styles.width && !styles.height) {
-        const imgCs = window.getComputedStyle(el);
-        styles.width = imgCs.width;
-        styles.height = imgCs.height;
+        const computedStyles = window.getComputedStyle(target);
+        styles.width = computedStyles.width;
+        styles.height = computedStyles.height;
       }
     }
 
-    if (el instanceof HTMLBRElement) return { html: "<br>", processedNodes };
+    if (target instanceof HTMLBRElement) {
+      return { html: "<br>", processedNodes };
+    }
 
-    // Normalize tag names
-    const tableTags = ["table", "thead", "tbody", "tfoot", "tr", "td", "th", "caption", "colgroup", "col"];
-    const formTags = ["input", "textarea"];
-    const outputTag = [...tableTags, ...formTags].includes(tagName) ? "div" : tagName;
+    const tableElements = ["table", "thead", "tbody", "tfoot", "tr", "td", "th", "caption", "colgroup", "col"];
+    const inputs = ["input", "textarea"];
+    const finalTagName = [...tableElements, ...inputs].includes(tagName) ? "div" : tagName;
 
-    // SVG attribute handling — exact match with Paper Snapshot
-    if (el instanceof SVGElement) {
-      attrs.forEach(([name, val]) => {
-        if (["class", "style", "display", "overflow"].includes(name) || !val) return;
+    if (target instanceof SVGElement) {
+      targetAttributes.forEach(([name, value]) => {
+        if (["class", "style", "display", "overflow"].includes(name) || !value) return;
         if (["fill", "stroke", "color"].includes(name)) {
-          if (val.startsWith("var(")) {
-            const resolved = styles[name];
-            if (resolved) val = resolved;
-          } else if (val.toLowerCase() === "currentcolor") {
-            const resolved = styles[name] ?? styles.color;
-            if (resolved) val = resolved;
+          if (value.startsWith("var(")) {
+            const computedValue = styles[name];
+            if (computedValue) value = computedValue;
+          } else if (value.toLowerCase() === "currentcolor") {
+            const computedValue = styles[name] ?? styles.color;
+            if (computedValue) value = computedValue;
           }
         }
-        extraAttrs.push([name, val.replaceAll('"', "'")]);
+        attributesToSerialize.push([name, value.replaceAll('"', "'")]);
       });
-      for (const [name] of extraAttrs) {
-        if (!["width", "height"].includes(name)) delete styles[name];
+
+      for (const [name] of attributesToSerialize) {
+        if (["width", "height"].includes(name)) continue;
+        delete styles[name];
       }
     }
 
-    // Build style attribute
     if (Object.keys(styles).length > 0) {
       if (styles.width || styles.height) {
         styles.width ??= "auto";
         styles.height ??= "auto";
       }
-      extraAttrs.push(["style", stylesToString(styles)]);
+      attributesToSerialize.push(["style", toInlineStyles(styles)]);
     }
 
-    // KEY LOGIC — exact match with Paper Snapshot:
-    // Render with tag if: isInsideSVG OR (element is visible AND not display:contents)
-    // Otherwise: just output children (unwrap the element)
-    if (isInsideSVG(el) || (el.checkVisibility() && styles.display !== "contents")) {
-      return {
-        html: `<${outputTag} ${extraAttrs.map(([k, v]) => `${k}="${v}"`).join(" ")}>${children.join("")}</${outputTag}>`,
-        processedNodes,
-      };
+    const isElementVisible = isChildOfSVG(target) || (target.checkVisibility() && styles.display !== "contents");
+    if (isElementVisible) {
+      const html = `<${finalTagName} ${attributesToSerialize.map(([key, value]) => `${key}="${value}"`).join(" ")}>${children.join("")}</${finalTagName}>`;
+      return { html, processedNodes };
     }
 
     return { html: children.join(""), processedNodes };
   }
 
-  // Execute serialization
-  const target = document.querySelector(selector);
-  if (!target) return { status: "error", error: "Element not found" };
-
-  const abortController = new AbortController();
-  function onEscapeKey(e) {
-    if (e.key === "Escape") {
-      e.preventDefault();
-      e.stopPropagation();
-      abortController.abort();
+  const elementToSerialize = document.querySelector(selector);
+  if (elementToSerialize) {
+    const abortController = new AbortController();
+    function keyDownHandler(e) {
+      if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); abortController.abort(); }
     }
+    window.addEventListener("keydown", keyDownHandler, { capture: true });
+
+    setToastProgress(null);
+    const dryRun = await serialize(elementToSerialize, { dryRun: true });
+    totalNodesToProcess = dryRun.processedNodes;
+    setToastProgress(0);
+
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    const result = await serialize(elementToSerialize, { abortSignal: abortController.signal });
+    window.removeEventListener("keydown", keyDownHandler, { capture: true });
+
+    if (abortController.signal.aborted) return { status: "aborted" };
+    return { status: "success", html: result.html };
   }
-  window.addEventListener("keydown", onEscapeKey, { capture: true });
 
-  // Dry run to count nodes for progress
-  updateProgress(null);
-  totalNodes = (await serialize(target, { dryRun: true })).processedNodes;
-  updateProgress(0);
-  await new Promise((r) => setTimeout(r, 500));
-
-  // Real serialization
-  const result = await serialize(target, { abortSignal: abortController.signal });
-  window.removeEventListener("keydown", onEscapeKey, { capture: true });
-
-  if (abortController.signal.aborted) return { status: "aborted" };
-  return { status: "success", html: result.html };
+  return { status: "error", error: "Element not found" };
 }
 
 // ============================================================================
-// TOAST: Notification UI
+// TOAST — Simplified from Paper Snapshot: toast.ts
+// Changes: element names, CSS var names
 // ============================================================================
-function showToast(message, { iconColor = "#6366f1", dismissTimeout = 5000, hideOnHover = false, showProgressBar = false, messageClassName = "" } = {}) {
-  const existing = document.querySelector("#ui2code-toast-container");
-  const container = existing || document.createElement("div");
-  container.id = "ui2code-toast-container";
-  container.removeAttribute("data-removing");
-  container.setAttribute("data-timeout", String(dismissTimeout));
+function showToast(messageHTML, { iconColor = "#6366f1", dismissTimeout = 5000, hideOnHover = false, showProgressBar = false, messageClassName = "" } = {}) {
+  const existing = document.querySelector("#ui2code-toast-wrapper");
+  const wrapper = existing || document.createElement("div");
+  wrapper.id = "ui2code-toast-wrapper";
+  wrapper.removeAttribute("data-removing");
+  wrapper.setAttribute("data-timeout", String(dismissTimeout));
 
   if (existing) {
-    const toast = existing.querySelector("ui2code-toast");
-    if (toast) {
-      const shadow = toast.shadowRoot;
+    const toastCustomEl = existing.querySelector("ui2code-toast");
+    if (toastCustomEl) {
+      const shadow = toastCustomEl.shadowRoot;
       if (shadow) {
-        const wrapper = shadow.querySelector(".toast__message-wrapper");
-        if (wrapper) {
-          const items = Array.from(wrapper.querySelectorAll(".toast__message-item"));
+        const msgWrapper = shadow.querySelector(".toast__message-wrapper");
+        if (msgWrapper) {
+          const items = Array.from(msgWrapper.querySelectorAll(".toast__message-item"));
           if (messageClassName && items.find((i) => i.classList.contains(messageClassName))) {
             const toastEl = shadow.querySelector(".toast");
             toastEl.getAnimations().forEach((a) => a.cancel());
-            toastEl.animate([{ transform: "scale(1)" }, { transform: "scale(1.02)" }, { transform: "scale(1)" }], {
-              duration: 500,
-              easing: "cubic-bezier(0.34, 1.56, 0.64, 1)",
-            });
+            toastEl.animate([{ transform: "scale(1)" }, { transform: "scale(1.02)" }, { transform: "scale(1)" }], { duration: 500, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" });
             existing.setAttribute("data-timeout", String(dismissTimeout));
             existing.removeAttribute("data-removing");
             return;
@@ -744,88 +689,52 @@ function showToast(message, { iconColor = "#6366f1", dismissTimeout = 5000, hide
             item.addEventListener("transitionend", onEnd, { once: true });
             item.style.transform = "translate(-50%, -24px)";
           });
-
           const newItem = document.createElement("div");
           newItem.className = `toast__message-item${messageClassName ? ` ${messageClassName}` : ""}`;
-          newItem.innerHTML = message;
-          wrapper.appendChild(newItem);
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              const allItems = wrapper.querySelectorAll(".toast__message-item");
-              const last = allItems[allItems.length - 1];
-              if (last) {
-                const w = Math.max(last.offsetWidth, last.scrollWidth, last.getBoundingClientRect().width);
-                wrapper.style.width = `${w}px`;
-              }
-            });
-          });
+          newItem.innerHTML = messageHTML;
+          msgWrapper.appendChild(newItem);
+          requestAnimationFrame(() => { requestAnimationFrame(() => {
+            const allItems = msgWrapper.querySelectorAll(".toast__message-item");
+            const last = allItems[allItems.length - 1];
+            if (last) { const w = Math.max(last.offsetWidth, last.scrollWidth, last.getBoundingClientRect().width); msgWrapper.style.width = `${w}px`; }
+          }); });
         }
-
         const svgPath = shadow.querySelector("svg path");
         if (svgPath) svgPath.setAttribute("fill", iconColor);
-
         const toastEl = shadow.querySelector(".toast");
-        if (toastEl) {
-          hideOnHover ? toastEl.setAttribute("data-hide-on-hover", "") : toastEl.removeAttribute("data-hide-on-hover");
-        }
-
+        if (toastEl) { hideOnHover ? toastEl.setAttribute("data-hide-on-hover", "") : toastEl.removeAttribute("data-hide-on-hover"); }
         const progressBar = shadow.querySelector(".toast__progress");
         if (showProgressBar && !progressBar) {
-          const bar = document.createElement("div");
-          bar.className = "toast__progress";
-          const toastEl2 = shadow.querySelector(".toast");
-          if (toastEl2) toastEl2.insertBefore(bar, toastEl2.firstChild);
+          const bar = document.createElement("div"); bar.className = "toast__progress";
+          const t = shadow.querySelector(".toast"); if (t) t.insertBefore(bar, t.firstChild);
         } else if (!showProgressBar && progressBar) {
           const onEnd = () => { progressBar.removeEventListener("transitionend", onEnd); progressBar.remove(); };
-          progressBar.addEventListener("transitionend", onEnd, { once: true });
-          progressBar.style.opacity = "0";
+          progressBar.addEventListener("transitionend", onEnd, { once: true }); progressBar.style.opacity = "0";
         }
         return;
       }
     }
   }
 
-  container.setHTMLUnsafe(`
+  wrapper.setHTMLUnsafe(`
     <ui2code-toast>
       <template shadowrootmode="open">
         <style>
           *:not(svg *, style, span) { all: initial; }
-          kbd {
-            align-items: center; background-color: rgb(252, 252, 249); border-radius: 3px;
-            box-shadow: inset 0 -.05em .5em #00000006, inset 0 .05em #fffffff2, inset 0 .25em .5em #00000006, inset 0 -.05em #00000026, 0 0 0 .05em #0000001f, 0 .08em .17em #0003;
-            box-sizing: border-box; color: oklab(0 0 0 / 0.8); display: inline-flex;
-            font-family: -apple-system, 'system-ui', system-ui, sans-serif; font-size: 12px; line-height: 1;
-            height: 20px; justify-content: center; margin-inline: 2px; padding: 0 4px; min-width: 20px;
-          }
-          [data-hide-on-hover] { opacity: 1; }
-          [data-hide-on-hover]:hover { opacity: 0; }
-          .toast {
-            box-sizing: border-box; position: relative; display: flex; align-items: center; contain: content;
-            height: 48px; background-color: rgb(255 255 255); --popup-radius: 8px;
-            border-radius: var(--popup-radius);
-            box-shadow: rgb(0 0 0 / 25%) 0px 4px 20px -4px, rgb(0 0 0 / 10%) 0px 0px 0px 1px;
-            font-synthesis: none; pointer-events: auto;
-            transition: opacity 350ms ease, scale 350ms cubic-bezier(0.34, 1.56, 0.64, 1), translate 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
-            transform-origin: top center;
-            @starting-style { opacity: 0; scale: 0.98; translate: 0 -24px; }
-          }
+          kbd { align-items: center; background-color: rgb(252, 252, 249); border-radius: 3px; box-shadow: inset 0 -.05em .5em #00000006, inset 0 .05em #fffffff2, inset 0 .25em .5em #00000006, inset 0 -.05em #00000026, 0 0 0 .05em #0000001f, 0 .08em .17em #0003; box-sizing: border-box; color: oklab(0 0 0 / 0.8); display: inline-flex; font-family: -apple-system, 'system-ui', system-ui, sans-serif; font-size: 12px; line-height: 1; height: 20px; justify-content: center; margin-inline: 2px; padding: 0 4px; min-width: 20px; }
+          [data-hide-on-hover] { opacity: 1; } [data-hide-on-hover]:hover { opacity: 0; }
+          .toast { box-sizing: border-box; position: relative; display: flex; align-items: center; contain: content; height: 48px; background-color: rgb(255 255 255); --popup-radius: 8px; border-radius: var(--popup-radius); box-shadow: rgb(0 0 0 / 25%) 0px 4px 20px -4px, rgb(0 0 0 / 10%) 0px 0px 0px 1px; font-synthesis: none; pointer-events: auto; transition: opacity 350ms ease, scale 350ms cubic-bezier(0.34, 1.56, 0.64, 1), translate 350ms cubic-bezier(0.34, 1.56, 0.64, 1); transform-origin: top center; @starting-style { opacity: 0; scale: 0.98; translate: 0 -24px; } }
           .toast.animate-out { opacity: 0; translate: 0 -16px; scale: 0.98; transition: opacity 150ms ease-in, scale 150ms ease-in, translate 150ms ease-in; }
           .toast__placement { position: fixed; left: 0; right: 0; top: 16px; display: flex; justify-content: center; pointer-events: none; user-select: none; z-index: calc(infinity); }
           .toast__message { align-items: center; box-sizing: border-box; display: flex; flex-direction: column; flex-shrink: 0; height: 100%; overflow: hidden; position: relative; padding-right: 20px; padding-left: 50px; }
           .toast__message-wrapper { height: 100%; position: relative; transition: width 500ms cubic-bezier(0, 0.9, 0.2, 1); will-change: width; }
-          .toast__message-item {
-            align-items: center; display: flex; gap: 4px; height: 100%; justify-content: center; left: 50%;
-            position: absolute; top: 0; transform: translateX(-50%); width: fit-content;
-            color: oklab(0% 0 0 / 80%); font-size: 14px; font-family: system-ui, sans-serif;
-            -moz-osx-font-smoothing: grayscale; -webkit-font-smoothing: antialiased; line-height: 16px; text-wrap-mode: nowrap;
-            transition: transform 250ms cubic-bezier(0.33, 1, 0.68, 1), opacity 250ms ease-out, filter 250ms ease-out;
-          }
+          .toast__message-item { align-items: center; display: flex; gap: 4px; height: 100%; justify-content: center; left: 50%; position: absolute; top: 0; transform: translateX(-50%); width: fit-content; color: oklab(0% 0 0 / 80%); font-size: 14px; font-family: system-ui, sans-serif; -moz-osx-font-smoothing: grayscale; -webkit-font-smoothing: antialiased; line-height: 16px; text-wrap-mode: nowrap; transition: transform 250ms cubic-bezier(0.33, 1, 0.68, 1), opacity 250ms ease-out, filter 250ms ease-out; }
           .toast__message-item:not(:first-child) { @starting-style { opacity: 0; filter: blur(4px); transform: translate(-50%, 24px); } }
           .toast__message-item:not(:last-child) { opacity: 0; filter: blur(4px); }
           .toast__message-item span.dot { margin: 0 4px; opacity: 0.4; }
           .toast__message-item.capturing { gap: 0px; }
-          .toast__message-item.capturing::after { color: oklab(0% 0 0 / 60%); content: var(--suffix, ""); font-variant-numeric: tabular-nums; width: var(--suffix-width, 0); text-align: right; }
-          .toast__progress { background-color: rgb(0 0 0 / 3.5%); inset: 0; position: absolute; scale: calc(var(--progress, 0) / 100) 1; transform-origin: left; transition: scale 250ms ease-out, opacity 150ms ease-out; }
+          .toast__message-item.capturing::after { color: oklab(0% 0 0 / 60%); content: var(--ui2code-suffix, ""); font-variant-numeric: tabular-nums; width: var(--ui2code-suffix-width, 0); text-align: right; }
+          .toast__progress { background-color: rgb(0 0 0 / 3.5%); inset: 0; position: absolute; scale: calc(var(--ui2code-progress, 0) / 100) 1; transform-origin: left; transition: scale 250ms ease-out, opacity 150ms ease-out; }
           .toast__progress.no-transition { transition: none; }
           svg { position: absolute; left: 19px; transition: fill 250ms ease-out; z-index: 1; }
           @media (prefers-color-scheme: dark) {
@@ -837,15 +746,15 @@ function showToast(message, { iconColor = "#6366f1", dismissTimeout = 5000, hide
           }
         </style>
         <div class="toast__placement">
-          <div class="toast" ${hideOnHover ? 'data-hide-on-hover' : ''}>
-            ${showProgressBar ? '<div class="toast__progress"></div>' : ''}
+          <div class="toast" ${hideOnHover ? "data-hide-on-hover" : ""}>
+            ${showProgressBar ? '<div class="toast__progress"></div>' : ""}
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z" fill="${iconColor}"/>
             </svg>
             <div class="toast__message">
               <div class="toast__message-wrapper">
-                <div class="toast__message-item${messageClassName ? ` ${messageClassName}` : ''}">
-                  ${message}
+                <div class="toast__message-item${messageClassName ? ` ${messageClassName}` : ""}">
+                  ${messageHTML}
                 </div>
               </div>
             </div>
@@ -855,65 +764,56 @@ function showToast(message, { iconColor = "#6366f1", dismissTimeout = 5000, hide
     </ui2code-toast>
   `);
 
-  if (!container.parentElement) {
-    document.body.appendChild(container);
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const toast = container.querySelector("ui2code-toast");
-        if (toast) {
-          const shadow = toast.shadowRoot;
-          if (shadow) {
-            const wrapper = shadow.querySelector(".toast__message-wrapper");
-            const item = shadow.querySelector(".toast__message-item");
-            if (wrapper && item) {
-              const w = Math.max(item.offsetWidth, item.scrollWidth, item.getBoundingClientRect().width);
-              wrapper.style.width = `${w}px`;
-            }
+  if (!wrapper.parentElement) {
+    document.body.appendChild(wrapper);
+    requestAnimationFrame(() => { requestAnimationFrame(() => {
+      const toastCustomEl = wrapper.querySelector("ui2code-toast");
+      if (toastCustomEl) {
+        const shadow = toastCustomEl.shadowRoot;
+        if (shadow) {
+          const msgWrapper = shadow.querySelector(".toast__message-wrapper");
+          const item = shadow.querySelector(".toast__message-item");
+          if (msgWrapper && item) {
+            const w = Math.max(item.offsetWidth, item.scrollWidth, item.getBoundingClientRect().width);
+            msgWrapper.style.width = `${w}px`;
           }
         }
-      });
-    });
+      }
+    }); });
   }
 }
 
 function dismissToast({ immediate = false } = {}) {
-  const container = document.querySelector("#ui2code-toast-container");
-  if (!(container instanceof HTMLElement)) return;
-  if (container.hasAttribute("data-removing")) return;
-
-  const timeout = immediate ? 0 : Number(container.getAttribute("data-timeout") || "0");
-  const toastEl = container.querySelector("ui2code-toast")?.shadowRoot?.querySelector(".toast");
+  const wrapper = document.querySelector("#ui2code-toast-wrapper");
+  if (!(wrapper instanceof HTMLElement)) return;
+  if (wrapper.hasAttribute("data-removing")) return;
+  const timeout = immediate ? 0 : Number(wrapper.getAttribute("data-timeout") || "0");
+  const toastEl = wrapper.querySelector("ui2code-toast")?.shadowRoot?.querySelector(".toast");
   if (!toastEl) return;
-
   const doRemove = () => {
-    const onEnd = () => { toastEl.removeEventListener("transitionend", onEnd); container.remove(); };
+    const onEnd = () => { toastEl.removeEventListener("transitionend", onEnd); wrapper.remove(); };
     toastEl.addEventListener("transitionend", onEnd);
   };
-
-  if (timeout === 0) {
-    toastEl.classList.add("animate-out");
-    doRemove();
-  } else {
+  if (timeout === 0) { toastEl.classList.add("animate-out"); doRemove(); }
+  else {
     const id = Date.now().toString(36);
-    container.setAttribute("data-removing", id);
+    wrapper.setAttribute("data-removing", id);
     window.addEventListener("mousemove", () => {
-      setTimeout(() => {
-        if (container.getAttribute("data-removing") === id) {
-          toastEl.classList.add("animate-out");
-          doRemove();
-        }
-      }, timeout);
+      setTimeout(() => { if (wrapper.getAttribute("data-removing") === id) { toastEl.classList.add("animate-out"); doRemove(); } }, timeout);
     }, { once: true });
   }
 }
 
 // ============================================================================
-// PROCESSING INDICATOR: Border animation around selected element
+// PROCESSING INDICATOR — Direct port from Paper Snapshot: processing-indicator.ts
 // ============================================================================
 function showProcessingIndicator(selector) {
-  ["ui2code-blanket", "ui2code-indicator", "ui2code-picker-outline", "ui2code-indicator-styles"].forEach((id) =>
-    document.getElementById(id)?.remove()
-  );
+  const BLANKET_ID = "ui2code-blanket";
+  const INDICATOR_ID = "ui2code-indicator";
+  const PICKER_ID = "ui2code-picker-outline";
+  const STYLES_ID = "ui2code-indicator-styles";
+
+  [BLANKET_ID, PICKER_ID, INDICATOR_ID, STYLES_ID].forEach((id) => document.getElementById(id)?.remove());
 
   const el = document.querySelector(selector);
   if (!el) return;
@@ -928,7 +828,7 @@ function showProcessingIndicator(selector) {
   const borderRadius = getComputedStyle(el).borderRadius;
 
   const styles = document.createElement("style");
-  styles.id = "ui2code-indicator-styles";
+  styles.id = STYLES_ID;
   styles.textContent = `
     @keyframes __ui2code-spin { to { transform: rotate(360deg); } }
     @keyframes __ui2code-fade-in { from { opacity: 0; } to { opacity: 1; } }
@@ -937,64 +837,24 @@ function showProcessingIndicator(selector) {
   document.head.appendChild(styles);
 
   const indicator = document.createElement("div");
-  indicator.id = "ui2code-indicator";
-  Object.assign(indicator.style, {
-    animation: "__ui2code-fade-in 300ms ease-in forwards",
-    borderRadius: borderRadius || "0px",
-    boxSizing: "border-box",
-    height: `${height}px`,
-    left: `${left}px`,
-    maskComposite: "exclude",
-    overflow: "hidden",
-    padding: "2px",
-    pointerEvents: "none",
-    position: "absolute",
-    top: `${top}px`,
-    WebkitMask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
-    WebkitMaskComposite: "xor",
-    width: `${width}px`,
-    zIndex: "calc(infinity)",
-  });
+  indicator.id = INDICATOR_ID;
+  Object.assign(indicator.style, { animation: "__ui2code-fade-in 300ms ease-in forwards", borderRadius: borderRadius || "0px", boxSizing: "border-box", height: `${height}px`, left: `${left}px`, maskComposite: "exclude", overflow: "hidden", padding: "2px", pointerEvents: "none", position: "absolute", top: `${top}px`, WebkitMask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)", WebkitMaskComposite: "xor", width: `${width}px`, zIndex: "calc(infinity)" });
 
   const diameter = Math.ceil(Math.sqrt(width * width + height * height));
   const spinner = document.createElement("div");
-  Object.assign(spinner.style, {
-    animation: "__ui2code-spin 2500ms linear infinite",
-    background: "conic-gradient(#6366f1 0%, rgba(99,102,241,0.3) 25%, #6366f1 50%, rgba(99,102,241,0.3) 75%, #6366f1 100%)",
-    borderRadius: "50%",
-    height: `${diameter}px`,
-    left: "50%",
-    marginLeft: `${-diameter / 2}px`,
-    marginTop: `${-diameter / 2}px`,
-    position: "absolute",
-    top: "50%",
-    width: `${diameter}px`,
-    willChange: "transform",
-  });
+  Object.assign(spinner.style, { animation: "__ui2code-spin 2500ms linear infinite", background: "conic-gradient(#6366f1 0%, rgba(99,102,241,0.3) 25%, #6366f1 50%, rgba(99,102,241,0.3) 75%, #6366f1 100%)", borderRadius: "50%", height: `${diameter}px`, left: "50%", marginLeft: `${-diameter / 2}px`, marginTop: `${-diameter / 2}px`, position: "absolute", top: "50%", width: `${diameter}px`, willChange: "transform" });
   indicator.appendChild(spinner);
 
-  const outline = document.createElement("div");
-  outline.id = "ui2code-picker-outline";
-  Object.assign(outline.style, {
-    animation: "__ui2code-fade-out 300ms ease-out forwards",
-    border: "2px solid #6366f1",
-    borderRadius: borderRadius || "0px",
-    boxSizing: "border-box",
-    height: `${height}px`,
-    left: `${left}px`,
-    pointerEvents: "none",
-    position: "absolute",
-    top: `${top}px`,
-    width: `${width}px`,
-    zIndex: "calc(infinity)",
-  });
+  const pickerOutline = document.createElement("div");
+  pickerOutline.id = PICKER_ID;
+  Object.assign(pickerOutline.style, { animation: "__ui2code-fade-out 300ms ease-out forwards", border: "2px solid oklch(0.7 0.15 258)", borderRadius: borderRadius || "0px", boxSizing: "border-box", height: `${height}px`, left: `${left}px`, pointerEvents: "none", position: "absolute", top: `${top}px`, width: `${width}px`, zIndex: "calc(infinity)" });
 
   const blanket = document.createElement("div");
-  blanket.id = "ui2code-blanket";
+  blanket.id = BLANKET_ID;
   Object.assign(blanket.style, { position: "fixed", inset: "0", zIndex: "calc(infinity)", cursor: "wait" });
 
   document.body.appendChild(blanket);
-  document.body.appendChild(outline);
+  document.body.appendChild(pickerOutline);
   document.body.appendChild(indicator);
 }
 
@@ -1002,33 +862,20 @@ function hideProcessingIndicator() {
   const indicator = document.getElementById("ui2code-indicator");
   if (!indicator) return;
   indicator.style.animation = "__ui2code-fade-out 200ms ease-in forwards";
-  const cleanup = () => {
-    ["ui2code-blanket", "ui2code-indicator", "ui2code-picker-outline", "ui2code-indicator-styles"].forEach((id) =>
-      document.getElementById(id)?.remove()
-    );
-  };
+  const cleanup = () => { ["ui2code-blanket", "ui2code-indicator", "ui2code-picker-outline", "ui2code-indicator-styles"].forEach((id) => document.getElementById(id)?.remove()); };
   indicator.addEventListener("transitionend", cleanup, { once: true });
   setTimeout(cleanup, 300);
 }
 
 // ============================================================================
-// FOCUS PROMPT: Click-to-start overlay for unfocused tabs
+// FOCUS PROMPT — Direct port from Paper Snapshot: click-to-start.ts
 // ============================================================================
-function showFocusPrompt() {
+function clickToStartOverlay() {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
-    Object.assign(overlay.style, {
-      position: "fixed", inset: "0", zIndex: "2147483647", cursor: "pointer",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      background: "rgba(0,0,0,0.15)", backdropFilter: "saturate(1.5)",
-    });
+    Object.assign(overlay.style, { position: "fixed", inset: "0", zIndex: "2147483647", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.15)", backdropFilter: "saturate(1.5)" });
     const label = document.createElement("div");
-    Object.assign(label.style, {
-      background: "rgba(0,0,0,0.82)", color: "rgba(255,255,255,0.9)",
-      padding: "8px 16px", borderRadius: "10px",
-      font: "500 13px/1.4 -apple-system,BlinkMacSystemFont,Inter,system-ui,sans-serif",
-      pointerEvents: "none", boxShadow: "0 4px 20px -4px rgba(0,0,0,0.6)", letterSpacing: "-0.01em",
-    });
+    Object.assign(label.style, { background: "rgba(0,0,0,0.82)", color: "rgba(255,255,255,0.9)", padding: "8px 16px", borderRadius: "10px", font: "500 13px/1.4 -apple-system,BlinkMacSystemFont,Inter,system-ui,sans-serif", pointerEvents: "none", boxShadow: "0 4px 20px -4px rgba(0,0,0,0.6)", letterSpacing: "-0.01em" });
     label.textContent = "Click to start selecting an element";
     overlay.appendChild(label);
     document.body.appendChild(overlay);
@@ -1037,320 +884,74 @@ function showFocusPrompt() {
 }
 
 // ============================================================================
-// PREVIEW: Show captured HTML in a preview overlay with iframe
+// PREVIEW — Show captured HTML in overlay with iframe before copying
 // ============================================================================
 function showPreview(html) {
   return new Promise((resolve) => {
-    // Backdrop
     const backdrop = document.createElement("div");
     backdrop.id = "ui2code-preview-backdrop";
-    Object.assign(backdrop.style, {
-      position: "fixed",
-      inset: "0",
-      zIndex: "2147483647",
-      background: "rgba(0, 0, 0, 0.6)",
-      backdropFilter: "blur(4px)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif",
-      opacity: "0",
-      transition: "opacity 200ms ease-out",
-    });
+    Object.assign(backdrop.style, { position: "fixed", inset: "0", zIndex: "2147483647", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif", opacity: "0", transition: "opacity 200ms ease-out" });
 
-    // Panel
     const panel = document.createElement("div");
-    Object.assign(panel.style, {
-      background: "#1c1c1e",
-      borderRadius: "16px",
-      boxShadow: "0 24px 80px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08)",
-      display: "flex",
-      flexDirection: "column",
-      maxWidth: "90vw",
-      maxHeight: "90vh",
-      minWidth: "480px",
-      minHeight: "360px",
-      width: "75vw",
-      height: "80vh",
-      overflow: "hidden",
-      transform: "scale(0.96) translateY(8px)",
-      transition: "transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1)",
-    });
+    Object.assign(panel.style, { background: "#1c1c1e", borderRadius: "16px", boxShadow: "0 24px 80px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08)", display: "flex", flexDirection: "column", maxWidth: "90vw", maxHeight: "90vh", minWidth: "480px", minHeight: "360px", width: "75vw", height: "80vh", overflow: "hidden", transform: "scale(0.96) translateY(8px)", transition: "transform 250ms cubic-bezier(0.34,1.56,0.64,1)" });
 
-    // Header bar
+    // Header
     const header = document.createElement("div");
-    Object.assign(header.style, {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: "16px 20px",
-      borderBottom: "1px solid rgba(255,255,255,0.08)",
-      flexShrink: "0",
-    });
-
+    Object.assign(header.style, { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.08)", flexShrink: "0" });
     const title = document.createElement("div");
-    Object.assign(title.style, {
-      color: "rgba(255,255,255,0.9)",
-      fontSize: "14px",
-      fontWeight: "600",
-      letterSpacing: "-0.01em",
-    });
+    Object.assign(title.style, { color: "rgba(255,255,255,0.9)", fontSize: "14px", fontWeight: "600", letterSpacing: "-0.01em" });
     title.textContent = "Preview Captured Element";
-
     const headerRight = document.createElement("div");
-    Object.assign(headerRight.style, {
-      display: "flex",
-      gap: "8px",
-      alignItems: "center",
-    });
-
-    // Size info label
+    Object.assign(headerRight.style, { display: "flex", gap: "8px", alignItems: "center" });
     const sizeLabel = document.createElement("div");
-    Object.assign(sizeLabel.style, {
-      color: "rgba(255,255,255,0.4)",
-      fontSize: "12px",
-      fontVariantNumeric: "tabular-nums",
-      marginRight: "8px",
-    });
-    const htmlSizeKB = (new Blob([html]).size / 1024).toFixed(1);
-    sizeLabel.textContent = `${htmlSizeKB} KB`;
+    Object.assign(sizeLabel.style, { color: "rgba(255,255,255,0.4)", fontSize: "12px", fontVariantNumeric: "tabular-nums", marginRight: "8px" });
+    sizeLabel.textContent = `${(new Blob([html]).size / 1024).toFixed(1)} KB`;
 
-    // Cancel button
     const cancelBtn = document.createElement("button");
-    Object.assign(cancelBtn.style, {
-      background: "rgba(255,255,255,0.08)",
-      border: "1px solid rgba(255,255,255,0.1)",
-      borderRadius: "8px",
-      color: "rgba(255,255,255,0.7)",
-      cursor: "pointer",
-      fontSize: "13px",
-      fontWeight: "500",
-      padding: "6px 16px",
-      fontFamily: "inherit",
-      transition: "all 150ms ease",
-    });
+    Object.assign(cancelBtn.style, { background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "13px", fontWeight: "500", padding: "6px 16px", fontFamily: "inherit", transition: "all 150ms ease" });
     cancelBtn.textContent = "Cancel";
-    cancelBtn.addEventListener("mouseenter", () => {
-      cancelBtn.style.background = "rgba(255,255,255,0.12)";
-      cancelBtn.style.color = "rgba(255,255,255,0.9)";
-    });
-    cancelBtn.addEventListener("mouseleave", () => {
-      cancelBtn.style.background = "rgba(255,255,255,0.08)";
-      cancelBtn.style.color = "rgba(255,255,255,0.7)";
-    });
+    cancelBtn.onmouseenter = () => { cancelBtn.style.background = "rgba(255,255,255,0.12)"; cancelBtn.style.color = "rgba(255,255,255,0.9)"; };
+    cancelBtn.onmouseleave = () => { cancelBtn.style.background = "rgba(255,255,255,0.08)"; cancelBtn.style.color = "rgba(255,255,255,0.7)"; };
 
-    // Copy button
     const copyBtn = document.createElement("button");
-    Object.assign(copyBtn.style, {
-      background: "#6366f1",
-      border: "1px solid rgba(255,255,255,0.1)",
-      borderRadius: "8px",
-      color: "#fff",
-      cursor: "pointer",
-      fontSize: "13px",
-      fontWeight: "600",
-      padding: "6px 20px",
-      fontFamily: "inherit",
-      transition: "all 150ms ease",
-      boxShadow: "0 1px 3px rgba(99,102,241,0.3)",
-    });
+    Object.assign(copyBtn.style, { background: "#6366f1", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#fff", cursor: "pointer", fontSize: "13px", fontWeight: "600", padding: "6px 20px", fontFamily: "inherit", transition: "all 150ms ease", boxShadow: "0 1px 3px rgba(99,102,241,0.3)" });
     copyBtn.textContent = "Copy to Clipboard";
-    copyBtn.addEventListener("mouseenter", () => {
-      copyBtn.style.background = "#818cf8";
-    });
-    copyBtn.addEventListener("mouseleave", () => {
-      copyBtn.style.background = "#6366f1";
-    });
+    copyBtn.onmouseenter = () => { copyBtn.style.background = "#818cf8"; };
+    copyBtn.onmouseleave = () => { copyBtn.style.background = "#6366f1"; };
 
-    headerRight.appendChild(sizeLabel);
-    headerRight.appendChild(cancelBtn);
-    headerRight.appendChild(copyBtn);
-    header.appendChild(title);
-    header.appendChild(headerRight);
+    headerRight.append(sizeLabel, cancelBtn, copyBtn);
+    header.append(title, headerRight);
 
-    // Toolbar: background toggle + zoom
-    const toolbar = document.createElement("div");
-    Object.assign(toolbar.style, {
-      display: "flex",
-      alignItems: "center",
-      gap: "12px",
-      padding: "8px 20px",
-      borderBottom: "1px solid rgba(255,255,255,0.06)",
-      flexShrink: "0",
-    });
-
-    let currentBg = "#1a1a1a";
-    const bgOptions = [
-      { label: "Dark", value: "#1a1a1a" },
-      { label: "Light", value: "#ffffff" },
-      { label: "Checkerboard", value: "checkerboard" },
-    ];
-
-    const bgLabel = document.createElement("span");
-    Object.assign(bgLabel.style, { color: "rgba(255,255,255,0.4)", fontSize: "12px" });
-    bgLabel.textContent = "Background:";
-    toolbar.appendChild(bgLabel);
-
-    const bgBtns = [];
-    bgOptions.forEach((opt) => {
-      const btn = document.createElement("button");
-      Object.assign(btn.style, {
-        background: opt.value === "checkerboard"
-          ? "repeating-conic-gradient(#808080 0% 25%, #c0c0c0 0% 50%) 50%/12px 12px"
-          : opt.value,
-        border: opt.value === currentBg ? "2px solid #6366f1" : "2px solid rgba(255,255,255,0.15)",
-        borderRadius: "6px",
-        width: "24px",
-        height: "24px",
-        cursor: "pointer",
-        transition: "border-color 150ms ease",
-        padding: "0",
-        flexShrink: "0",
-      });
-      btn.title = opt.label;
-      btn.addEventListener("click", () => {
-        currentBg = opt.value;
-        bgBtns.forEach((b) => (b.style.border = "2px solid rgba(255,255,255,0.15)"));
-        btn.style.border = "2px solid #6366f1";
-        updateIframeBg();
-      });
-      bgBtns.push(btn);
-      toolbar.appendChild(btn);
-    });
-
-    // Zoom controls
-    const zoomSpacer = document.createElement("div");
-    zoomSpacer.style.flex = "1";
-    toolbar.appendChild(zoomSpacer);
-
-    let zoom = 100;
-    const zoomLabel = document.createElement("span");
-    Object.assign(zoomLabel.style, {
-      color: "rgba(255,255,255,0.5)",
-      fontSize: "12px",
-      fontVariantNumeric: "tabular-nums",
-      minWidth: "36px",
-      textAlign: "center",
-    });
-    zoomLabel.textContent = "100%";
-
-    function makeZoomBtn(text) {
-      const btn = document.createElement("button");
-      Object.assign(btn.style, {
-        background: "rgba(255,255,255,0.08)",
-        border: "1px solid rgba(255,255,255,0.1)",
-        borderRadius: "6px",
-        color: "rgba(255,255,255,0.7)",
-        cursor: "pointer",
-        fontSize: "14px",
-        fontWeight: "600",
-        width: "28px",
-        height: "28px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "0",
-        fontFamily: "inherit",
-        transition: "all 150ms ease",
-      });
-      btn.textContent = text;
-      btn.addEventListener("mouseenter", () => { btn.style.background = "rgba(255,255,255,0.14)"; });
-      btn.addEventListener("mouseleave", () => { btn.style.background = "rgba(255,255,255,0.08)"; });
-      return btn;
-    }
-
-    const zoomOutBtn = makeZoomBtn("−");
-    const zoomInBtn = makeZoomBtn("+");
-
-    function updateZoom() {
-      zoomLabel.textContent = `${zoom}%`;
-      const iframeDoc = iframe.contentDocument;
-      if (iframeDoc?.body) {
-        iframeDoc.body.style.transform = `scale(${zoom / 100})`;
-        iframeDoc.body.style.transformOrigin = "top left";
-      }
-    }
-
-    zoomOutBtn.addEventListener("click", () => {
-      zoom = Math.max(25, zoom - 25);
-      updateZoom();
-    });
-    zoomInBtn.addEventListener("click", () => {
-      zoom = Math.min(200, zoom + 25);
-      updateZoom();
-    });
-
-    toolbar.appendChild(zoomOutBtn);
-    toolbar.appendChild(zoomLabel);
-    toolbar.appendChild(zoomInBtn);
-
-    // Iframe container
+    // Iframe container — NO CSS reset, minimal wrapper
     const iframeContainer = document.createElement("div");
-    Object.assign(iframeContainer.style, {
-      flex: "1",
-      overflow: "auto",
-      position: "relative",
-    });
+    Object.assign(iframeContainer.style, { flex: "1", overflow: "auto", position: "relative", background: "#1a1a1a" });
 
     const iframe = document.createElement("iframe");
-    Object.assign(iframe.style, {
-      border: "none",
-      width: "100%",
-      height: "100%",
-    });
+    Object.assign(iframe.style, { border: "none", width: "100%", height: "100%" });
     iframe.sandbox = "allow-same-origin";
-
-    function updateIframeBg() {
-      const iframeDoc = iframe.contentDocument;
-      if (!iframeDoc?.body) return;
-      if (currentBg === "checkerboard") {
-        iframeDoc.body.style.background = "repeating-conic-gradient(#e0e0e0 0% 25%, #ffffff 0% 50%) 50%/20px 20px";
-      } else {
-        iframeDoc.body.style.background = currentBg;
-      }
-    }
-
     iframeContainer.appendChild(iframe);
 
-    // Footer with hint
+    // Footer
     const footer = document.createElement("div");
-    Object.assign(footer.style, {
-      padding: "10px 20px",
-      borderTop: "1px solid rgba(255,255,255,0.06)",
-      color: "rgba(255,255,255,0.35)",
-      fontSize: "12px",
-      textAlign: "center",
-      flexShrink: "0",
-    });
-    footer.textContent = "Paste into Claude Code → ask to convert to React component";
+    Object.assign(footer.style, { padding: "10px 20px", borderTop: "1px solid rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.35)", fontSize: "12px", textAlign: "center", flexShrink: "0" });
+    footer.textContent = "Paste into Claude Code \u2192 ask to convert to React component";
 
-    // Assemble
-    panel.appendChild(header);
-    panel.appendChild(toolbar);
-    panel.appendChild(iframeContainer);
-    panel.appendChild(footer);
+    panel.append(header, iframeContainer, footer);
     backdrop.appendChild(panel);
     document.body.appendChild(backdrop);
 
-    // Write HTML into iframe
+    // Write HTML into iframe — NO CSS RESET to avoid interfering with serialized styles
     requestAnimationFrame(() => {
       const iframeDoc = iframe.contentDocument;
       if (iframeDoc) {
         iframeDoc.open();
-        iframeDoc.write(`<!DOCTYPE html><html><head><style>
-          * { margin: 0; padding: 0; box-sizing: border-box; }
-          body { display: flex; align-items: flex-start; justify-content: center; padding: 24px; min-height: 100vh; }
-        </style></head><body>${html}</body></html>`);
+        iframeDoc.write("<!DOCTYPE html><html><head><meta charset=\"utf-8\"></head><body style=\"margin:0;padding:24px;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;background:#1a1a1a;\">" + html + "</body></html>");
         iframeDoc.close();
-        updateIframeBg();
       }
-
-      // Animate in
       backdrop.style.opacity = "1";
       panel.style.transform = "scale(1) translateY(0)";
     });
 
-    // Cleanup function
     function close(action) {
       backdrop.style.opacity = "0";
       panel.style.transform = "scale(0.96) translateY(8px)";
@@ -1361,134 +962,116 @@ function showPreview(html) {
 
     cancelBtn.addEventListener("click", () => close("cancel"));
     copyBtn.addEventListener("click", () => close("copy"));
-    backdrop.addEventListener("click", (e) => {
-      if (e.target === backdrop) close("cancel");
-    });
-    document.addEventListener("keydown", function onKey(e) {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        document.removeEventListener("keydown", onKey, { capture: true });
-        close("cancel");
-      }
-      if (e.key === "Enter") {
-        e.preventDefault();
-        document.removeEventListener("keydown", onKey, { capture: true });
-        close("copy");
-      }
-    }, { capture: true });
+    backdrop.addEventListener("click", (e) => { if (e.target === backdrop) close("cancel"); });
+
+    function onKey(e) {
+      if (e.key === "Escape") { e.preventDefault(); document.removeEventListener("keydown", onKey, { capture: true }); close("cancel"); }
+      if (e.key === "Enter") { e.preventDefault(); document.removeEventListener("keydown", onKey, { capture: true }); close("copy"); }
+    }
+    document.addEventListener("keydown", onKey, { capture: true });
   });
 }
 
 // ============================================================================
-// BACKGROUND SERVICE WORKER: Orchestrates the full flow
+// BACKGROUND SERVICE WORKER — Orchestration
 // ============================================================================
 chrome.action.onClicked.addListener(async (tab) => {
   await chrome.action.disable(tab.id);
 
-  // Check if page has focus, show click prompt if not
   const [focusResult] = await chrome.scripting.executeScript({
     target: { tabId: tab.id },
     func: () => document.hasFocus(),
   });
+
   if (focusResult?.result === false) {
     await chrome.scripting.executeScript({
       target: { tabId: tab.id },
-      func: showFocusPrompt,
+      func: clickToStartOverlay,
     });
   }
 
-  // Show instruction toast
   await chrome.scripting.executeScript({
     target: { tabId: tab.id },
     func: showToast,
     args: [
-      'Click or <kbd>↵</kbd> to capture <span class="dot">·</span> <span><kbd>↑</kbd><kbd>↓</kbd></span> to fine-tune <span class="dot">·</span> <kbd>esc</kbd> to cancel',
+      'Click or <kbd>\u21b5</kbd> to capture <span class="dot">\u00b7</span> <span><kbd>\u2191</kbd><kbd>\u2193</kbd></span> to fine-tune <span class="dot">\u00b7</span> <kbd>esc</kbd> to cancel',
       { dismissTimeout: 0, hideOnHover: true, messageClassName: "initial" },
     ],
   });
 
-  // Run element picker in all frames
   chrome.scripting.executeScript(
-    { target: { tabId: tab.id, allFrames: true }, func: pickElement },
+    { target: { tabId: tab.id, allFrames: true }, func: elementPicker },
     async (results) => {
-      const picked = results.find((r) => !!r.result);
+      const result = results.find((res) => !!res.result);
 
-      if (picked) {
-        const frameId = picked.frameId;
-        const selector = picked.result;
+      if (result) {
+        const frameId = result.frameId;
+        const selector = result.result;
 
-        // Show processing indicator
         await chrome.scripting.executeScript({
           target: { tabId: tab.id },
           func: showProcessingIndicator,
           args: [selector],
         });
 
-        // Show capturing toast
         await chrome.scripting.executeScript({
           target: { tabId: tab.id },
           func: showToast,
-          args: ["Capturing element...", { iconColor: "#CCCCCC", showProgressBar: true, messageClassName: "capturing" }],
+          args: ["Capturing selection...", { iconColor: "#CCCCCC", showProgressBar: true, messageClassName: "capturing" }],
         });
 
-        // Serialize the selected element
-        const [serializeResult] = await Promise.all([
+        const [serializedHTML] = await Promise.all([
           chrome.scripting.executeScript({
             target: { tabId: tab.id, frameIds: [frameId] },
-            func: serializeElement,
+            func: elementSerializer,
             args: [selector],
           }),
-          new Promise((r) => setTimeout(r, 500)),
+          new Promise((resolve) => setTimeout(resolve, 500)),
         ]);
 
-        const data = serializeResult[0]?.result;
+        const serializationResult = serializedHTML[0]?.result;
 
-        if (data.status === "success") {
-          // Dismiss the capturing toast before showing preview
+        if (serializationResult.status === "success") {
+          // Dismiss capturing toast before showing preview
           await chrome.scripting.executeScript({
             target: { tabId: tab.id },
             func: dismissToast,
             args: [{ immediate: true }],
           });
 
-          // Show preview overlay with iframe
+          // Show preview
           const [previewResult] = await chrome.scripting.executeScript({
             target: { tabId: tab.id },
             func: showPreview,
-            args: [data.html],
+            args: [serializationResult.html],
           });
 
           const action = previewResult?.result;
-
           if (action === "copy") {
-            // User confirmed — copy to clipboard
             await chrome.scripting.executeScript({
               target: { tabId: tab.id },
               func: copyToClipboard,
-              args: [data.html],
+              args: [serializationResult.html],
             });
-
             await chrome.scripting.executeScript({
               target: { tabId: tab.id },
               func: showToast,
               args: ["Copied! Paste the HTML into Claude Code to generate React components."],
             });
           } else {
-            // User cancelled
             await chrome.scripting.executeScript({
               target: { tabId: tab.id },
               func: showToast,
               args: ["Cancelled", { iconColor: "#CCCCCC", dismissTimeout: 2000 }],
             });
           }
-        } else if (data.status === "error") {
+        } else if (serializationResult.status === "error") {
           await chrome.scripting.executeScript({
             target: { tabId: tab.id },
             func: showToast,
             args: ["An error occurred", { iconColor: "#CCCCCC" }],
           });
         } else {
-          // Aborted
           await chrome.scripting.executeScript({
             target: { tabId: tab.id },
             func: dismissToast,
@@ -1496,14 +1079,12 @@ chrome.action.onClicked.addListener(async (tab) => {
           });
         }
 
-        // Hide processing indicator
         await chrome.scripting.executeScript({
           target: { tabId: tab.id },
           func: hideProcessingIndicator,
         });
       }
 
-      // Dismiss toast and re-enable action
       await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: dismissToast,
