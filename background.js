@@ -503,6 +503,36 @@ async function elementSerializer(selector) {
         children.push(`<div style="${toInlineStyles(beforeStyles)}"></div>`);
       }
       styles = resolveComputedStyles(target, { isRoot: __isRoot });
+
+      // BROWSER FIX: Elements like <fieldset>, <button>, <select>, <input>, <textarea>,
+      // <legend> have user-agent default backgrounds (Canvas, ButtonFace, Field).
+      // Paper Snapshot skips transparent backgrounds because they match the <link> reference,
+      // but paper.design has no UA stylesheet. For browser rendering, we must explicitly
+      // set background-color to override UA defaults.
+      const uaBgElements = ["fieldset", "button", "select", "input", "textarea", "legend", "hr"];
+      if (uaBgElements.includes(tagName)) {
+        if (!styles["background-color"]) styles["background-color"] = targetComputedStyles.backgroundColor;
+        if (!styles["border-style"]) styles["border-style"] = targetComputedStyles.borderStyle || "none";
+        if (!styles["border-width"]) styles["border-width"] = targetComputedStyles.borderWidth || "0px";
+        if (!styles["border-color"]) styles["border-color"] = targetComputedStyles.borderColor;
+        if (!styles["appearance"]) { styles["appearance"] = "none"; styles["-webkit-appearance"] = "none"; }
+        if (!styles["padding"] && !styles["padding-top"]) {
+          styles["padding-top"] = targetComputedStyles.paddingTop;
+          styles["padding-right"] = targetComputedStyles.paddingRight;
+          styles["padding-bottom"] = targetComputedStyles.paddingBottom;
+          styles["padding-left"] = targetComputedStyles.paddingLeft;
+        }
+        if (!styles["margin"] && !styles["margin-top"]) {
+          styles["margin-top"] = targetComputedStyles.marginTop;
+          styles["margin-right"] = targetComputedStyles.marginRight;
+          styles["margin-bottom"] = targetComputedStyles.marginBottom;
+          styles["margin-left"] = targetComputedStyles.marginLeft;
+        }
+      }
+      // Force text-decoration for <a> tags (UA adds underlines)
+      if (tagName === "a" && !styles["text-decoration"]) {
+        styles["text-decoration"] = targetComputedStyles.textDecoration || "none";
+      }
     }
 
     const targetAttributes = target.getAttributeNames().map((name) => [name, target.getAttribute(name) || ""]);
