@@ -694,9 +694,30 @@ async function elementSerializer(selector) {
 
     // Extract interactive CSS rules (hover, focus, active, transitions)
     const interactiveCSS = extractInteractiveStyles(elementToSerialize);
+
+    // Strip positioning styles from the root element that only make sense
+    // in the original page context (position, z-index, pointer-events, inset)
+    let rootHtml = result.html;
+    rootHtml = rootHtml.replace(/^(<\w+\s[^>]*?)style="([^"]*)"/, (match, before, styleStr) => {
+      const cleaned = styleStr
+        .replace(/\bz-index:\s*[^;]+;?\s*/g, "")
+        .replace(/\bpointer-events:\s*[^;]+;?\s*/g, "")
+        .replace(/\binset[^:]*:\s*[^;]+;?\s*/g, "")
+        .replace(/\btop:\s*[^;]+;?\s*/g, "")
+        .replace(/\bleft:\s*[^;]+;?\s*/g, "")
+        .replace(/\bright:\s*[^;]+;?\s*/g, "")
+        .replace(/\bbottom:\s*[^;]+;?\s*/g, "")
+        .trim();
+      return `${before}style="${cleaned}"`;
+    });
+
+    // Wrap in a centering container so it renders correctly in any HTML viewer
+    const pageColorScheme = window.getComputedStyle(document.documentElement).colorScheme || "";
+    const wrapper = `<div style="display:flex;justify-content:center;align-items:flex-start;padding:24px;min-height:100vh;${pageColorScheme ? `color-scheme:${pageColorScheme};` : ""}">${rootHtml}</div>`;
+
     const finalHtml = interactiveCSS
-      ? `<style>${interactiveCSS}</style>${result.html}`
-      : result.html;
+      ? `<style>${interactiveCSS}</style>${wrapper}`
+      : wrapper;
 
     return { status: "success", html: finalHtml };
   }
