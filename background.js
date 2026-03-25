@@ -884,7 +884,8 @@ function clickToStartOverlay() {
 }
 
 // ============================================================================
-// PREVIEW — Show captured HTML in overlay with iframe before copying
+// PREVIEW — Show captured HTML in overlay using Shadow DOM (same page context)
+// This ensures fonts, SVGs, and color context render correctly
 // ============================================================================
 function showPreview(html) {
   return new Promise((resolve) => {
@@ -922,32 +923,32 @@ function showPreview(html) {
     headerRight.append(sizeLabel, cancelBtn, copyBtn);
     header.append(title, headerRight);
 
-    // Iframe container — NO CSS reset, minimal wrapper
-    const iframeContainer = document.createElement("div");
-    Object.assign(iframeContainer.style, { flex: "1", overflow: "auto", position: "relative", background: "#1a1a1a" });
+    // Preview container using Shadow DOM for style isolation
+    const previewScroller = document.createElement("div");
+    Object.assign(previewScroller.style, { flex: "1", overflow: "auto", position: "relative", background: "#1a1a1a" });
 
-    const iframe = document.createElement("iframe");
-    Object.assign(iframe.style, { border: "none", width: "100%", height: "100%" });
-    iframe.sandbox = "allow-same-origin";
-    iframeContainer.appendChild(iframe);
+    const previewHost = document.createElement("div");
+    Object.assign(previewHost.style, { minHeight: "100%", display: "flex", justifyContent: "center", alignItems: "flex-start", padding: "24px" });
+    const shadow = previewHost.attachShadow({ mode: "open" });
+    // Detect page's color-scheme to match dark/light mode rendering
+    const pageColorScheme = window.getComputedStyle(document.documentElement).colorScheme ||
+                            window.getComputedStyle(document.body).colorScheme || "normal";
+    // Inject the serialized HTML into the shadow DOM
+    // This renders in the same page context (fonts, resources available)
+    // but isolated from page styles (shadow DOM boundary)
+    shadow.innerHTML = `<style>:host { display: contents; color-scheme: ${pageColorScheme}; }</style>${html}`;
+    previewScroller.appendChild(previewHost);
 
     // Footer
     const footer = document.createElement("div");
     Object.assign(footer.style, { padding: "10px 20px", borderTop: "1px solid rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.35)", fontSize: "12px", textAlign: "center", flexShrink: "0" });
     footer.textContent = "Paste into Claude Code \u2192 ask to convert to React component";
 
-    panel.append(header, iframeContainer, footer);
+    panel.append(header, previewScroller, footer);
     backdrop.appendChild(panel);
     document.body.appendChild(backdrop);
 
-    // Write HTML into iframe — NO CSS RESET to avoid interfering with serialized styles
     requestAnimationFrame(() => {
-      const iframeDoc = iframe.contentDocument;
-      if (iframeDoc) {
-        iframeDoc.open();
-        iframeDoc.write("<!DOCTYPE html><html><head><meta charset=\"utf-8\"></head><body style=\"margin:0;padding:24px;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;background:#1a1a1a;\">" + html + "</body></html>");
-        iframeDoc.close();
-      }
       backdrop.style.opacity = "1";
       panel.style.transform = "scale(1) translateY(0)";
     });
