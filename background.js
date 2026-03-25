@@ -388,11 +388,19 @@ async function elementSerializer(selector) {
     if (isRoot) {
       const box = element.getBoundingClientRect();
       const width = Math.ceil(box.width) + "px";
-      const height = Math.ceil(box.height) + "px";
       if (box.width > 200 || box.height > 200 || styles.width?.includes("%") || styles.height?.includes("%")) {
+        // Set explicit width so layout columns/grids work correctly
         styles.width = width;
-        styles.height = height;
+        // Use min-height instead of fixed height so content isn't clipped
+        styles["min-height"] = Math.ceil(box.height) + "px";
+        styles.height = "auto";
       }
+      // Remove overflow clipping on root — let full content show
+      delete styles["overflow"];
+      delete styles["overflow-x"];
+      delete styles["overflow-y"];
+      delete styles["overflow-block"];
+      delete styles["overflow-inline"];
     }
 
     const rootBackgroundInvisible =
