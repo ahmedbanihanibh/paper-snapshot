@@ -1149,6 +1149,409 @@ function hideProcessingIndicator() {
 }
 
 // ============================================================================
+// MODE PROMPT — Choose between Static Capture vs Record Interactions
+// ============================================================================
+function showModePrompt() {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    Object.assign(overlay.style, { position: "fixed", inset: "0", zIndex: "2147483647", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.5)", backdropFilter: "blur(3px)", fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif", opacity: "0", transition: "opacity 200ms ease" });
+
+    const card = document.createElement("div");
+    Object.assign(card.style, { background: "#1c1c1e", borderRadius: "16px", boxShadow: "0 24px 80px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08)", padding: "24px", maxWidth: "380px", width: "90vw", transform: "scale(0.96)", transition: "transform 200ms cubic-bezier(0.34,1.56,0.64,1)" });
+
+    const title = document.createElement("div");
+    Object.assign(title.style, { color: "#fff", fontSize: "16px", fontWeight: "600", marginBottom: "8px" });
+    title.textContent = "Capture Mode";
+
+    const desc = document.createElement("div");
+    Object.assign(desc.style, { color: "rgba(255,255,255,0.5)", fontSize: "13px", lineHeight: "1.5", marginBottom: "20px" });
+    desc.textContent = "Choose how to capture this element.";
+
+    function makeOption(icon, label, sublabel, value, primary) {
+      const btn = document.createElement("button");
+      Object.assign(btn.style, {
+        display: "flex", alignItems: "center", gap: "12px", width: "100%", padding: "12px 16px",
+        background: primary ? "#6366f1" : "rgba(255,255,255,0.06)", border: "1px solid " + (primary ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.08)"),
+        borderRadius: "10px", cursor: "pointer", marginBottom: "8px", textAlign: "left", fontFamily: "inherit", transition: "all 150ms ease",
+      });
+      btn.onmouseenter = () => { btn.style.background = primary ? "#818cf8" : "rgba(255,255,255,0.1)"; };
+      btn.onmouseleave = () => { btn.style.background = primary ? "#6366f1" : "rgba(255,255,255,0.06)"; };
+
+      const iconEl = document.createElement("div");
+      Object.assign(iconEl.style, { fontSize: "22px", width: "32px", textAlign: "center", flexShrink: "0" });
+      iconEl.textContent = icon;
+
+      const textWrap = document.createElement("div");
+      const labelEl = document.createElement("div");
+      Object.assign(labelEl.style, { color: "#fff", fontSize: "14px", fontWeight: "600" });
+      labelEl.textContent = label;
+      const subEl = document.createElement("div");
+      Object.assign(subEl.style, { color: "rgba(255,255,255,0.5)", fontSize: "12px", marginTop: "2px" });
+      subEl.textContent = sublabel;
+      textWrap.append(labelEl, subEl);
+      btn.append(iconEl, textWrap);
+
+      btn.addEventListener("click", () => { close(value); });
+      return btn;
+    }
+
+    const recordBtn = makeOption("\u{1F534}", "Record Interactions", "Hover, click, focus \u2014 capture all micro-interactions", "record", true);
+    const staticBtn = makeOption("\u{1F4F7}", "Static Capture", "One-shot snapshot of current state", "static", false);
+
+    card.append(title, desc, recordBtn, staticBtn);
+    overlay.appendChild(card);
+    document.body.appendChild(overlay);
+
+    requestAnimationFrame(() => { overlay.style.opacity = "1"; card.style.transform = "scale(1)"; });
+
+    function close(value) {
+      overlay.style.opacity = "0"; card.style.transform = "scale(0.96)";
+      setTimeout(() => { overlay.remove(); resolve(value); }, 160);
+    }
+
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) close("static"); });
+    document.addEventListener("keydown", function onKey(e) {
+      if (e.key === "Escape") { document.removeEventListener("keydown", onKey, { capture: true }); close("static"); }
+    }, { capture: true });
+  });
+}
+
+// ============================================================================
+// INTERACTION RECORDER — Captures style diffs during user interactions
+// ============================================================================
+function interactionRecorder(selector) {
+  return new Promise((resolve) => {
+    const root = document.querySelector(selector);
+    if (!root) { resolve({ snapshots: [], transitions: {} }); return; }
+
+    const snapshots = [];
+    const transitions = {};
+    let baselineStyles = new Map();
+    let recording = false;
+
+    // Generate a stable CSS-path for any element relative to root
+    function getPath(el) {
+      if (el === root) return ":root";
+      const parts = [];
+      let node = el;
+      while (node && node !== root) {
+        const parent = node.parentElement;
+        if (!parent) break;
+        const siblings = Array.from(parent.children);
+        const tag = node.tagName.toLowerCase();
+        const idx = siblings.filter((s) => s.tagName === node.tagName).indexOf(node);
+        parts.unshift(idx > 0 ? `${tag}:nth-of-type(${idx + 1})` : tag);
+        node = parent;
+      }
+      return parts.join(" > ");
+    }
+
+    // Capture computed styles for all elements in subtree
+    function captureAllStyles() {
+      const map = new Map();
+      const elements = [root, ...root.querySelectorAll("*")];
+      for (const el of elements) {
+        if (!(el instanceof HTMLElement || el instanceof SVGElement)) continue;
+        const cs = window.getComputedStyle(el);
+        const path = getPath(el);
+        const styles = {};
+        // Capture only visually-relevant properties
+        const props = ["background-color", "color", "opacity", "transform", "box-shadow",
+          "border-color", "border-radius", "width", "height", "max-height", "padding",
+          "margin", "font-size", "font-weight", "text-decoration", "visibility", "display",
+          "overflow", "clip-path", "filter", "backdrop-filter", "outline", "scale",
+          "translate", "rotate", "gap", "flex", "grid-template-columns", "grid-template-rows",
+          "left", "top", "right", "bottom", "inset", "position"];
+        for (const p of props) {
+          const v = cs.getPropertyValue(p);
+          if (v) styles[p] = v;
+        }
+        // Also capture transition property
+        const tr = cs.getPropertyValue("transition");
+        if (tr && tr !== "none" && tr !== "all 0s ease 0s") {
+          transitions[path] = tr;
+        }
+        map.set(path, styles);
+      }
+      return map;
+    }
+
+    // Diff two style maps
+    function diffStyles(before, after) {
+      const diffs = {};
+      const allPaths = new Set([...before.keys(), ...after.keys()]);
+      for (const path of allPaths) {
+        const b = before.get(path) || {};
+        const a = after.get(path) || {};
+        const changed = {};
+        const allProps = new Set([...Object.keys(b), ...Object.keys(a)]);
+        for (const prop of allProps) {
+          if (b[prop] !== a[prop]) {
+            changed[prop] = { from: b[prop] || "none", to: a[prop] || "none" };
+          }
+        }
+        if (Object.keys(changed).length > 0) {
+          diffs[path] = changed;
+        }
+      }
+      return diffs;
+    }
+
+    // Capture a snapshot on interaction
+    function captureSnapshot(trigger, targetEl) {
+      requestAnimationFrame(() => {
+        const currentStyles = captureAllStyles();
+        const styleDiffs = diffStyles(baselineStyles, currentStyles);
+        if (Object.keys(styleDiffs).length > 0) {
+          snapshots.push({
+            trigger,
+            target: targetEl ? getPath(targetEl) : ":root",
+            timestamp: Date.now(),
+            styleDiffs,
+          });
+        }
+      });
+    }
+
+    // Event handlers
+    const events = ["mouseenter", "mouseleave", "mousedown", "mouseup", "focus", "blur", "focusin", "focusout", "click"];
+    function eventHandler(e) {
+      if (!recording) return;
+      captureSnapshot(e.type, e.target);
+    }
+
+    // MutationObserver for class/attribute/child changes
+    const observer = new MutationObserver((mutations) => {
+      if (!recording) return;
+      let hasRelevant = false;
+      for (const m of mutations) {
+        if (m.type === "attributes" || m.type === "childList") { hasRelevant = true; break; }
+      }
+      if (hasRelevant) captureSnapshot("mutation", root);
+    });
+
+    // START recording
+    baselineStyles = captureAllStyles();
+    recording = true;
+
+    for (const evt of events) {
+      root.addEventListener(evt, eventHandler, { capture: true });
+    }
+    observer.observe(root, { subtree: true, attributes: true, childList: true, attributeFilter: ["class", "style", "aria-expanded", "aria-hidden", "open", "data-state", "data-active"] });
+
+    // Also watch body for portal elements (tooltips, dropdowns)
+    const bodyObserver = new MutationObserver((mutations) => {
+      if (!recording) return;
+      for (const m of mutations) {
+        if (m.addedNodes.length > 0) {
+          captureSnapshot("portal-added", root);
+        }
+      }
+    });
+    bodyObserver.observe(document.body, { childList: true });
+
+    // Show recording UI
+    const recordingUI = document.createElement("div");
+    Object.assign(recordingUI.style, { position: "fixed", top: "16px", left: "50%", transform: "translateX(-50%)", zIndex: "2147483647", display: "flex", alignItems: "center", gap: "12px", background: "#1c1c1e", borderRadius: "12px", padding: "10px 20px", boxShadow: "0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.08)", fontFamily: "-apple-system,system-ui,sans-serif", fontSize: "14px", color: "#fff", userSelect: "none" });
+
+    const dot = document.createElement("div");
+    Object.assign(dot.style, { width: "10px", height: "10px", borderRadius: "50%", background: "#ef4444", animation: "ui2code-pulse 1s ease-in-out infinite" });
+    const pulseStyle = document.createElement("style");
+    pulseStyle.textContent = "@keyframes ui2code-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }";
+    document.head.appendChild(pulseStyle);
+
+    const label = document.createElement("span");
+    label.textContent = "Recording... interact with the element";
+    Object.assign(label.style, { color: "rgba(255,255,255,0.8)" });
+
+    const counter = document.createElement("span");
+    Object.assign(counter.style, { color: "rgba(255,255,255,0.4)", fontSize: "12px", fontVariantNumeric: "tabular-nums" });
+    counter.textContent = "0 events";
+    const counterInterval = setInterval(() => { counter.textContent = `${snapshots.length} events`; }, 200);
+
+    const stopBtn = document.createElement("button");
+    Object.assign(stopBtn.style, { background: "#ef4444", border: "none", borderRadius: "8px", color: "#fff", cursor: "pointer", fontSize: "13px", fontWeight: "600", padding: "6px 16px", fontFamily: "inherit", marginLeft: "8px" });
+    stopBtn.textContent = "Stop";
+    stopBtn.onmouseenter = () => { stopBtn.style.background = "#dc2626"; };
+    stopBtn.onmouseleave = () => { stopBtn.style.background = "#ef4444"; };
+
+    recordingUI.append(dot, label, counter, stopBtn);
+    document.body.appendChild(recordingUI);
+
+    function stopRecording() {
+      recording = false;
+      clearInterval(counterInterval);
+      for (const evt of events) {
+        root.removeEventListener(evt, eventHandler, { capture: true });
+      }
+      observer.disconnect();
+      bodyObserver.disconnect();
+      recordingUI.remove();
+      pulseStyle.remove();
+      resolve({ snapshots, transitions, baselineStyles: Object.fromEntries(baselineStyles) });
+    }
+
+    stopBtn.addEventListener("click", stopRecording);
+    document.addEventListener("keydown", function onKey(e) {
+      if (e.key === "Escape") {
+        document.removeEventListener("keydown", onKey, { capture: true });
+        stopRecording();
+      }
+    }, { capture: true });
+  });
+}
+
+// ============================================================================
+// INTERACTION → REACT JSX — Generate React component with interaction states
+// ============================================================================
+function interactionToReactJsx(recordingData, baselineJsx) {
+  const { snapshots, transitions } = recordingData;
+
+  // Group snapshots by trigger type into interaction pairs
+  const hoverDiffs = {}; // path → style changes on hover
+  const activeDiffs = {};
+  const focusDiffs = {};
+  const clickToggleDiffs = {};
+
+  for (const snap of snapshots) {
+    for (const [path, changes] of Object.entries(snap.styleDiffs)) {
+      const toStyles = {};
+      for (const [prop, { to }] of Object.entries(changes)) {
+        toStyles[prop] = to;
+      }
+
+      if (snap.trigger === "mouseenter") {
+        hoverDiffs[path] = { ...(hoverDiffs[path] || {}), ...toStyles };
+      } else if (snap.trigger === "mousedown") {
+        activeDiffs[path] = { ...(activeDiffs[path] || {}), ...toStyles };
+      } else if (snap.trigger === "focus" || snap.trigger === "focusin") {
+        focusDiffs[path] = { ...(focusDiffs[path] || {}), ...toStyles };
+      } else if (snap.trigger === "click" || snap.trigger === "mutation") {
+        clickToggleDiffs[path] = { ...(clickToggleDiffs[path] || {}), ...toStyles };
+      }
+    }
+  }
+
+  // Convert CSS property name to camelCase
+  function toCamelCase(prop) {
+    if (prop.startsWith("-webkit-")) return "Webkit" + prop.slice(8).replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+    return prop.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+  }
+
+  // Convert rgb to hex
+  function rgbToHex(rgb) {
+    const m = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    if (!m) return rgb;
+    return "#" + [m[1], m[2], m[3]].map((x) => parseInt(x).toString(16).padStart(2, "0")).join("").toUpperCase();
+  }
+
+  // Format style object as JSX
+  function formatStyles(styles) {
+    return Object.entries(styles)
+      .map(([k, v]) => {
+        v = v.replace(/rgba?\(\d+,\s*\d+,\s*\d+(?:,\s*[\d.]+)?\)/g, rgbToHex);
+        return `${toCamelCase(k)}: '${v}'`;
+      })
+      .join(", ");
+  }
+
+  // Build the interaction metadata
+  const hasHover = Object.keys(hoverDiffs).length > 0;
+  const hasActive = Object.keys(activeDiffs).length > 0;
+  const hasFocus = Object.keys(focusDiffs).length > 0;
+  const hasToggle = Object.keys(clickToggleDiffs).length > 0;
+
+  // Build imports and state hooks
+  let hooks = "";
+  if (hasHover || hasActive || hasFocus || hasToggle) {
+    hooks = "import { useState } from 'react';\n\n";
+  }
+
+  let stateDecls = "";
+  if (hasHover) stateDecls += "  const [isHovered, setIsHovered] = useState(false);\n";
+  if (hasActive) stateDecls += "  const [isActive, setIsActive] = useState(false);\n";
+  if (hasFocus) stateDecls += "  const [isFocused, setIsFocused] = useState(false);\n";
+  if (hasToggle) stateDecls += "  const [isOpen, setIsOpen] = useState(false);\n";
+
+  // Build style constants for each interaction state
+  let styleConsts = "";
+  if (hasHover) {
+    const allHover = Object.values(hoverDiffs).reduce((acc, v) => ({ ...acc, ...v }), {});
+    styleConsts += `  const hoverStyles = { ${formatStyles(allHover)} };\n`;
+  }
+  if (hasActive) {
+    const allActive = Object.values(activeDiffs).reduce((acc, v) => ({ ...acc, ...v }), {});
+    styleConsts += `  const activeStyles = { ${formatStyles(allActive)} };\n`;
+  }
+  if (hasFocus) {
+    const allFocus = Object.values(focusDiffs).reduce((acc, v) => ({ ...acc, ...v }), {});
+    styleConsts += `  const focusStyles = { ${formatStyles(allFocus)} };\n`;
+  }
+
+  // Build transition string from recorded transitions
+  const transitionValues = Object.values(transitions);
+  const transitionStr = transitionValues.length > 0 ? transitionValues[0] : "";
+
+  // Build event handlers comment
+  let eventComment = "  // Interaction handlers detected:\n";
+  if (hasHover) eventComment += "  // - Hover: onMouseEnter/onMouseLeave\n";
+  if (hasActive) eventComment += "  // - Active: onMouseDown/onMouseUp\n";
+  if (hasFocus) eventComment += "  // - Focus: onFocus/onBlur\n";
+  if (hasToggle) eventComment += "  // - Toggle: onClick\n";
+  if (transitionStr) eventComment += `  // - CSS transition: ${transitionStr}\n`;
+  eventComment += `  // - Total recorded events: ${snapshots.length}\n`;
+
+  // Build the component
+  let code = hooks;
+  code += `/**\n * UI Snapshot with Recorded Interactions\n * ${snapshots.length} interaction events captured.\n`;
+  if (hasHover) code += ` * Hover effects detected on ${Object.keys(hoverDiffs).length} elements.\n`;
+  if (hasActive) code += ` * Active/press effects detected.\n`;
+  if (hasFocus) code += ` * Focus effects detected.\n`;
+  if (hasToggle) code += ` * Click toggle effects detected.\n`;
+  code += ` */\n`;
+  code += `export default function CapturedComponent() {\n`;
+  code += stateDecls;
+  if (stateDecls) code += "\n";
+  code += styleConsts;
+  if (styleConsts) code += "\n";
+  code += eventComment;
+  code += "\n";
+
+  // Add the baseline JSX with interaction props injected
+  // Extract just the JSX part from the baseline
+  let jsx = baselineJsx;
+  const returnMatch = jsx.match(/return\s*\(\s*([\s\S]*)\s*\);\s*\}/);
+  if (returnMatch) {
+    jsx = returnMatch[1].trim();
+  }
+
+  // Inject event handlers and conditional styles into the root element
+  let rootProps = "";
+  if (hasHover) rootProps += `\n      onMouseEnter={() => setIsHovered(true)}\n      onMouseLeave={() => setIsHovered(false)}`;
+  if (hasActive) rootProps += `\n      onMouseDown={() => setIsActive(true)}\n      onMouseUp={() => setIsActive(false)}`;
+  if (hasFocus) rootProps += `\n      onFocus={() => setIsFocused(true)}\n      onBlur={() => setIsFocused(false)}`;
+  if (hasToggle) rootProps += `\n      onClick={() => setIsOpen(!isOpen)}`;
+
+  // Inject style spread into first element's style
+  let styleSpread = "";
+  if (hasHover) styleSpread += "...(isHovered && hoverStyles), ";
+  if (hasActive) styleSpread += "...(isActive && activeStyles), ";
+  if (hasFocus) styleSpread += "...(isFocused && focusStyles), ";
+  if (transitionStr) styleSpread += `transition: '${transitionStr}', `;
+
+  if (rootProps || styleSpread) {
+    // Find the first style={{ in the JSX and inject
+    jsx = jsx.replace(/style=\{\{/, `style={{ ${styleSpread}`);
+    // Find the first > after the opening tag and inject event handlers before it
+    jsx = jsx.replace(/(style=\{\{[^}]*\}\})/, `$1${rootProps}`);
+  }
+
+  code += `  return (\n    ${jsx}\n  );\n}\n`;
+
+  return code;
+}
+
+// ============================================================================
 // FOCUS PROMPT — Direct port from Paper Snapshot: click-to-start.ts
 // ============================================================================
 function clickToStartOverlay() {
@@ -1401,98 +1804,148 @@ chrome.action.onClicked.addListener(async (tab) => {
             const frameId = result.frameId;
             const selector = result.result;
 
-            await chrome.scripting.executeScript({
+            // Ask user: Record Interactions or Static Capture?
+            const [modeResult] = await chrome.scripting.executeScript({
               target: { tabId: tab.id },
-              func: showProcessingIndicator,
-              args: [selector],
+              func: showModePrompt,
             });
+            const mode = modeResult?.result || "static";
 
-            await chrome.scripting.executeScript({
-              target: { tabId: tab.id },
-              func: showToast,
-              args: ["Capturing selection...", { iconColor: "#CCCCCC", showProgressBar: true, messageClassName: "capturing" }],
-            });
+            if (mode === "record") {
+              // ===== RECORDING MODE =====
+              // 1. Dismiss toast, remove blanket so user can interact
+              await chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                func: dismissToast,
+                args: [{ immediate: true }],
+              });
 
-            const [serializedHTML] = await Promise.all([
-              chrome.scripting.executeScript({
+              // 2. Run interaction recorder (user interacts, then stops)
+              const [recordResult] = await chrome.scripting.executeScript({
                 target: { tabId: tab.id, frameIds: [frameId] },
-                func: elementSerializer,
+                func: interactionRecorder,
                 args: [selector],
-              }),
-              new Promise((resolve) => setTimeout(resolve, 500)),
-            ]);
+              });
+              const recordingData = recordResult?.result;
 
-            const serializationResult = serializedHTML?.[0]?.result;
-
-            if (serializationResult?.status === "success") {
+              // 3. Now serialize the baseline (static snapshot)
               await chrome.scripting.executeScript({
                 target: { tabId: tab.id },
-                func: dismissToast,
-                args: [{ immediate: true }],
+                func: showProcessingIndicator,
+                args: [selector],
               });
-
-              const [previewResult] = await chrome.scripting.executeScript({
+              await chrome.scripting.executeScript({
                 target: { tabId: tab.id },
-                func: showPreview,
-                args: [serializationResult.rawHtml, serializationResult.html],
+                func: showToast,
+                args: ["Processing recording...", { iconColor: "#ef4444", showProgressBar: true, messageClassName: "capturing" }],
               });
 
-              const action = previewResult?.result;
-              if (action === "copy-ai") {
+              const [serializedHTML] = await Promise.all([
+                chrome.scripting.executeScript({
+                  target: { tabId: tab.id, frameIds: [frameId] },
+                  func: elementSerializer,
+                  args: [selector],
+                }),
+                new Promise((r) => setTimeout(r, 500)),
+              ]);
+              const serializationResult = serializedHTML?.[0]?.result;
+
+              if (serializationResult?.status === "success" && recordingData) {
+                // 4. Generate interactive React JSX
+                const [jsxResult] = await chrome.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  func: interactionToReactJsx,
+                  args: [recordingData, serializationResult.html],
+                });
+                const interactiveJsx = jsxResult?.result || serializationResult.html;
+
                 await chrome.scripting.executeScript({
                   target: { tabId: tab.id },
-                  func: copyToClipboard,
-                  args: [serializationResult.html],
+                  func: dismissToast,
+                  args: [{ immediate: true }],
                 });
-                await chrome.scripting.executeScript({
+
+                // 5. Show preview
+                const [previewResult] = await chrome.scripting.executeScript({
                   target: { tabId: tab.id },
-                  func: showToast,
-                  args: ["Copied for Claude/v0! Paste to generate React components."],
+                  func: showPreview,
+                  args: [serializationResult.rawHtml, interactiveJsx],
                 });
-              } else if (action === "copy-raw") {
-                await chrome.scripting.executeScript({
-                  target: { tabId: tab.id },
-                  func: copyToClipboard,
-                  args: [serializationResult.rawHtml],
-                });
-                await chrome.scripting.executeScript({
-                  target: { tabId: tab.id },
-                  func: showToast,
-                  args: ["Copied raw HTML!"],
-                });
+
+                const action = previewResult?.result;
+                if (action === "copy-ai") {
+                  await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: copyToClipboard, args: [interactiveJsx] });
+                  await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: showToast, args: [`Copied! ${recordingData.snapshots?.length || 0} interactions recorded.`] });
+                } else if (action === "copy-raw") {
+                  await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: copyToClipboard, args: [serializationResult.rawHtml] });
+                  await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: showToast, args: ["Copied raw HTML!"] });
+                } else {
+                  await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: showToast, args: ["Cancelled", { iconColor: "#CCCCCC", dismissTimeout: 2000 }] });
+                }
               } else {
+                await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: showToast, args: ["Recording failed.", { iconColor: "#CCCCCC" }] });
+              }
+
+              await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: hideProcessingIndicator });
+
+            } else {
+              // ===== STATIC MODE (existing flow) =====
+              await chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                func: showProcessingIndicator,
+                args: [selector],
+              });
+
+              await chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                func: showToast,
+                args: ["Capturing selection...", { iconColor: "#CCCCCC", showProgressBar: true, messageClassName: "capturing" }],
+              });
+
+              const [serializedHTML] = await Promise.all([
+                chrome.scripting.executeScript({
+                  target: { tabId: tab.id, frameIds: [frameId] },
+                  func: elementSerializer,
+                  args: [selector],
+                }),
+                new Promise((resolve) => setTimeout(resolve, 500)),
+              ]);
+
+              const serializationResult = serializedHTML?.[0]?.result;
+
+              if (serializationResult?.status === "success") {
                 await chrome.scripting.executeScript({
                   target: { tabId: tab.id },
-                  func: showToast,
-                  args: ["Cancelled", { iconColor: "#CCCCCC", dismissTimeout: 2000 }],
+                  func: dismissToast,
+                  args: [{ immediate: true }],
                 });
-              }
-            } else if (serializationResult?.status === "error") {
-              console.error("Serialization error:", serializationResult.error);
-              await chrome.scripting.executeScript({
-                target: { tabId: tab.id },
-                func: showToast,
-                args: ["An error occurred", { iconColor: "#CCCCCC" }],
-              });
-            } else if (serializationResult?.status === "aborted") {
-              await chrome.scripting.executeScript({
-                target: { tabId: tab.id },
-                func: dismissToast,
-                args: [{ immediate: true }],
-              });
-            } else {
-              console.error("Serialization failed — no result returned");
-              await chrome.scripting.executeScript({
-                target: { tabId: tab.id },
-                func: showToast,
-                args: ["Capture failed. Try selecting a different element.", { iconColor: "#CCCCCC" }],
-              });
-            }
 
-            await chrome.scripting.executeScript({
-              target: { tabId: tab.id },
-              func: hideProcessingIndicator,
-            });
+                const [previewResult] = await chrome.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  func: showPreview,
+                  args: [serializationResult.rawHtml, serializationResult.html],
+                });
+
+                const action = previewResult?.result;
+                if (action === "copy-ai") {
+                  await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: copyToClipboard, args: [serializationResult.html] });
+                  await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: showToast, args: ["Copied for Claude/v0! Paste to generate React components."] });
+                } else if (action === "copy-raw") {
+                  await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: copyToClipboard, args: [serializationResult.rawHtml] });
+                  await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: showToast, args: ["Copied raw HTML!"] });
+                } else {
+                  await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: showToast, args: ["Cancelled", { iconColor: "#CCCCCC", dismissTimeout: 2000 }] });
+                }
+              } else if (serializationResult?.status === "error") {
+                await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: showToast, args: ["An error occurred", { iconColor: "#CCCCCC" }] });
+              } else if (serializationResult?.status === "aborted") {
+                await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: dismissToast, args: [{ immediate: true }] });
+              } else {
+                await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: showToast, args: ["Capture failed.", { iconColor: "#CCCCCC" }] });
+              }
+
+              await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: hideProcessingIndicator });
+            }
           }
 
           await chrome.scripting.executeScript({
