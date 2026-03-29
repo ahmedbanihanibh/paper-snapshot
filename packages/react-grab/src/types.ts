@@ -550,6 +550,11 @@ export interface ReactGrabRendererProps {
   clearPromptPosition?: DropdownAnchor | null;
   onClearCommentsConfirm?: () => void;
   onClearCommentsCancel?: () => void;
+  // Recording
+  isRecording?: boolean;
+  recordingEventCount?: number;
+  onStartRecording?: () => void;
+  onStopRecording?: () => void;
 }
 
 export interface GrabbedBox {

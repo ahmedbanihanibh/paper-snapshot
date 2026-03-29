@@ -87,6 +87,10 @@ interface GrabStore {
   contextMenuClickOffset: Position | null;
 
   selectedAgent: AgentOptions | null;
+
+  // Recording state
+  isRecording: boolean;
+  recordingEventCount: number;
 }
 
 interface GrabStoreInput {
@@ -144,6 +148,9 @@ const createInitialStore = (input: GrabStoreInput): GrabStore => ({
   contextMenuClickOffset: null,
 
   selectedAgent: null,
+
+  isRecording: false,
+  recordingEventCount: 0,
 });
 
 interface GrabActions {
@@ -208,6 +215,9 @@ interface GrabActions {
   hideContextMenu: () => void;
   updateContextMenuPosition: () => void;
   setSelectedAgent: (agent: AgentOptions | null) => void;
+  startRecording: () => void;
+  stopRecording: () => void;
+  incrementRecordingEvent: () => void;
 }
 
 const createGrabStore = (input: GrabStoreInput) => {
@@ -662,6 +672,16 @@ const createGrabStore = (input: GrabStoreInput) => {
 
     setSelectedAgent: (agent: AgentOptions | null) => {
       setStore("selectedAgent", agent);
+    },
+    startRecording: () => {
+      setStore("isRecording", true);
+      setStore("recordingEventCount", 0);
+    },
+    stopRecording: () => {
+      setStore("isRecording", false);
+    },
+    incrementRecordingEvent: () => {
+      setStore("recordingEventCount", (c) => c + 1);
     },
   };
 

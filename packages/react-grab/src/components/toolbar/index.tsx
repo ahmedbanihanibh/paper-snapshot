@@ -19,6 +19,7 @@ import {
 import { IconSelect } from "../icons/icon-select.jsx";
 import { IconComment } from "../icons/icon-comment.jsx";
 import { IconCopy } from "../icons/icon-copy.jsx";
+import { IconRecord } from "../icons/icon-record.jsx";
 import {
   createSafePolygonTracker,
   type TargetRect,
@@ -97,6 +98,8 @@ interface ToolbarProps {
   isCommentsPinned?: boolean;
   onToggleToolbarMenu?: () => void;
   isToolbarMenuOpen?: boolean;
+  isRecording?: boolean;
+  onRecordClick?: () => void;
 }
 
 interface FreezeHandlersOptions {
@@ -1226,13 +1229,38 @@ export const Toolbar: Component<ToolbarProps> = (props) => {
             </Tooltip>
           </>
         }
+        isRecording={props.isRecording}
+        recordButton={
+          <>
+            <button
+              data-react-grab-ignore-events
+              data-react-grab-toolbar-record
+              aria-label={props.isRecording ? "Stop recording" : "Record interactions"}
+              class={cn(
+                "contain-layout flex items-center justify-center cursor-pointer interactive-scale touch-hitbox",
+                buttonSpacingClass(),
+                hitboxConstraintClass(),
+              )}
+              onClick={() => props.onRecordClick?.()}
+            >
+              <IconRecord
+                size={14}
+                isRecording={props.isRecording}
+                class={cn(
+                  "transition-colors",
+                  props.isRecording ? "text-red-500 animate-pulse" : "text-[#B3B3B3]",
+                )}
+              />
+            </button>
+          </>
+        }
         toggleButton={
           <>
             <button
               data-react-grab-ignore-events
               data-react-grab-toolbar-enabled
               aria-label={
-                props.enabled ? "Disable React Grab" : "Enable React Grab"
+                props.enabled ? "Disable UI to Code" : "Enable UI to Code"
               }
               aria-pressed={Boolean(props.enabled)}
               class={cn(

@@ -140,6 +140,7 @@ import { commentPlugin } from "./plugins/comment.js";
 import { openPlugin } from "./plugins/open.js";
 import { copyHtmlPlugin } from "./plugins/copy-html.js";
 import { copyStylesPlugin } from "./plugins/copy-styles.js";
+import { copyReactCssPlugin } from "./plugins/copy-react-css.js";
 import {
   freezeAnimations,
   freezeAllAnimations,
@@ -167,6 +168,7 @@ import { lockViewportZoom } from "../utils/lock-viewport-zoom.js";
 import { getNearestEdge } from "../utils/get-nearest-edge.js";
 
 const builtInPlugins = [
+  copyReactCssPlugin,
   copyPlugin,
   commentPlugin,
   copyHtmlPlugin,
@@ -4208,6 +4210,32 @@ export const init = (rawOptions?: Options): ReactGrabAPI => {
                   handleCommentsClear();
                 }}
                 onClearCommentsCancel={dismissClearPrompt}
+                isRecording={store.isRecording}
+                onStartRecording={() => {
+                  const el = store.frozenElement;
+                  if (!el) return;
+                  actions.startRecording();
+                  // Dynamic import to keep bundle smaller
+                  import("../utils/interaction-recorder.js").then(({ startRecording }) => {
+                    const controls = startRecording(el, () => actions.incrementRecordingEvent());
+                    (window as any).__ui2code_recording = controls;
+                  }).catch(console.error);
+                }}
+                onStopRecording={() => {
+                  actions.stopRecording();
+                  const controls = (window as any).__ui2code_recording;
+                  if (controls) {
+                    const data = controls.stop();
+                    // Generate interactive React and copy
+                    import("../utils/react-interaction-generator.js").then(({ generateInteractiveReact }) => {
+                      const jsx = generateInteractiveReact(data, "");
+                      import("../utils/copy-content.js").then(({ copyContent }) => {
+                        copyContent(jsx);
+                      }).catch(console.error);
+                    }).catch(console.error);
+                    (window as any).__ui2code_recording = null;
+                  }
+                }}
               />
             );
           }, rendererRoot);

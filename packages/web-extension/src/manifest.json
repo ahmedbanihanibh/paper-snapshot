@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "React Grab",
+  "name": "UI to Code",
   "version": "0.0.8",
-  "description": "Select context for coding agents directly from your website. Makes tools like Cursor, Claude Code, Copilot run up to 3× faster",
+  "description": "Capture any UI element as React JSX with inline styles. Record micro-interactions. Built for Claude Code and v0.",
   "author": "Aiden Bai",
   "homepage_url": "https://react-grab.com",
   "icons": {
@@ -12,7 +12,7 @@
     "128": "assets/icons/icon-128.png"
   },
   "action": {
-    "default_title": "React Grab (Active)",
+    "default_title": "UI to Code",
     "default_icon": {
       "16": "assets/icons/icon-16.png",
       "32": "assets/icons/icon-32.png",

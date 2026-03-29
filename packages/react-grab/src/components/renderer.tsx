@@ -216,6 +216,14 @@ export const ReactGrabRenderer: Component<ReactGrabRendererProps> = (props) => {
           isCommentsPinned={props.isCommentsPinned}
           onToggleToolbarMenu={props.onToggleToolbarMenu}
           isToolbarMenuOpen={Boolean(props.toolbarMenuPosition)}
+          isRecording={props.isRecording}
+          onRecordClick={() => {
+            if (props.isRecording) {
+              props.onStopRecording?.();
+            } else {
+              props.onStartRecording?.();
+            }
+          }}
           isClearPromptOpen={Boolean(props.clearPromptPosition)}
         />
       </Show>

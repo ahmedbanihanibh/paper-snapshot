@@ -4,6 +4,7 @@ import { IconSelect } from "../icons/icon-select.jsx";
 import { IconChevron } from "../icons/icon-chevron.jsx";
 import { IconComment } from "../icons/icon-comment.jsx";
 import { IconCopy } from "../icons/icon-copy.jsx";
+import { IconRecord } from "../icons/icon-record.jsx";
 import {
   getExpandGridClass,
   getButtonSpacingClass,
@@ -28,6 +29,8 @@ export interface ToolbarContentProps {
   selectButton?: JSX.Element;
   commentsButton?: JSX.Element;
   copyAllButton?: JSX.Element;
+  recordButton?: JSX.Element;
+  isRecording?: boolean;
   toggleButton?: JSX.Element;
   collapseButton?: JSX.Element;
   transformOrigin?: string;
@@ -128,6 +131,28 @@ export const ToolbarContent: Component<ToolbarContentProps> = (props) => {
         class={cn(
           "transition-colors",
           props.isCommentsPinned ? "text-black/50" : "text-[#B3B3B3]",
+        )}
+      />
+    </button>
+  );
+
+  const defaultRecordButton = () => (
+    <button
+      data-react-grab-ignore-events
+      data-react-grab-toolbar-record
+      aria-label={props.isRecording ? "Stop recording" : "Record interactions"}
+      class={cn(
+        "contain-layout flex items-center justify-center cursor-pointer interactive-scale touch-hitbox",
+        buttonSpacingClass(),
+        hitboxConstraintClass(),
+      )}
+    >
+      <IconRecord
+        size={14}
+        isRecording={props.isRecording}
+        class={cn(
+          "transition-colors",
+          props.isRecording ? "text-red-500" : "text-[#B3B3B3]",
         )}
       />
     </button>
@@ -274,6 +299,17 @@ export const ToolbarContent: Component<ToolbarContentProps> = (props) => {
             >
               <div class={cn("relative overflow-visible", minDimensionClass())}>
                 {props.copyAllButton ?? defaultCopyAllButton()}
+              </div>
+            </div>
+            <div
+              class={cn(
+                "grid",
+                gridTransitionClass(),
+                expandGridClass(Boolean(props.enabled)),
+              )}
+            >
+              <div class={cn("relative overflow-visible", minDimensionClass())}>
+                {props.recordButton ?? defaultRecordButton()}
               </div>
             </div>
           </div>
