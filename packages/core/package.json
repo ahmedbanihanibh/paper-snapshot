@@ -1,0 +1,40 @@
+{
+  "name": "ui-to-code-core",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "browser": "dist/index.global.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "scripts": {
+    "build": "tsup && tailwindcss -i ./src/styles.css -o ./dist/styles.css -m",
+    "dev": "concurrently \"tsup --watch\" \"tailwindcss -i ./src/styles.css -o ./dist/styles.css --watch\""
+  },
+  "dependencies": {
+    "solid-js": "^1.9.10"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/preset-typescript": "^7.28.5",
+    "@tailwindcss/cli": "^4.1.17",
+    "babel-preset-solid": "^1.9.10",
+    "clsx": "^2.1.1",
+    "concurrently": "^9.1.2",
+    "esbuild-plugin-babel": "^0.2.3",
+    "tailwindcss": "^4.1.0",
+    "tsup": "^8.2.4",
+    "typescript": "^5.9.3"
+  }
+}
