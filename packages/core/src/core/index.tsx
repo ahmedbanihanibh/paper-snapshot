@@ -96,6 +96,16 @@ function handleStartRecording() {
   const el = store.selectedElement();
   if (!el) return;
 
+  // During recording, disable the overlay so user can interact with the page
+  if (shadowHost) {
+    shadowHost.style.pointerEvents = "none";
+    shadowHost.style.inset = "auto";
+    shadowHost.style.top = "0";
+    shadowHost.style.left = "0";
+    shadowHost.style.right = "0";
+    shadowHost.style.bottom = "auto";
+  }
+
   actions.setPhase("recording");
   activeRecording = runRecordingCapture(el, () => {
     actions.addRecordingEvent();

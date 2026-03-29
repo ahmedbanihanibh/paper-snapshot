@@ -1,5 +1,5 @@
 import { Show } from "solid-js";
-import { store, actions } from "../core/store";
+import { store } from "../core/store";
 import { Z_UI } from "../constants";
 
 /**
