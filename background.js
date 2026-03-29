@@ -727,11 +727,14 @@ async function elementSerializer(selector) {
       return `${before}style="${cleaned}"`;
     });
 
-    // RAW HTML version (for HTML viewers, paper.design, etc.)
-    const rawHtml = rootHtml;
+    // Simplify ALL output — remove redundant CSS on both versions
+    const cleanHtml = simplifyStyles(rootHtml);
+
+    // RAW HTML version (simplified, for HTML viewers)
+    const rawHtml = cleanHtml;
 
     // REACT JSX version for Claude Code / v0
-    const jsxCode = htmlToJsx(simplifyStyles(rootHtml));
+    const jsxCode = htmlToJsx(cleanHtml);
     let claudeOutput = `/**\n * UI Snapshot — Convert to React component.\n * Match the EXACT visual appearance: colors, spacing, typography, icons, layout.\n */\nexport default function CapturedComponent() {\n  return (\n${jsxCode}\n  );\n}\n`;
 
     return { status: "success", html: claudeOutput, rawHtml: rawHtml };
@@ -743,8 +746,13 @@ async function elementSerializer(selector) {
   function simplifyStyles(html) {
     // Properties to remove (they duplicate shorthand or are browser-internal)
     const redundantProps = new Set([
+      // Logical properties that duplicate physical ones
       "border-block-end-color", "border-block-start-color",
       "border-inline-end-color", "border-inline-start-color",
+      "border-block-end-width", "border-block-start-width",
+      "border-inline-end-width", "border-inline-start-width",
+      "border-block-end-style", "border-block-start-style",
+      "border-inline-end-style", "border-inline-start-style",
       "border-end-end-radius", "border-end-start-radius",
       "border-start-end-radius", "border-start-start-radius",
       "padding-block-end", "padding-block-start",
@@ -752,14 +760,24 @@ async function elementSerializer(selector) {
       "margin-block-end", "margin-block-start",
       "margin-inline-end", "margin-inline-start",
       "inline-size", "block-size",
+      "min-inline-size", "max-inline-size",
+      // Color duplicates
       "caret-color", "column-rule-color", "text-emphasis-color",
       "-webkit-text-fill-color", "-webkit-text-stroke-color",
+      // Browser internals
       "unicode-bidi", "-webkit-tap-highlight-color",
+      "text-rendering", "font-synthesis",
+      // Overflow duplicates (keep overflow-x/y, remove logical)
+      "overflow-block", "overflow-inline", "overflow-clip-margin",
+      // Rarely needed
+      "list-style-type", "text-wrap-mode",
+      "-moz-osx-font-smoothing", "-webkit-font-smoothing",
+      "shape-rendering",
     ]);
 
     // Properties that duplicate `color` value — remove if same as color
     const colorDupes = new Set([
-      "outline-color", "text-decoration-color",
+      "outline-color", "text-decoration-color", "column-rule-color",
     ]);
 
     return html.replace(/style="([^"]*)"/g, (match, styleStr) => {
@@ -795,6 +813,62 @@ async function elementSerializer(selector) {
       if (brVals.length === 4 && new Set(brVals).size === 1) {
         props["border-radius"] = brVals[0];
         br.forEach((p) => delete props[p]);
+      }
+
+      // Consolidate border-color if all 4 sides are the same
+      const bc = ["border-top-color", "border-right-color", "border-bottom-color", "border-left-color"];
+      const bcVals = bc.map((p) => props[p]).filter(Boolean);
+      if (bcVals.length === 4 && new Set(bcVals).size === 1) {
+        props["border-color"] = bcVals[0];
+        bc.forEach((p) => delete props[p]);
+      }
+
+      // Consolidate border-width if all 4 sides are the same
+      const bw = ["border-top-width", "border-right-width", "border-bottom-width", "border-left-width"];
+      const bwVals = bw.map((p) => props[p]).filter(Boolean);
+      if (bwVals.length === 4 && new Set(bwVals).size === 1) {
+        props["border-width"] = bwVals[0];
+        bw.forEach((p) => delete props[p]);
+      }
+
+      // Consolidate padding if all 4 sides match
+      const pd = ["padding-top", "padding-right", "padding-bottom", "padding-left"];
+      const pdVals = pd.map((p) => props[p]).filter(Boolean);
+      if (pdVals.length === 4 && new Set(pdVals).size === 1) {
+        props["padding"] = pdVals[0];
+        pd.forEach((p) => delete props[p]);
+      }
+
+      // Consolidate margin if all 4 sides match
+      const mg = ["margin-top", "margin-right", "margin-bottom", "margin-left"];
+      const mgVals = mg.map((p) => props[p]).filter(Boolean);
+      if (mgVals.length === 4 && new Set(mgVals).size === 1) {
+        props["margin"] = mgVals[0];
+        mg.forEach((p) => delete props[p]);
+      }
+
+      // Simplify font-family: keep only the first 2 fonts + generic
+      if (props["font-family"]) {
+        const fonts = props["font-family"].split(",").map((f) => f.trim());
+        if (fonts.length > 3) {
+          const primary = fonts[0];
+          const generic = fonts.find((f) => ["sans-serif", "serif", "monospace", "system-ui"].includes(f)) || "sans-serif";
+          props["font-family"] = `${primary}, system-ui, ${generic}`;
+        }
+      }
+
+      // Consolidate overflow if x and y are the same
+      if (props["overflow-x"] && props["overflow-x"] === props["overflow-y"]) {
+        props["overflow"] = props["overflow-x"];
+        delete props["overflow-x"];
+        delete props["overflow-y"];
+      }
+
+      // Consolidate row-gap/column-gap if same
+      if (props["row-gap"] && props["row-gap"] === props["column-gap"]) {
+        props["gap"] = props["row-gap"];
+        delete props["row-gap"];
+        delete props["column-gap"];
       }
 
       // Rebuild
