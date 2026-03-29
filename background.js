@@ -1813,14 +1813,34 @@ chrome.action.onClicked.addListener(async (tab) => {
 
             if (mode === "record") {
               // ===== RECORDING MODE =====
-              // 1. Dismiss toast, remove blanket so user can interact
+              // 1. Serialize baseline FIRST (before recording, while element is in resting state)
               await chrome.scripting.executeScript({
                 target: { tabId: tab.id },
-                func: dismissToast,
-                args: [{ immediate: true }],
+                func: showToast,
+                args: ["Capturing baseline...", { iconColor: "#CCCCCC", showProgressBar: true, messageClassName: "capturing" }],
               });
 
-              // 2. Run interaction recorder (user interacts, then stops)
+              const [baselineHTML] = await Promise.all([
+                chrome.scripting.executeScript({
+                  target: { tabId: tab.id, frameIds: [frameId] },
+                  func: elementSerializer,
+                  args: [selector],
+                }),
+                new Promise((r) => setTimeout(r, 300)),
+              ]);
+              const baselineResult = baselineHTML?.[0]?.result;
+
+              if (!baselineResult?.status === "success") {
+                await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: showToast, args: ["Capture failed.", { iconColor: "#CCCCCC" }] });
+                await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: hideProcessingIndicator });
+                return;
+              }
+
+              // 2. Dismiss toast + hide indicator so user can interact freely
+              await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: dismissToast, args: [{ immediate: true }] });
+              await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: hideProcessingIndicator });
+
+              // 3. Run interaction recorder (user interacts, then clicks Stop)
               const [recordResult] = await chrome.scripting.executeScript({
                 target: { tabId: tab.id, frameIds: [frameId] },
                 func: interactionRecorder,
@@ -1828,48 +1848,28 @@ chrome.action.onClicked.addListener(async (tab) => {
               });
               const recordingData = recordResult?.result;
 
-              // 3. Now serialize the baseline (static snapshot)
-              await chrome.scripting.executeScript({
-                target: { tabId: tab.id },
-                func: showProcessingIndicator,
-                args: [selector],
-              });
-              await chrome.scripting.executeScript({
-                target: { tabId: tab.id },
-                func: showToast,
-                args: ["Processing recording...", { iconColor: "#ef4444", showProgressBar: true, messageClassName: "capturing" }],
-              });
+              if (baselineResult?.status === "success" && recordingData) {
+                // 4. Generate interactive React JSX from baseline + recording
+                await chrome.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  func: showToast,
+                  args: ["Generating component...", { iconColor: "#6366f1", showProgressBar: true, messageClassName: "capturing" }],
+                });
 
-              const [serializedHTML] = await Promise.all([
-                chrome.scripting.executeScript({
-                  target: { tabId: tab.id, frameIds: [frameId] },
-                  func: elementSerializer,
-                  args: [selector],
-                }),
-                new Promise((r) => setTimeout(r, 500)),
-              ]);
-              const serializationResult = serializedHTML?.[0]?.result;
-
-              if (serializationResult?.status === "success" && recordingData) {
-                // 4. Generate interactive React JSX
                 const [jsxResult] = await chrome.scripting.executeScript({
                   target: { tabId: tab.id },
                   func: interactionToReactJsx,
-                  args: [recordingData, serializationResult.html],
+                  args: [recordingData, baselineResult.html],
                 });
-                const interactiveJsx = jsxResult?.result || serializationResult.html;
+                const interactiveJsx = jsxResult?.result || baselineResult.html;
 
-                await chrome.scripting.executeScript({
-                  target: { tabId: tab.id },
-                  func: dismissToast,
-                  args: [{ immediate: true }],
-                });
+                await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: dismissToast, args: [{ immediate: true }] });
 
-                // 5. Show preview
+                // 5. Show preview with recording data for the timeline player
                 const [previewResult] = await chrome.scripting.executeScript({
                   target: { tabId: tab.id },
                   func: showPreview,
-                  args: [serializationResult.rawHtml, interactiveJsx],
+                  args: [baselineResult.rawHtml, interactiveJsx],
                 });
 
                 const action = previewResult?.result;
@@ -1877,7 +1877,7 @@ chrome.action.onClicked.addListener(async (tab) => {
                   await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: copyToClipboard, args: [interactiveJsx] });
                   await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: showToast, args: [`Copied! ${recordingData.snapshots?.length || 0} interactions recorded.`] });
                 } else if (action === "copy-raw") {
-                  await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: copyToClipboard, args: [serializationResult.rawHtml] });
+                  await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: copyToClipboard, args: [baselineResult.rawHtml] });
                   await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: showToast, args: ["Copied raw HTML!"] });
                 } else {
                   await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: showToast, args: ["Cancelled", { iconColor: "#CCCCCC", dismissTimeout: 2000 }] });
@@ -1885,8 +1885,6 @@ chrome.action.onClicked.addListener(async (tab) => {
               } else {
                 await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: showToast, args: ["Recording failed.", { iconColor: "#CCCCCC" }] });
               }
-
-              await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: hideProcessingIndicator });
 
             } else {
               // ===== STATIC MODE (existing flow) =====
