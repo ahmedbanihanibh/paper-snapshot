@@ -1,5 +1,7 @@
-import { createRoot, createEffect, onCleanup } from "solid-js";
+import { createEffect, onCleanup } from "solid-js";
+import { render } from "solid-js/web";
 import { store, actions } from "./store";
+import { Renderer } from "../components/renderer";
 import { ELEMENT_DETECTION_THROTTLE_MS, Z_BLANKET, Z_UI } from "../constants";
 import type { UIToCodeAPI, UIToCodeOptions, Plugin } from "../types";
 
@@ -95,17 +97,9 @@ export function init(options: UIToCodeOptions = {}): UIToCodeAPI {
       }
 
       // Mount SolidJS UI inside shadow root
-      dispose = createRoot((disposeFn) => {
-        // Reactive effects go here
-        createEffect(() => {
-          if (!store.isActive() && dispose) {
-            disposeFn();
-            dispose = null;
-          }
-        });
-
-        return disposeFn;
-      });
+      if (shadowRoot) {
+        dispose = render(() => <Renderer />, shadowRoot);
+      }
 
       plugins.forEach((p) => p.onActivate?.());
     },
