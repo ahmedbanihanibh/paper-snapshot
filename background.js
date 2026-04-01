@@ -23,6 +23,27 @@ async function copyToClipboard(text) {
   ]);
 }
 
+// Copy for Paper app — wraps HTML in <x-paper-html> so Paper recognizes the paste
+async function copyToClipboardForPaper(html) {
+  function waitForFocus() {
+    if (document.hasFocus()) {
+      return Promise.resolve();
+    }
+    return new Promise((resolve) => {
+      window.addEventListener("focus", () => resolve(), { once: true });
+    });
+  }
+
+  await waitForFocus();
+  const paperHtml = `<x-paper-html>${html}</x-paper-html>`;
+  await navigator.clipboard.write([
+    new ClipboardItem({
+      "text/plain": new Blob([html], { type: "text/plain" }),
+      "text/html": new Blob([paperHtml], { type: "text/html" }),
+    }),
+  ]);
+}
+
 // ============================================================================
 // ELEMENT PICKER — Direct port from Paper Snapshot: element-picker.ts
 // Only change: "x-paper-toast" → "ui2code-toast", attribute name
@@ -1173,6 +1194,13 @@ function showPreview(html, jsxCode) {
     cancelBtn.onmouseenter = () => { cancelBtn.style.background = "rgba(255,255,255,0.12)"; cancelBtn.style.color = "rgba(255,255,255,0.9)"; };
     cancelBtn.onmouseleave = () => { cancelBtn.style.background = "rgba(255,255,255,0.08)"; cancelBtn.style.color = "rgba(255,255,255,0.7)"; };
 
+    const copyPaperBtn = document.createElement("button");
+    Object.assign(copyPaperBtn.style, { background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "12px", fontWeight: "500", padding: "6px 12px", fontFamily: "inherit", transition: "all 150ms ease" });
+    copyPaperBtn.textContent = "Copy for Paper";
+    copyPaperBtn.title = "Copy as Paper-compatible snapshot (paste directly into Paper app)";
+    copyPaperBtn.onmouseenter = () => { copyPaperBtn.style.background = "rgba(255,255,255,0.14)"; copyPaperBtn.style.color = "rgba(255,255,255,0.9)"; };
+    copyPaperBtn.onmouseleave = () => { copyPaperBtn.style.background = "rgba(255,255,255,0.08)"; copyPaperBtn.style.color = "rgba(255,255,255,0.7)"; };
+
     const copyRawBtn = document.createElement("button");
     Object.assign(copyRawBtn.style, { background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "12px", fontWeight: "500", padding: "6px 12px", fontFamily: "inherit", transition: "all 150ms ease" });
     copyRawBtn.textContent = "Copy React CSS";
@@ -1187,7 +1215,7 @@ function showPreview(html, jsxCode) {
     copyAIBtn.onmouseenter = () => { copyAIBtn.style.background = "#818cf8"; };
     copyAIBtn.onmouseleave = () => { copyAIBtn.style.background = "#6366f1"; };
 
-    headerRight.append(sizeLabel, cancelBtn, copyRawBtn, copyAIBtn);
+    headerRight.append(sizeLabel, cancelBtn, copyPaperBtn, copyRawBtn, copyAIBtn);
     header.append(title, headerRight);
 
     // Toolbar with zoom controls
@@ -1332,6 +1360,7 @@ function showPreview(html, jsxCode) {
     }
 
     cancelBtn.addEventListener("click", () => close("cancel"));
+    copyPaperBtn.addEventListener("click", () => close("copy-paper"));
     copyRawBtn.addEventListener("click", () => close("copy-raw"));
     copyAIBtn.addEventListener("click", () => close("copy-ai"));
     backdrop.addEventListener("click", (e) => { if (e.target === backdrop) close("cancel"); });
@@ -1436,6 +1465,17 @@ chrome.action.onClicked.addListener(async (tab) => {
                   target: { tabId: tab.id },
                   func: showToast,
                   args: ["Copied for Claude/v0! Paste to generate React components."],
+                });
+              } else if (action === "copy-paper") {
+                await chrome.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  func: copyToClipboardForPaper,
+                  args: [serializationResult.rawHtml],
+                });
+                await chrome.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  func: showToast,
+                  args: ["Copied for Paper! Paste into Paper app."],
                 });
               } else if (action === "copy-raw") {
                 await chrome.scripting.executeScript({
