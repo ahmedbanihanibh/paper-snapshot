@@ -527,10 +527,8 @@ async function copyToClipboardForLottielab(rawHtml) {
 
   const allLayers = convertElement(rootEl, 0, 0);
 
-  // Wrap in a top-level group if multiple layers
-  const lottieLayers = allLayers.length === 1 ? allLayers : [
-    makeGroupLayer("UI Snapshot", 0, 0, 100, allLayers),
-  ];
+  // Cap layers and keep flat (no group wrapper — Lottielab may reject groups on paste)
+  const lottieLayers = allLayers.slice(0, 15);
 
   const lottiePasteHTML = `\n    <meta charset="utf-8">\n    <div id="lottielab-paste">\n      <span id="layers" data-contents="${encodeURIComponent(JSON.stringify(lottieLayers))}"></span>\n    </div>\n  `;
 
