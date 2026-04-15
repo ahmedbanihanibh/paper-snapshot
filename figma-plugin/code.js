@@ -559,15 +559,27 @@ async function createNode(layer, parent, parentStyles) {
       if (bgGrads2.length > 0) bgFills2 = bgGrads2;
       frame.fills = bgFills2;
 
-      // Border radius
-      const br = parseBorderRadius(s["border-radius"]);
-      if (typeof br === "number") {
-        frame.cornerRadius = br;
-      } else if (Array.isArray(br)) {
-        frame.topLeftRadius = br[0] || 0;
-        frame.topRightRadius = br[1] || 0;
-        frame.bottomRightRadius = br[2] || 0;
-        frame.bottomLeftRadius = br[3] || 0;
+      // Border radius (shorthand or individual corners)
+      var brTL2 = px(s["border-top-left-radius"]) || px(s["border-start-start-radius"]);
+      var brTR2 = px(s["border-top-right-radius"]) || px(s["border-start-end-radius"]);
+      var brBR2 = px(s["border-bottom-right-radius"]) || px(s["border-end-end-radius"]);
+      var brBL2 = px(s["border-bottom-left-radius"]) || px(s["border-end-start-radius"]);
+      if (brTL2 || brTR2 || brBR2 || brBL2) {
+        if (brTL2 === brTR2 && brTR2 === brBR2 && brBR2 === brBL2) {
+          frame.cornerRadius = brTL2;
+        } else {
+          frame.topLeftRadius = brTL2;
+          frame.topRightRadius = brTR2;
+          frame.bottomRightRadius = brBR2;
+          frame.bottomLeftRadius = brBL2;
+        }
+      } else {
+        var br2 = parseBorderRadius(s["border-radius"]);
+        if (typeof br2 === "number") frame.cornerRadius = br2;
+        else if (Array.isArray(br2)) {
+          frame.topLeftRadius = br2[0] || 0; frame.topRightRadius = br2[1] || 0;
+          frame.bottomRightRadius = br2[2] || 0; frame.bottomLeftRadius = br2[3] || 0;
+        }
       }
 
       // Border
@@ -663,15 +675,30 @@ async function createNode(layer, parent, parentStyles) {
   if (bgGradients.length > 0) bgFills = bgGradients;
   frame.fills = bgFills;
 
-  // Border radius
-  const br = parseBorderRadius(s["border-radius"]);
-  if (typeof br === "number") {
-    frame.cornerRadius = br;
-  } else if (Array.isArray(br)) {
-    frame.topLeftRadius = br[0] || 0;
-    frame.topRightRadius = br[1] || 0;
-    frame.bottomRightRadius = br[2] || 0;
-    frame.bottomLeftRadius = br[3] || 0;
+  // Border radius (shorthand or individual corners)
+  var brTL = px(s["border-top-left-radius"]) || px(s["border-start-start-radius"]);
+  var brTR = px(s["border-top-right-radius"]) || px(s["border-start-end-radius"]);
+  var brBR = px(s["border-bottom-right-radius"]) || px(s["border-end-end-radius"]);
+  var brBL = px(s["border-bottom-left-radius"]) || px(s["border-end-start-radius"]);
+  if (brTL || brTR || brBR || brBL) {
+    if (brTL === brTR && brTR === brBR && brBR === brBL) {
+      frame.cornerRadius = brTL;
+    } else {
+      frame.topLeftRadius = brTL;
+      frame.topRightRadius = brTR;
+      frame.bottomRightRadius = brBR;
+      frame.bottomLeftRadius = brBL;
+    }
+  } else {
+    var br = parseBorderRadius(s["border-radius"]);
+    if (typeof br === "number") {
+      frame.cornerRadius = br;
+    } else if (Array.isArray(br)) {
+      frame.topLeftRadius = br[0] || 0;
+      frame.topRightRadius = br[1] || 0;
+      frame.bottomRightRadius = br[2] || 0;
+      frame.bottomLeftRadius = br[3] || 0;
+    }
   }
 
   // Border (shorthand or individual sides)
