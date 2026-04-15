@@ -57,14 +57,14 @@ function parseColor(str) {
     var la = parseFloat(labMatch[2]);
     var lb = parseFloat(labMatch[3]);
     var alpha = labMatch[4] !== undefined ? parseFloat(labMatch[4]) : 1;
-    // Lab to XYZ (D65 illuminant)
+    // Lab to XYZ (D65 illuminant, white point Xn=0.95047 Yn=1 Zn=1.08883)
     var fy = (L + 16) / 116;
     var fx = la / 500 + fy;
     var fz = fy - lb / 200;
     var delta = 6/29;
-    var xr = fx > delta ? fx*fx*fx : 3*delta*delta*(fx - 4/29);
-    var yr = L > 8 ? fy*fy*fy : L / 903.3;
-    var zr = fz > delta ? fz*fz*fz : 3*delta*delta*(fz - 4/29);
+    var xr = (fx > delta ? fx*fx*fx : 3*delta*delta*(fx - 4/29)) * 0.95047;
+    var yr = (L > 8 ? fy*fy*fy : L / 903.3) * 1.0;
+    var zr = (fz > delta ? fz*fz*fz : 3*delta*delta*(fz - 4/29)) * 1.08883;
     // XYZ to linear sRGB (D65)
     var lr = 3.2406*xr - 1.5372*yr - 0.4986*zr;
     var lg = -0.9689*xr + 1.8758*yr + 0.0415*zr;
@@ -418,6 +418,20 @@ async function createNode(layer, parent, parentStyles) {
     } catch(e) {
       return null;
     }
+  }
+
+  // ── IMAGE: create rectangle with image fill ───────────────────────────
+  if (layer.type === "IMAGE") {
+    var imgS = layer.styles || {};
+    var imgW = px(imgS.width) || px(imgS["inline-size"]) || 22;
+    var imgH = px(imgS.height) || px(imgS["block-size"]) || imgW;
+    var imgFrame = figma.createRectangle();
+    imgFrame.name = "img";
+    imgFrame.resize(imgW, imgH);
+    imgFrame.cornerRadius = px(imgS["border-radius"]) || px(imgS["border-top-left-radius"]) || 0;
+    imgFrame.fills = [{ type: "SOLID", color: { r: 0.85, g: 0.85, b: 0.85 }, opacity: 0.3 }];
+    parent.appendChild(imgFrame);
+    return imgFrame;
   }
 
   // ── ELEMENT: create frame/rectangle/text ───────────────────────────────

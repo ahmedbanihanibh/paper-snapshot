@@ -169,6 +169,16 @@
       return { type: "SVG", svg: el.outerHTML, styles };
     }
 
+    // Handle <img> elements
+    if (tag === "img") {
+      return {
+        type: "IMAGE",
+        src: el.getAttribute("src") || "",
+        styles,
+        tag: "img"
+      };
+    }
+
     const layer = {
       type: "ELEMENT",
       tag,
