@@ -833,36 +833,32 @@ async function elementSerializer(selector) {
   }
 
   // Resolve the actual text content of a ::before/::after pseudo-element
-  // Handles: content: "string", content: open-quote, content: close-quote, content: attr(...)
   function resolvePseudoContent(element, pseudo, styles) {
     if (!styles.content) return "";
     const raw = styles.content;
-    // CSS content: none or normal
     if (raw === "none" || raw === "normal") return "";
-    // String literal: content: '"' or content: 'text'
-    // The computed value comes as a string, possibly with quotes
-    if (raw === "open-quote") {
-      // Resolve from the quotes property on the element or ancestors
-      const quotesVal = window.getComputedStyle(element).quotes;
-      if (quotesVal && quotesVal !== "none" && quotesVal !== "auto") {
-        // quotes: '"' '"' ''' ''' — extract the opening quote
-        const parts = quotesVal.match(/["']([^"']+)["']/g);
-        if (parts && parts.length > 0) return parts[0].replace(/["']/g, "");
+
+    // For open-quote / close-quote, use the browser's computed content
+    // which is already the resolved quote character as a string like '"'
+    if (raw === "open-quote" || raw === "close-quote") {
+      // Try getting the actual rendered content from the pseudo-element
+      const computed = window.getComputedStyle(element, pseudo);
+      const computedContent = computed.content;
+      if (computedContent && computedContent !== "none" && computedContent !== "normal"
+          && computedContent !== "open-quote" && computedContent !== "close-quote") {
+        // Strip wrapping quotes from computed value: '"' → " or "\201C" → \u201C
+        const stripped = computedContent.replace(/^["']|["']$/g, "");
+        if (stripped) return stripped;
       }
-      return "\u201C"; // fallback: left double quotation mark
+      // Fallback to curly quotes
+      return raw === "open-quote" ? "\u201C" : "\u201D";
     }
-    if (raw === "close-quote") {
-      const quotesVal = window.getComputedStyle(element).quotes;
-      if (quotesVal && quotesVal !== "none" && quotesVal !== "auto") {
-        const parts = quotesVal.match(/["']([^"']+)["']/g);
-        if (parts && parts.length > 1) return parts[1].replace(/["']/g, "");
-      }
-      return "\u201D"; // fallback: right double quotation mark
-    }
-    // String value like: "»" or "• "
+
+    // String value like: "»" or "• " — strip wrapping quotes
     const strMatch = raw.match(/^["'](.*)["']$/);
     if (strMatch) return strMatch[1];
-    // Counter or attr() — just return empty for now
+    // Bare string without quotes
+    if (raw.length <= 3 && raw !== "''") return raw;
     return "";
   }
 
@@ -1066,7 +1062,10 @@ async function elementSerializer(selector) {
       const beforeStyles = resolveComputedStyles(target, { pseudo: "::before" });
       if (Object.keys(beforeStyles).length && !isScaledToZeroAndOutOfFlow(beforeStyles)) {
         const beforeText = resolvePseudoContent(target, "::before", beforeStyles);
-        children.push(`<div style="${toInlineStyles(beforeStyles)}">${encodeHTML(beforeText)}</div>`);
+        delete beforeStyles.content; // content doesn't work on regular elements
+        const isInlinePseudo = beforeStyles.display === "inline" || beforeStyles.display === "inline-block";
+        const pseudoTag = isInlinePseudo ? "span" : "div";
+        children.push(`<${pseudoTag} style="${toInlineStyles(beforeStyles)}">${encodeHTML(beforeText)}</${pseudoTag}>`);
       }
       styles = resolveComputedStyles(target, { isRoot: __isRoot });
 
@@ -1169,7 +1168,10 @@ async function elementSerializer(selector) {
     const afterStyles = resolveComputedStyles(target, { pseudo: "::after" });
     if (Object.keys(afterStyles).length && !isScaledToZeroAndOutOfFlow(afterStyles)) {
       const afterText = resolvePseudoContent(target, "::after", afterStyles);
-      children.push(`<div style="${toInlineStyles(afterStyles)}">${encodeHTML(afterText)}</div>`);
+      delete afterStyles.content;
+      const isInlineAfter = afterStyles.display === "inline" || afterStyles.display === "inline-block";
+      const afterTag = isInlineAfter ? "span" : "div";
+      children.push(`<${afterTag} style="${toInlineStyles(afterStyles)}">${encodeHTML(afterText)}</${afterTag}>`);
     }
 
     const attributesToSerialize = [];
