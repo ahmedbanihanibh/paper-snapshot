@@ -64,11 +64,31 @@ function isPercent100(val) {
 function parseGradientFills(bgImage) {
   if (!bgImage) return [];
   var fills = [];
-  // Match each linear-gradient(...) in the string
-  var re = /linear-gradient\(([^)]+(?:\([^)]*\)[^)]*)*)\)/g;
-  var match;
-  while ((match = re.exec(bgImage)) !== null) {
-    var inner = match[1];
+
+  // Extract gradient contents using balanced paren matching (handles nested rgba())
+  function extractGradients(str) {
+    var results = [];
+    var idx = 0;
+    while (true) {
+      var start = str.indexOf("linear-gradient(", idx);
+      if (start === -1) break;
+      var parenStart = start + "linear-gradient(".length;
+      var depth = 1;
+      var i = parenStart;
+      while (i < str.length && depth > 0) {
+        if (str[i] === "(") depth++;
+        else if (str[i] === ")") depth--;
+        i++;
+      }
+      results.push(str.substring(parenStart, i - 1));
+      idx = i;
+    }
+    return results;
+  }
+
+  var gradients = extractGradients(bgImage);
+  for (var gi = 0; gi < gradients.length; gi++) {
+    var inner = gradients[gi];
     // Split by commas, but not commas inside rgba()
     var parts = [];
     var depth = 0, start = 0;
@@ -498,12 +518,12 @@ async function createNode(layer, parent, parentStyles) {
   const layoutMode = getLayoutMode(s);
   if (layoutMode !== "NONE") {
     frame.layoutMode = layoutMode;
-    frame.primaryAxisAlignItems = mapAlignment(
-      layoutMode === "HORIZONTAL" ? s["justify-content"] : s["align-items"]
-    );
-    frame.counterAxisAlignItems = mapAlignment(
-      layoutMode === "HORIZONTAL" ? s["align-items"] : s["justify-content"]
-    );
+    // In CSS flex: justify-content controls the main axis, align-items the cross axis
+    // In Figma: primaryAxisAlignItems = main axis, counterAxisAlignItems = cross axis
+    // For HORIZONTAL: main = horizontal (justify-content), cross = vertical (align-items)
+    // For VERTICAL: main = vertical (justify-content), cross = horizontal (align-items)
+    frame.primaryAxisAlignItems = mapAlignment(s["justify-content"]);
+    frame.counterAxisAlignItems = mapAlignment(s["align-items"]);
 
     // Use direction-appropriate gap: column-gap for HORIZONTAL, row-gap for VERTICAL
     var gap;
