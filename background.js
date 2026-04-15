@@ -113,44 +113,44 @@ async function copyToClipboardForLottielab(rawHtml) {
     return new Promise(resolve => window.addEventListener("focus", resolve, { once: true }));
   }
 
-  // Lottielab animatable property (static value, no keyframes)
+  // ── Lottielab helpers ─────────────────────────────────────────────────────
   function sp(value) {
     return { staticValue: value, defaultFrame: 0, keyframes: [] };
   }
 
-  // Parse CSS color to Lottielab RGB (0-255 range)
   function parseCssColor(str) {
-    if (!str) return null;
+    if (!str || str === "transparent" || str === "rgba(0, 0, 0, 0)") return null;
+    str = str.trim();
     const m = str.match(/rgba?\(\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\s*\)/);
-    if (m) return { r: Math.round(parseFloat(m[1])), g: Math.round(parseFloat(m[2])), b: Math.round(parseFloat(m[3])) };
+    if (m) return { r: Math.round(parseFloat(m[1])), g: Math.round(parseFloat(m[2])), b: Math.round(parseFloat(m[3])), a: m[4] !== undefined ? parseFloat(m[4]) : 1 };
     if (str.startsWith("#")) {
       let hex = str.slice(1);
       if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
-      return { r: parseInt(hex.slice(0,2),16), g: parseInt(hex.slice(2,4),16), b: parseInt(hex.slice(4,6),16) };
+      return { r: parseInt(hex.slice(0,2),16), g: parseInt(hex.slice(2,4),16), b: parseInt(hex.slice(4,6),16), a: 1 };
     }
     return null;
   }
 
-  // Parse root element dimensions and styles
-  const tmpDiv = document.createElement("div");
-  tmpDiv.innerHTML = rawHtml;
-  const rootEl = tmpDiv.firstElementChild;
-  const rootStyle = rootEl ? rootEl.getAttribute("style") || "" : "";
-  const widthMatch = rootStyle.match(/width:\s*([\d.]+)px/);
-  const heightMatch = rootStyle.match(/(?:min-)?height:\s*([\d.]+)px/);
-  const w = widthMatch ? parseFloat(widthMatch[1]) : 400;
-  const h = heightMatch ? parseFloat(heightMatch[1]) : 300;
-  const bgMatch = rootStyle.match(/background(?:-color)?:\s*([^;]+)/);
-  const bgColor = bgMatch ? parseCssColor(bgMatch[1].trim()) : { r: 255, g: 255, b: 255 };
-  const brMatch = rootStyle.match(/border-radius:\s*([\d.]+)px/);
-  const borderRadius = brMatch ? parseFloat(brMatch[1]) : 0;
+  function parseStyleAttr(el) {
+    const s = {};
+    const raw = el.getAttribute("style") || "";
+    for (const part of raw.split(";")) {
+      const idx = part.indexOf(":");
+      if (idx < 0) continue;
+      const k = part.slice(0, idx).trim();
+      const v = part.slice(idx + 1).trim();
+      if (k) s[k] = v;
+    }
+    return s;
+  }
 
-  // Lottielab transform object
-  function makeTransform(x, y, opacity) {
+  function pxVal(v) { return parseFloat(v) || 0; }
+
+  function makeTransform(x, y, opacity, scaleX, scaleY, rotation) {
     return {
       position: { isLocked: false, staticValue: { x: x, y: y }, defaultFrame: 0, keyframes: [] },
-      scale: { aspectRatioLocked: false, staticValue: [1, 1], defaultFrame: 0, keyframes: [] },
-      rotation: sp(0),
+      scale: { aspectRatioLocked: false, staticValue: [scaleX || 1, scaleY || 1], defaultFrame: 0, keyframes: [] },
+      rotation: sp(rotation || 0),
       origin: { isLocked: true, staticValue: { x: 0, y: 0 }, defaultFrame: 0, keyframes: [] },
       skew: sp(0),
       skewAxis: sp(0),
@@ -158,39 +158,380 @@ async function copyToClipboardForLottielab(rawHtml) {
     };
   }
 
-  // Build shape-layer with rectangle geometry (exact Lottielab format)
-  const shapeLayer = {
-    layerType: "shape-layer",
-    name: "UI Snapshot",
-    locked: false,
-    visibility: sp(true),
-    fixedFrames: [],
-    transform: makeTransform(w / 2, h / 2, 100),
-    pathDirection: 1,
-    geometry: {
-      type: "rectangle",
-      dimensions: { aspectRatioLocked: false, staticValue: [w, h], defaultFrame: 0, keyframes: [] },
-      cornerRadius: sp(borderRadius),
-    },
-    styles: [
-      {
-        type: "fill",
-        hidden: false,
-        opacity: sp(100),
-        paint: { type: "solid", staticValue: bgColor || { r: 255, g: 255, b: 255 }, defaultFrame: 0, keyframes: [] },
+  function makeShapeLayer(name, w, h, x, y, fillColor, strokeColor, strokeWidth, cornerRadius, opacity) {
+    const styles = [];
+    if (strokeColor) {
+      styles.push({
+        type: "stroke", hidden: false, opacity: sp(100),
+        paint: { type: "solid", staticValue: { r: strokeColor.r, g: strokeColor.g, b: strokeColor.b }, defaultFrame: 0, keyframes: [] },
+        thickness: sp(strokeWidth || 1), alignment: "centre", lineCap: "butt", lineJoin: "miter",
+      });
+    }
+    if (fillColor) {
+      styles.push({
+        type: "fill", hidden: false, opacity: sp(fillColor.a !== undefined ? Math.round(fillColor.a * 100) : 100),
+        paint: { type: "solid", staticValue: { r: fillColor.r, g: fillColor.g, b: fillColor.b }, defaultFrame: 0, keyframes: [] },
+      });
+    }
+    return {
+      layerType: "shape-layer", name: name, locked: false,
+      visibility: sp(true), fixedFrames: [],
+      transform: makeTransform(x, y, opacity !== undefined ? opacity : 100),
+      pathDirection: 1,
+      geometry: {
+        type: "rectangle",
+        dimensions: { aspectRatioLocked: false, staticValue: [w, h], defaultFrame: 0, keyframes: [] },
+        cornerRadius: sp(cornerRadius || 0),
       },
-    ],
-    trimPath: {
-      start: sp(0),
-      end: sp(100),
-      offset: sp(0),
-    },
-    blendMode: "normal",
-    effects: [],
-    animations: [],
-  };
+      styles: styles,
+      trimPath: { start: sp(0), end: sp(100), offset: sp(0) },
+      blendMode: "normal", effects: [], animations: [],
+    };
+  }
 
-  const lottieLayers = [shapeLayer];
+  function makeGroupLayer(name, x, y, opacity, childLayers) {
+    return {
+      layerType: "group-layer", name: name, locked: false,
+      visibility: sp(true), fixedFrames: [],
+      transform: makeTransform(x, y, opacity !== undefined ? opacity : 100),
+      groupTypeProperties: { type: "group", styles: [] },
+      blendMode: "normal",
+      layers: childLayers,
+    };
+  }
+
+  // ── Build styles array from SVG fill/stroke ────────────────────────────────
+  function makeStyles(fillColor, strokeColor, strokeWidth, lineCap, lineJoin) {
+    const styles = [];
+    if (strokeColor) {
+      styles.push({
+        type: "stroke", hidden: false, opacity: sp(100),
+        paint: { type: "solid", staticValue: { r: strokeColor.r, g: strokeColor.g, b: strokeColor.b }, defaultFrame: 0, keyframes: [] },
+        thickness: sp(strokeWidth || 0.5), alignment: "centre",
+        lineCap: lineCap || "round", lineJoin: lineJoin || "miter",
+      });
+    }
+    if (fillColor) {
+      styles.push({
+        type: "fill", hidden: false, opacity: sp(fillColor.a !== undefined ? Math.round(fillColor.a * 100) : 100),
+        paint: { type: "solid", staticValue: { r: fillColor.r, g: fillColor.g, b: fillColor.b }, defaultFrame: 0, keyframes: [] },
+      });
+    }
+    return styles;
+  }
+
+  // ── Parse SVG path d-attribute to Lottielab vector-path control points ────
+  function svgDToVectorPath(d) {
+    const points = [];
+    // Simple parser: extract M, L, C, Z commands and their coordinates
+    const cmds = d.match(/[MLHVCSQTAZmlhvcsqtaz][^MLHVCSQTAZmlhvcsqtaz]*/g);
+    if (!cmds) return points;
+
+    let cx = 0, cy = 0; // current position
+    for (const cmd of cmds) {
+      const type = cmd[0];
+      const nums = cmd.slice(1).trim().match(/-?[\d.]+(?:e[+-]?\d+)?/g);
+      const vals = nums ? nums.map(Number) : [];
+
+      if (type === "M" || type === "m") {
+        for (let i = 0; i < vals.length; i += 2) {
+          cx = type === "M" ? vals[i] : cx + vals[i];
+          cy = type === "M" ? vals[i+1] : cy + vals[i+1];
+          points.push({ position: { x: cx, y: cy }, inTangent: { x: 0, y: 0 }, outTangent: { x: 0, y: 0 } });
+        }
+      } else if (type === "L" || type === "l") {
+        for (let i = 0; i < vals.length; i += 2) {
+          cx = type === "L" ? vals[i] : cx + vals[i];
+          cy = type === "L" ? vals[i+1] : cy + vals[i+1];
+          points.push({ position: { x: cx, y: cy }, inTangent: { x: 0, y: 0 }, outTangent: { x: 0, y: 0 } });
+        }
+      } else if (type === "H" || type === "h") {
+        for (let i = 0; i < vals.length; i++) {
+          cx = type === "H" ? vals[i] : cx + vals[i];
+          points.push({ position: { x: cx, y: cy }, inTangent: { x: 0, y: 0 }, outTangent: { x: 0, y: 0 } });
+        }
+      } else if (type === "V" || type === "v") {
+        for (let i = 0; i < vals.length; i++) {
+          cy = type === "V" ? vals[i] : cy + vals[i];
+          points.push({ position: { x: cx, y: cy }, inTangent: { x: 0, y: 0 }, outTangent: { x: 0, y: 0 } });
+        }
+      } else if (type === "C" || type === "c") {
+        // Cubic bezier: C x1 y1 x2 y2 x y
+        for (let i = 0; i < vals.length; i += 6) {
+          const abs = type === "C";
+          const x1 = abs ? vals[i] : cx + vals[i];
+          const y1 = abs ? vals[i+1] : cy + vals[i+1];
+          const x2 = abs ? vals[i+2] : cx + vals[i+2];
+          const y2 = abs ? vals[i+3] : cy + vals[i+3];
+          const ex = abs ? vals[i+4] : cx + vals[i+4];
+          const ey = abs ? vals[i+5] : cy + vals[i+5];
+          // Set outTangent on previous point (relative to previous point)
+          if (points.length > 0) {
+            const prev = points[points.length - 1];
+            prev.outTangent = { x: x1 - prev.position.x, y: y1 - prev.position.y };
+          }
+          // New point with inTangent (relative to this point)
+          points.push({
+            position: { x: ex, y: ey },
+            inTangent: { x: x2 - ex, y: y2 - ey },
+            outTangent: { x: 0, y: 0 },
+          });
+          cx = ex; cy = ey;
+        }
+      } else if (type === "Z" || type === "z") {
+        // Close path — no new point needed
+      }
+      // S, Q, T, A are less common — skip for now
+    }
+    return points;
+  }
+
+  // ── Make a text-layer (exact Lottielab format) ────────────────────────────
+  function makeTextLayer(name, text, x, y, fontSize, fontWeight, fontFamily, fillColor, opacity, w, h) {
+    return {
+      layerType: "text-layer", name: name || text, locked: false,
+      visibility: sp(true),
+      transform: makeTransform(x, y, opacity !== undefined ? opacity : 100),
+      content: text, autoRename: true,
+      horizontalAlignment: 0, verticalAlignment: 0, layout: 2,
+      fontFamilyTag: fontFamily || "Inter",
+      fontWeight: fontWeight || 400, fontWidth: 100,
+      fontSize: fontSize || 16, slant: 0,
+      letterSpacing: 0, lineHeight: 100, paragraphSpacing: 0,
+      layoutDimension: { aspectRatioLocked: false, staticValue: [w || 200, h || 50], defaultFrame: 0, keyframes: [] },
+      fixedFrames: [],
+      styles: makeStyles(fillColor || { r: 0, g: 0, b: 0 }, null, 0),
+      blendMode: "normal", effects: [], animations: [], textAnimations: [],
+    };
+  }
+
+  // ── Parse SVG element into Lottielab layers ───────────────────────────────
+  function parseSvgElement(svgEl) {
+    const layers = [];
+    const svgW = parseFloat(svgEl.getAttribute("width")) || 100;
+    const svgH = parseFloat(svgEl.getAttribute("height")) || 100;
+
+    function walkSvg(el, parentName) {
+      const tag = el.tagName.toLowerCase();
+
+      if (tag === "path") {
+        const d = el.getAttribute("d");
+        if (!d) return;
+        const fill = parseCssColor(el.getAttribute("fill"));
+        const stroke = parseCssColor(el.getAttribute("stroke"));
+        const sw = parseFloat(el.getAttribute("stroke-width")) || 0;
+        const lc = el.getAttribute("stroke-linecap") || "round";
+        const lj = el.getAttribute("stroke-linejoin") || "miter";
+        const name = el.getAttribute("name") || parentName || "Path";
+        const controlPoints = svgDToVectorPath(d);
+        if (controlPoints.length < 2) return;
+        layers.push({
+          layerType: "shape-layer", name: name, locked: false,
+          visibility: sp(true), fixedFrames: [],
+          transform: makeTransform(0, 0, 100),
+          pathDirection: 1,
+          geometry: { type: "vector-path", staticValue: controlPoints, defaultFrame: 0, keyframes: [] },
+          styles: makeStyles(fill, stroke, sw, lc, lj),
+          trimPath: { start: sp(0), end: sp(100), offset: sp(0) },
+          blendMode: "normal", effects: [], animations: [],
+        });
+      }
+
+      if (tag === "circle") {
+        const cx = parseFloat(el.getAttribute("cx")) || 0;
+        const cy = parseFloat(el.getAttribute("cy")) || 0;
+        const r = parseFloat(el.getAttribute("r")) || 1;
+        const fill = parseCssColor(el.getAttribute("fill"));
+        const opacityStr = el.getAttribute("opacity");
+        const opacity = opacityStr ? Math.round(parseFloat(opacityStr) * 100) : 100;
+        layers.push({
+          layerType: "shape-layer", name: "Circle",
+          locked: false, visibility: sp(true), fixedFrames: [],
+          transform: makeTransform(cx, cy, opacity),
+          pathDirection: 1,
+          geometry: {
+            type: "ellipse",
+            dimensions: { aspectRatioLocked: true, staticValue: [r * 2, r * 2], defaultFrame: 0, keyframes: [] },
+            arcStart: sp(0), arcSweep: sp(100), ratio: sp(0),
+          },
+          styles: makeStyles(fill, null, 0),
+          trimPath: { start: sp(0), end: sp(100), offset: sp(0) },
+          blendMode: "normal", effects: [], animations: [],
+        });
+      }
+
+      if (tag === "ellipse") {
+        const cx = parseFloat(el.getAttribute("cx")) || 0;
+        const cy = parseFloat(el.getAttribute("cy")) || 0;
+        const rx = parseFloat(el.getAttribute("rx")) || 1;
+        const ry = parseFloat(el.getAttribute("ry")) || 1;
+        const fill = parseCssColor(el.getAttribute("fill"));
+        layers.push({
+          layerType: "shape-layer", name: "Ellipse",
+          locked: false, visibility: sp(true), fixedFrames: [],
+          transform: makeTransform(cx, cy, 100),
+          pathDirection: 1,
+          geometry: {
+            type: "ellipse",
+            dimensions: { aspectRatioLocked: false, staticValue: [rx * 2, ry * 2], defaultFrame: 0, keyframes: [] },
+            arcStart: sp(0), arcSweep: sp(100), ratio: sp(0),
+          },
+          styles: makeStyles(fill, null, 0),
+          trimPath: { start: sp(0), end: sp(100), offset: sp(0) },
+          blendMode: "normal", effects: [], animations: [],
+        });
+      }
+
+      if (tag === "rect") {
+        const x = parseFloat(el.getAttribute("x")) || 0;
+        const y = parseFloat(el.getAttribute("y")) || 0;
+        const rw = parseFloat(el.getAttribute("width")) || 0;
+        const rh = parseFloat(el.getAttribute("height")) || 0;
+        const rx = parseFloat(el.getAttribute("rx")) || 0;
+        const fill = parseCssColor(el.getAttribute("fill"));
+        const stroke = parseCssColor(el.getAttribute("stroke"));
+        const sw = parseFloat(el.getAttribute("stroke-width")) || 0;
+        layers.push(makeShapeLayer("Rect", rw, rh, x + rw/2, y + rh/2, fill, stroke, sw, rx));
+      }
+
+      if (tag === "line") {
+        const x1 = parseFloat(el.getAttribute("x1")) || 0;
+        const y1 = parseFloat(el.getAttribute("y1")) || 0;
+        const x2 = parseFloat(el.getAttribute("x2")) || 0;
+        const y2 = parseFloat(el.getAttribute("y2")) || 0;
+        const stroke = parseCssColor(el.getAttribute("stroke"));
+        const sw = parseFloat(el.getAttribute("stroke-width")) || 1;
+        layers.push({
+          layerType: "shape-layer", name: "Line", locked: false,
+          visibility: sp(true), fixedFrames: [],
+          transform: makeTransform(0, 0, 100), pathDirection: 1,
+          geometry: {
+            type: "vector-path",
+            staticValue: [
+              { position: { x: x1, y: y1 }, inTangent: { x: 0, y: 0 }, outTangent: { x: 0, y: 0 } },
+              { position: { x: x2, y: y2 }, inTangent: { x: 0, y: 0 }, outTangent: { x: 0, y: 0 } },
+            ], defaultFrame: 0, keyframes: [],
+          },
+          styles: makeStyles(null, stroke, sw),
+          trimPath: { start: sp(0), end: sp(100), offset: sp(0) },
+          blendMode: "normal", effects: [], animations: [],
+        });
+      }
+
+      if (tag === "text") {
+        const textContent = el.textContent || "";
+        if (!textContent.trim()) return;
+        const x = parseFloat(el.getAttribute("x")) || 0;
+        const y = parseFloat(el.getAttribute("y")) || 0;
+        const fill = parseCssColor(el.getAttribute("fill")) || { r: 0, g: 0, b: 0 };
+        const fontSize = parseFloat(el.getAttribute("font-size")) || 14;
+        layers.push(makeTextLayer("Text", textContent.trim(), x, y, fontSize, 400, "Inter", fill, 100, 200, 30));
+      }
+
+      // Recurse into g children, wrapping in a group-layer
+      if (tag === "g") {
+        const gName = el.getAttribute("name") || el.getAttribute("filter") ? "Effect Group" : "Group";
+        const before = layers.length;
+        for (const child of el.children) {
+          walkSvg(child, gName);
+        }
+        // If the g produced layers, optionally wrap them (keep flat for simplicity)
+      }
+      // Skip defs/filter/clippath/mask — not visual
+      if (tag === "defs" || tag === "filter" || tag === "clippath" || tag === "mask") return;
+    }
+
+    for (const child of svgEl.children) {
+      walkSvg(child, "SVG");
+    }
+
+    return { layers, w: svgW, h: svgH };
+  }
+
+  // ── Recursively convert HTML elements to Lottielab layers ─────────────────
+  function convertElement(el, offsetX, offsetY) {
+    const tag = el.tagName.toLowerCase();
+    const s = parseStyleAttr(el);
+    const layers = [];
+
+    // Get dimensions
+    const w = pxVal(s.width) || pxVal(s["min-width"]) || pxVal(s["inline-size"]) || 100;
+    const h = pxVal(s.height) || pxVal(s["min-height"]) || 40;
+    const opacity = s.opacity !== undefined ? Math.round(parseFloat(s.opacity) * 100) : 100;
+    const bgColor = parseCssColor(s["background-color"] || s.background);
+    const borderRadius = pxVal(s["border-radius"]);
+    const borderColor = parseCssColor(s["border-color"] || s["border-top-color"]);
+    const borderWidth = pxVal(s["border-width"] || s["border-top-width"]);
+    const name = el.getAttribute("class") || el.getAttribute("data-class") || tag;
+    const shortName = name.split(" ")[0].split("_").pop() || tag;
+
+    // Create background rect if element has visible background
+    if (bgColor) {
+      layers.push(makeShapeLayer(shortName + " bg", w, h, offsetX + w/2, offsetY + h/2, bgColor, borderColor, borderWidth, borderRadius, opacity));
+    }
+
+    // Check for text content (no child elements = text-only element)
+    if (el.children.length === 0) {
+      const textContent = el.textContent ? el.textContent.trim() : "";
+      if (textContent) {
+        const textColor = parseCssColor(s.color) || { r: 0, g: 0, b: 0 };
+        const fontSize = pxVal(s["font-size"]) || 16;
+        const fw = parseInt(s["font-weight"]) || 400;
+        const ff = (s["font-family"] || "Inter").split(",")[0].trim().replace(/['"]/g, "");
+        const sysFont = ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "system-ui", "sans-serif"].includes(ff);
+        layers.push(makeTextLayer(shortName, textContent, offsetX + w/2, offsetY + h/2, fontSize, fw, sysFont ? "Inter" : ff, textColor, opacity, w, h));
+      }
+      return layers;
+    }
+
+    // Process children
+    for (const child of el.children) {
+      const childTag = child.tagName.toLowerCase();
+
+      if (childTag === "svg") {
+        const svgResult = parseSvgElement(child);
+        const cs = parseStyleAttr(child);
+        const svgX = pxVal(cs.left) || 0;
+        const svgY = pxVal(cs.top) || 0;
+        const svgOpacity = cs.opacity !== undefined ? Math.round(parseFloat(cs.opacity) * 100) : 100;
+        const svgW = pxVal(cs.width) || svgResult.w;
+        const svgH = pxVal(cs.height) || svgResult.h;
+
+        if (svgResult.layers.length > 0) {
+          layers.push(makeGroupLayer(
+            "SVG",
+            offsetX + svgX + svgW / 2,
+            offsetY + svgY + svgH / 2,
+            svgOpacity,
+            svgResult.layers
+          ));
+        }
+      } else {
+        // Recursively process HTML children
+        const cs = parseStyleAttr(child);
+        const childX = pxVal(cs.left) || pxVal(cs["margin-left"]) || 0;
+        const childY = pxVal(cs.top) || pxVal(cs["margin-top"]) || 0;
+        const childLayers = convertElement(child, offsetX + childX, offsetY + childY);
+        layers.push(...childLayers);
+      }
+    }
+
+    return layers;
+  }
+
+  // ── Parse HTML and convert ────────────────────────────────────────────────
+  const tmpDiv = document.createElement("div");
+  tmpDiv.innerHTML = rawHtml;
+  const rootEl = tmpDiv.firstElementChild;
+  if (!rootEl) return;
+
+  const allLayers = convertElement(rootEl, 0, 0);
+
+  // Wrap in a top-level group if multiple layers
+  const lottieLayers = allLayers.length === 1 ? allLayers : [
+    makeGroupLayer("UI Snapshot", 0, 0, 100, allLayers),
+  ];
+
   const lottiePasteHTML = `\n    <meta charset="utf-8">\n    <div id="lottielab-paste">\n      <span id="layers" data-contents="${encodeURIComponent(JSON.stringify(lottieLayers))}"></span>\n    </div>\n  `;
 
   await waitForFocus();
