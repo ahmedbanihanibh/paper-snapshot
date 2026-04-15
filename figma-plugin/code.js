@@ -366,11 +366,16 @@ async function createNode(layer, parent, parentStyles) {
   // Track if element is absolutely positioned (will use Figma absolute positioning)
   var isAbsolutePos = s.position === "absolute" || s.position === "fixed";
 
+  // Skip display:inline empty elements (CSS pseudo-element proxies like quote marks)
+  var isInlineEmpty = (s.display === "inline") && (!layer.text || layer.text.length === 0) && (!layer.children || layer.children.length === 0);
+  if (isInlineEmpty) return null;
+
   // Determine if this element is an empty spacer (no text, no children, no background)
   var hasBgColor = s["background-color"] && s["background-color"] !== "rgba(0, 0, 0, 0)" && s["background-color"] !== "transparent";
+  var hasBgImage = s["background-image"] && s["background-image"] !== "none";
   var hasText = layer.text && layer.text.length > 0;
   var hasKids = layer.children && layer.children.length > 0;
-  var isSpacer = !hasText && !hasKids && !hasBgColor;
+  var isSpacer = !hasText && !hasKids && !hasBgColor && !hasBgImage;
 
   const w = Math.max(px(s.width) || px(s["inline-size"]) || px(s["min-width"]) || (isSpacer ? 1 : 100), 1);
   const h = Math.max(px(s.height) || px(s["block-size"]) || px(s["min-height"]) || (isSpacer ? 1 : 40), 1);
@@ -625,6 +630,26 @@ async function createNode(layer, parent, parentStyles) {
   if (hasChildren) {
     for (var ci = 0; ci < layer.children.length; ci++) {
       var childLayer = layer.children[ci];
+      var cs = (childLayer && childLayer.styles) ? childLayer.styles : {};
+
+      // Handle margin-top: auto / margin-block-start: auto
+      // In CSS flex, this pushes the element to the bottom. In Figma, we insert
+      // a spacer frame with FILL sizing to achieve the same effect.
+      if (layoutMode !== "NONE" && (cs["margin-top"] === "auto" || cs["margin-block-start"] === "auto")) {
+        var spacer = figma.createFrame();
+        spacer.name = "spacer";
+        spacer.resize(1, 1);
+        spacer.fills = [];
+        frame.appendChild(spacer);
+        if (layoutMode === "VERTICAL") {
+          spacer.layoutSizingVertical = "FILL";
+          spacer.layoutSizingHorizontal = "FILL";
+        } else {
+          spacer.layoutSizingHorizontal = "FILL";
+        }
+        childPairs.push({ layer: { styles: {} }, node: spacer });
+      }
+
       var childNode = await createNode(childLayer, frame, s);
       if (childNode) {
         childPairs.push({ layer: childLayer, node: childNode });
