@@ -267,9 +267,9 @@ async function copyToClipboardForJitter(rawHtml) {
         var childS = parseStyleStr(child.getAttribute("style") || "");
         if (childS.position === "absolute" || childS.position === "fixed") continue;
 
-        // For horizontal flex children without explicit width, use reasonable default (not full parent width)
+        // Width: explicit > parent content width for column, half parent for horizontal
         var cwExplicit = px(childS.width) || px(childS["inline-size"]);
-        var cw = cwExplicit || (isColumn ? contentW : (px(childS["min-width"]) || 100));
+        var cw = cwExplicit || contentW;
         var ch2 = px(childS.height) || px(childS["block-size"]) || px(childS["min-height"]) || 40;
         var hasMarginAuto = childS["margin-top"] === "auto" || childS["margin-block-start"] === "auto";
         childInfos.push({ el: child, s: childS, w: cw, h: ch2, marginAuto: hasMarginAuto });
