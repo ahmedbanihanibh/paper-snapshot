@@ -265,12 +265,44 @@ async function createNode(layer, parent, parentStyles) {
 
   // ── ELEMENT: create frame/rectangle/text ───────────────────────────────
   const s = layer.styles || {};
-  const w = Math.max(px(s.width) || px(s["inline-size"]) || px(s["min-width"]) || 100, 1);
-  const h = Math.max(px(s.height) || px(s["block-size"]) || px(s["min-height"]) || 40, 1);
+
+  // Skip absolutely/fixed positioned elements (invisible hover overlays, etc.)
+  if (s.position === "absolute" || s.position === "fixed") {
+    return null;
+  }
+
+  // Determine if this element is an empty spacer (no text, no children, no background)
+  var hasBgColor = s["background-color"] && s["background-color"] !== "rgba(0, 0, 0, 0)" && s["background-color"] !== "transparent";
+  var hasText = layer.text && layer.text.length > 0;
+  var hasKids = layer.children && layer.children.length > 0;
+  var isSpacer = !hasText && !hasKids && !hasBgColor;
+
+  const w = Math.max(px(s.width) || px(s["inline-size"]) || px(s["min-width"]) || (isSpacer ? 1 : 100), 1);
+  const h = Math.max(px(s.height) || px(s["block-size"]) || px(s["min-height"]) || (isSpacer ? 1 : 40), 1);
 
   // Determine if this is a text-only element
   const isTextOnly = layer.text && layer.children.length === 0;
   const hasChildren = layer.children && layer.children.length > 0;
+
+  // ── Transparent wrapper bypass ──────────────────────────────────────────
+  // When a display:block element has width:100%, no background, no border,
+  // and exactly one child, skip creating a frame and pass through to parent.
+  // This prevents unnecessary vertical wrappers from breaking horizontal flow.
+  var display = s.display || "block";
+  var childW = s.width || s["inline-size"] || "";
+  var childH2 = s.height || s["block-size"] || "";
+  var isBlock = display === "block" || display === "list-item";
+  var isPassthrough = isBlock
+    && isPercent100(childW)
+    && !hasBgColor
+    && !(s["border-width"] && px(s["border-width"]) > 0 && s["border-style"] !== "none")
+    && !isTextOnly
+    && hasChildren
+    && layer.children.length === 1;
+
+  if (isPassthrough) {
+    return await createNode(layer.children[0], parent, s);
+  }
 
   if (isTextOnly) {
     // ── Text element ──────────────────────────────────────────────────────
@@ -398,8 +430,18 @@ async function createNode(layer, parent, parentStyles) {
     }
     if (gap > 0) frame.itemSpacing = gap;
 
-    frame.primaryAxisSizingMode = "AUTO";
-    frame.counterAxisSizingMode = "AUTO";
+    // Sizing: FIXED if explicit dimension exists, AUTO (hug) otherwise
+    // For HORIZONTAL: primary axis = width, counter axis = height
+    // For VERTICAL: primary axis = height, counter axis = width
+    var explicitW = px(s.width) || px(s["inline-size"]);
+    var explicitH = px(s.height) || px(s["block-size"]) || px(s["min-height"]);
+    if (layoutMode === "HORIZONTAL") {
+      frame.primaryAxisSizingMode = explicitW > 0 ? "FIXED" : "AUTO";
+      frame.counterAxisSizingMode = explicitH > 0 ? "FIXED" : "AUTO";
+    } else {
+      frame.primaryAxisSizingMode = explicitH > 0 ? "FIXED" : "AUTO";
+      frame.counterAxisSizingMode = explicitW > 0 ? "FIXED" : "AUTO";
+    }
   }
 
   // Padding (check both standard and logical properties)
@@ -407,6 +449,12 @@ async function createNode(layer, parent, parentStyles) {
   frame.paddingBottom = px(s["padding-bottom"]) || px(s["padding-block-end"]);
   frame.paddingLeft = px(s["padding-left"]) || px(s["padding-inline-start"]);
   frame.paddingRight = px(s["padding-right"]) || px(s["padding-inline-end"]);
+
+  // Max width / max height constraints
+  var maxW = px(s["max-width"] || s["max-inline-size"]);
+  if (maxW > 0) frame.maxWidth = maxW;
+  var maxH = px(s["max-height"] || s["max-block-size"]);
+  if (maxH > 0) frame.maxHeight = maxH;
 
   // Background
   const bg = colorToFill(s["background-color"] || s.background);
@@ -475,6 +523,15 @@ async function createNode(layer, parent, parentStyles) {
       var childWidth = childStyles.width || childStyles["inline-size"] || "";
       var childHeight = childStyles.height || childStyles["block-size"] || "";
 
+      // Detect spacer: no text, no children, no background — pure flex filler
+      var childLayerData = pair.layer || {};
+      var childHasContent = (childLayerData.text && childLayerData.text.length > 0)
+        || (childLayerData.children && childLayerData.children.length > 0);
+      var childHasBg = childStyles["background-color"]
+        && childStyles["background-color"] !== "rgba(0, 0, 0, 0)"
+        && childStyles["background-color"] !== "transparent";
+      var isChildSpacer = !childHasContent && !childHasBg && childFlexGrow >= 1;
+
       // flex-grow >= 1: FILL along primary axis
       if (childFlexGrow >= 1) {
         if (layoutMode === "HORIZONTAL") {
@@ -484,12 +541,21 @@ async function createNode(layer, parent, parentStyles) {
         }
       }
 
-      // width: 100% in a VERTICAL parent → FILL horizontally
-      if (isPercent100(childWidth) && layoutMode === "VERTICAL") {
+      // Spacer divs: also FILL on counter axis so they don't impose size
+      if (isChildSpacer) {
+        if (layoutMode === "HORIZONTAL") {
+          childFigma.layoutSizingVertical = "FILL";
+        } else {
+          childFigma.layoutSizingHorizontal = "FILL";
+        }
+      }
+
+      // width: 100% → FILL horizontally (max-width will constrain if set)
+      if (isPercent100(childWidth)) {
         childFigma.layoutSizingHorizontal = "FILL";
       }
-      // height: 100% in a HORIZONTAL parent → FILL vertically
-      if (isPercent100(childHeight) && layoutMode === "HORIZONTAL") {
+      // height: 100% → FILL vertically (any parent direction)
+      if (isPercent100(childHeight)) {
         childFigma.layoutSizingVertical = "FILL";
       }
 
