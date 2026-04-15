@@ -641,6 +641,9 @@ async function createNode(layer, parent, parentStyles) {
 
       if (!("layoutSizingHorizontal" in childFigma)) continue;
 
+      // Skip absolute-positioned children — can't set FILL/HUG on them
+      if (childFigma.layoutPositioning === "ABSOLUTE") continue;
+
       var canHug = childFigma.type === "TEXT" ||
         (childFigma.type === "FRAME" && childFigma.layoutMode && childFigma.layoutMode !== "NONE");
 
