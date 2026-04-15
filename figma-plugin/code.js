@@ -40,6 +40,16 @@ function parseColor(str) {
       a: m[4] !== undefined ? parseFloat(m[4]) : 1
     };
   }
+  // Parse color(srgb r g b / a) — values are 0-1 floats
+  var cm = str.match(/color\(\s*srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\s*\)/);
+  if (cm) {
+    return {
+      r: parseFloat(cm[1]),
+      g: parseFloat(cm[2]),
+      b: parseFloat(cm[3]),
+      a: cm[4] !== undefined ? parseFloat(cm[4]) : 1
+    };
+  }
   return null;
 }
 
@@ -461,23 +471,18 @@ async function createNode(layer, parent, parentStyles) {
     else if (s["text-transform"] === "lowercase") text.textCase = "LOWER";
     else if (s["text-transform"] === "capitalize") text.textCase = "TITLE";
 
-    // If max-width is set, constrain text width and wrap
-    var textMaxW = px(s["max-width"] || s["max-inline-size"]);
-    if (textMaxW > 0) {
-      text.textAutoResize = "HEIGHT";
-      text.resize(textMaxW, text.height || 40);
-    } else {
-      text.textAutoResize = "WIDTH_AND_HEIGHT";
-    }
+    text.textAutoResize = "WIDTH_AND_HEIGHT";
 
-    // Wrap text in a frame if it has background, border, padding, or explicit height
+    // Wrap text in a frame if it has background, border, padding, explicit height, or max-width
+    var textMaxW = px(s["max-width"] || s["max-inline-size"]);
     const hasBg = s["background-color"] && s["background-color"] !== "rgba(0, 0, 0, 0)" && s["background-color"] !== "transparent";
     const hasBorder = s["border-width"] && px(s["border-width"]) > 0 && s["border-style"] !== "none";
     var hasPadding = px(s["padding-left"]) > 0 || px(s["padding-right"]) > 0 || px(s["padding-top"]) > 0 || px(s["padding-bottom"]) > 0
       || px(s["padding-inline-start"]) > 0 || px(s["padding-inline-end"]) > 0;
     var hasExplicitH = px(s.height) > 0 || px(s["block-size"]) > 0;
+    var hasMaxW = textMaxW > 0;
 
-    if (hasBg || hasBorder || hasPadding || hasExplicitH) {
+    if (hasBg || hasBorder || hasPadding || hasExplicitH || hasMaxW) {
       const frame = figma.createFrame();
       frame.name = layer.tag || "container";
       frame.resize(w, h);
@@ -526,6 +531,14 @@ async function createNode(layer, parent, parentStyles) {
 
       // Opacity
       if (s.opacity) frame.opacity = parseFloat(s.opacity);
+
+      // Max-width constraint — resize frame and set text to wrap
+      if (hasMaxW) {
+        frame.resize(textMaxW, h || 40);
+        frame.maxWidth = textMaxW;
+        text.textAutoResize = "HEIGHT";
+        text.resize(textMaxW, text.height || 40);
+      }
 
       parent.appendChild(frame);
       frame.appendChild(text);
@@ -606,7 +619,7 @@ async function createNode(layer, parent, parentStyles) {
     frame.bottomLeftRadius = br[3] || 0;
   }
 
-  // Border
+  // Border (shorthand or individual sides)
   const hasBorder = s["border-width"] && px(s["border-width"]) > 0 && s["border-style"] !== "none";
   if (hasBorder) {
     const borderColor = colorToFill(s["border-color"]);
@@ -614,6 +627,27 @@ async function createNode(layer, parent, parentStyles) {
       frame.strokes = [borderColor];
       frame.strokeWeight = px(s["border-width"]) || 1;
       frame.strokeAlign = "INSIDE";
+    }
+  }
+  // Individual border sides (border-left, border-right, etc.)
+  if (!hasBorder) {
+    var sides = ["left", "right", "top", "bottom"];
+    for (var bi = 0; bi < sides.length; bi++) {
+      var side = sides[bi];
+      var bw = px(s["border-" + side + "-width"]) || px(s["border-inline-start-width"]);
+      var bs = s["border-" + side + "-style"] || s["border-inline-start-style"];
+      var bc = s["border-" + side + "-color"] || s["border-inline-start-color"];
+      if (bw > 0 && bs && bs !== "none" && bc) {
+        var borderFill = colorToFill(bc);
+        if (borderFill) {
+          frame.strokes = [borderFill];
+          frame.strokeWeight = bw;
+          frame.strokeAlign = "INSIDE";
+          // Figma doesn't support single-side borders directly,
+          // but we set strokesIncludedInLayout for auto-layout
+          break;
+        }
+      }
     }
   }
 

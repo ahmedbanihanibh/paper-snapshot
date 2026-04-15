@@ -189,8 +189,11 @@
         const childStyles = parseStyle(child.getAttribute("style") || "");
         const childDisplay = childStyles.display || "";
         const childTag = child.tagName.toLowerCase();
-        // Inline elements (span, a with display:inline) with only text → merge
-        if ((childDisplay === "inline" || childDisplay === "inline-block" || childTag === "span" || childTag === "a" || childTag === "strong" || childTag === "em" || childTag === "b" || childTag === "i")
+        // Inline elements with only text → merge (but NOT display:block/flex spans)
+        var isInline = childDisplay === "inline" || childDisplay === "inline-block" || childDisplay === "";
+        var isInlineTag = childTag === "span" || childTag === "a" || childTag === "strong" || childTag === "em" || childTag === "b" || childTag === "i";
+        var isBlockLevel = childDisplay === "block" || childDisplay === "flex" || childDisplay === "grid" || childDisplay === "list-item";
+        if (isInlineTag && isInline && !isBlockLevel
             && child.children.length === 0 && child.textContent.trim()) {
           mergedText += child.textContent.trim();
         } else {
