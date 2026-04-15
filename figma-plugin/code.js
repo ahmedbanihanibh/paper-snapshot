@@ -221,21 +221,45 @@ async function createNode(layer, parent, parentStyles) {
     return text;
   }
 
-  // ── SVG: use createNodeFromSvg ─────────────────────────────────────────
+  // ── SVG: use createNodeFromSvg with proper sizing ───────────────────────
   if (layer.type === "SVG") {
     try {
-      const svgNode = figma.createNodeFromSvg(layer.svg);
+      var svgNode = figma.createNodeFromSvg(layer.svg);
       svgNode.name = "SVG";
+
+      // Determine target size from SVG attributes and inline styles
+      var svgStyles = layer.styles || {};
+      var attrH = 0, attrW = 0, vbW = 0, vbH = 0;
+
+      // Read height/width attributes from the SVG string
+      var hAttr = layer.svg.match(/\bheight=["']?([\d.]+)/);
+      var wAttr = layer.svg.match(/\bwidth=["']?([\d.]+)/);
+      var vbAttr = layer.svg.match(/viewBox=["'](\S+)\s+(\S+)\s+(\S+)\s+(\S+)["']/);
+      if (hAttr) attrH = parseFloat(hAttr[1]);
+      if (wAttr) attrW = parseFloat(wAttr[1]);
+      if (vbAttr) { vbW = parseFloat(vbAttr[3]); vbH = parseFloat(vbAttr[4]); }
+
+      // CSS styles override attributes
+      var cssH = px(svgStyles.height) || px(svgStyles["block-size"]);
+      var cssW = px(svgStyles.width) || px(svgStyles["inline-size"]);
+
+      var targetH = cssH || attrH || vbH || 24;
+      var targetW = cssW || attrW;
+
+      // If no explicit width, compute from viewBox aspect ratio
+      if (!targetW && vbW && vbH && targetH) {
+        targetW = targetH * (vbW / vbH);
+      }
+      if (!targetW) targetW = targetH; // fallback square
+
+      if (targetW > 0 && targetH > 0) {
+        svgNode.resize(targetW, targetH);
+      }
+
       parent.appendChild(svgNode);
       return svgNode;
     } catch(e) {
-      // If SVG parsing fails, create a placeholder
-      const rect = figma.createRectangle();
-      rect.name = "SVG (parse failed)";
-      rect.resize(100, 100);
-      rect.fills = [{ type: "SOLID", color: { r: 0.9, g: 0.9, b: 0.9 } }];
-      parent.appendChild(rect);
-      return rect;
+      return null;
     }
   }
 
@@ -300,11 +324,11 @@ async function createNode(layer, parent, parentStyles) {
       frame.resize(w, h);
       frame.layoutMode = "HORIZONTAL";
       frame.primaryAxisAlignItems = mapAlignment(s["justify-content"] || s["text-align"]);
-      frame.counterAxisAlignItems = mapAlignment(s["align-items"]);
-      frame.paddingTop = px(s["padding-top"]);
-      frame.paddingBottom = px(s["padding-bottom"]);
-      frame.paddingLeft = px(s["padding-left"]);
-      frame.paddingRight = px(s["padding-right"]);
+      frame.counterAxisAlignItems = mapAlignment(s["align-items"] || "center");
+      frame.paddingTop = px(s["padding-top"]) || px(s["padding-block-start"]);
+      frame.paddingBottom = px(s["padding-bottom"]) || px(s["padding-block-end"]);
+      frame.paddingLeft = px(s["padding-left"]) || px(s["padding-inline-start"]);
+      frame.paddingRight = px(s["padding-right"]) || px(s["padding-inline-end"]);
       frame.primaryAxisSizingMode = "AUTO";
       frame.counterAxisSizingMode = "AUTO";
 
@@ -378,11 +402,11 @@ async function createNode(layer, parent, parentStyles) {
     frame.counterAxisSizingMode = "AUTO";
   }
 
-  // Padding
-  frame.paddingTop = px(s["padding-top"]);
-  frame.paddingBottom = px(s["padding-bottom"]);
-  frame.paddingLeft = px(s["padding-left"]);
-  frame.paddingRight = px(s["padding-right"]);
+  // Padding (check both standard and logical properties)
+  frame.paddingTop = px(s["padding-top"]) || px(s["padding-block-start"]);
+  frame.paddingBottom = px(s["padding-bottom"]) || px(s["padding-block-end"]);
+  frame.paddingLeft = px(s["padding-left"]) || px(s["padding-inline-start"]);
+  frame.paddingRight = px(s["padding-right"]) || px(s["padding-inline-end"]);
 
   // Background
   const bg = colorToFill(s["background-color"] || s.background);
