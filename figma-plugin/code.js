@@ -60,6 +60,83 @@ function isPercent100(val) {
   return val === "100%" || val === "100.00%";
 }
 
+// ── Parse CSS linear-gradient to Figma gradient fill ────────────────────────
+function parseGradientFills(bgImage) {
+  if (!bgImage) return [];
+  var fills = [];
+  // Match each linear-gradient(...) in the string
+  var re = /linear-gradient\(([^)]+(?:\([^)]*\)[^)]*)*)\)/g;
+  var match;
+  while ((match = re.exec(bgImage)) !== null) {
+    var inner = match[1];
+    // Split by commas, but not commas inside rgba()
+    var parts = [];
+    var depth = 0, start = 0;
+    for (var i = 0; i < inner.length; i++) {
+      if (inner[i] === '(') depth++;
+      else if (inner[i] === ')') depth--;
+      else if (inner[i] === ',' && depth === 0) {
+        parts.push(inner.substring(start, i).trim());
+        start = i + 1;
+      }
+    }
+    parts.push(inner.substring(start).trim());
+
+    var angle = 180; // default: top to bottom
+    var stopStart = 0;
+    // Check if first part is an angle
+    var angleMatch = parts[0].match(/^(\d+)deg$/);
+    if (angleMatch) {
+      angle = parseInt(angleMatch[1]);
+      stopStart = 1;
+    } else if (parts[0] === "to bottom") {
+      angle = 180; stopStart = 1;
+    } else if (parts[0] === "to top") {
+      angle = 0; stopStart = 1;
+    } else if (parts[0] === "to right") {
+      angle = 90; stopStart = 1;
+    } else if (parts[0] === "to left") {
+      angle = 270; stopStart = 1;
+    }
+
+    var stops = [];
+    var totalStops = parts.length - stopStart;
+    for (var si = stopStart; si < parts.length; si++) {
+      var stopPart = parts[si];
+      // Extract color and optional position
+      var colorMatch = stopPart.match(/(rgba?\([^)]+\)|#[a-fA-F0-9]+)/);
+      var posMatch = stopPart.match(/([\d.]+)%/);
+      if (colorMatch) {
+        var c = parseColor(colorMatch[1]);
+        var pos = posMatch ? parseFloat(posMatch[1]) / 100 : (si - stopStart) / Math.max(totalStops - 1, 1);
+        if (c) {
+          stops.push({ position: pos, color: { r: c.r, g: c.g, b: c.b, a: c.a } });
+        }
+      }
+    }
+
+    if (stops.length >= 2) {
+      // Convert CSS angle to Figma gradientTransform
+      // CSS: 0deg = bottom-to-top, 90deg = left-to-right, 180deg = top-to-bottom
+      var rad = (angle - 90) * Math.PI / 180;
+      var cos = Math.cos(rad);
+      var sin = Math.sin(rad);
+      fills.push({
+        type: "GRADIENT_LINEAR",
+        gradientTransform: [
+          [cos, sin, 0.5 - cos * 0.5 - sin * 0.5],
+          [-sin, cos, 0.5 + sin * 0.5 - cos * 0.5]
+        ],
+        gradientStops: stops,
+      });
+    } else if (stops.length === 1) {
+      // Single color "gradient" = solid fill
+      fills.push({ type: "SOLID", color: { r: stops[0].color.r, g: stops[0].color.g, b: stops[0].color.b }, opacity: stops[0].color.a });
+    }
+  }
+  return fills;
+}
+
 // ── Parse border-radius (handles "8px", "8px 4px", "8px 4px 2px 1px") ─────
 function parseBorderRadius(val) {
   if (!val) return 0;
@@ -367,9 +444,13 @@ async function createNode(layer, parent, parentStyles) {
       frame.primaryAxisSizingMode = "AUTO";
       frame.counterAxisSizingMode = "AUTO";
 
-      // Background
-      const bg = colorToFill(s["background-color"]);
-      frame.fills = bg ? [bg] : [];
+      // Background: solid color or gradient
+      var bgFills2 = [];
+      var bgSolid2 = colorToFill(s["background-color"]);
+      if (bgSolid2) bgFills2.push(bgSolid2);
+      var bgGrads2 = parseGradientFills(s["background-image"]);
+      if (bgGrads2.length > 0) bgFills2 = bgGrads2;
+      frame.fills = bgFills2;
 
       // Border radius
       const br = parseBorderRadius(s["border-radius"]);
@@ -459,9 +540,13 @@ async function createNode(layer, parent, parentStyles) {
   var maxH = px(s["max-height"] || s["max-block-size"]);
   if (maxH > 0) frame.maxHeight = maxH;
 
-  // Background
-  const bg = colorToFill(s["background-color"] || s.background);
-  frame.fills = bg ? [bg] : [];
+  // Background: solid color or gradient
+  var bgFills = [];
+  var bgSolid = colorToFill(s["background-color"]);
+  if (bgSolid) bgFills.push(bgSolid);
+  var bgGradients = parseGradientFills(s["background-image"]);
+  if (bgGradients.length > 0) bgFills = bgGradients;
+  frame.fills = bgFills;
 
   // Border radius
   const br = parseBorderRadius(s["border-radius"]);
