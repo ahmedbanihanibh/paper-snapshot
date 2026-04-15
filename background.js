@@ -1755,12 +1755,13 @@ function showPreview(html, jsxCode) {
     copyFigmaBtn.onmouseenter = () => { copyFigmaBtn.style.background = "rgba(255,255,255,0.14)"; copyFigmaBtn.style.color = "rgba(255,255,255,0.9)"; };
     copyFigmaBtn.onmouseleave = () => { copyFigmaBtn.style.background = "rgba(255,255,255,0.08)"; copyFigmaBtn.style.color = "rgba(255,255,255,0.7)"; };
 
-    const copyLottielabBtn = document.createElement("button");
-    Object.assign(copyLottielabBtn.style, { background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "12px", fontWeight: "500", padding: "6px 12px", fontFamily: "inherit", transition: "all 150ms ease" });
-    copyLottielabBtn.textContent = "Copy for Lottielab";
-    copyLottielabBtn.title = "Copy as Lottielab image layer (paste into editor with Cmd+V)";
-    copyLottielabBtn.onmouseenter = () => { copyLottielabBtn.style.background = "rgba(255,255,255,0.14)"; copyLottielabBtn.style.color = "rgba(255,255,255,0.9)"; };
-    copyLottielabBtn.onmouseleave = () => { copyLottielabBtn.style.background = "rgba(255,255,255,0.08)"; copyLottielabBtn.style.color = "rgba(255,255,255,0.7)"; };
+    // TODO: Lottielab copy disabled — clipboard format needs more investigation
+    // const copyLottielabBtn = document.createElement("button");
+    // Object.assign(copyLottielabBtn.style, { background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "12px", fontWeight: "500", padding: "6px 12px", fontFamily: "inherit", transition: "all 150ms ease" });
+    // copyLottielabBtn.textContent = "Copy for Lottielab";
+    // copyLottielabBtn.title = "Copy as Lottielab image layer (paste into editor with Cmd+V)";
+    // copyLottielabBtn.onmouseenter = () => { copyLottielabBtn.style.background = "rgba(255,255,255,0.14)"; copyLottielabBtn.style.color = "rgba(255,255,255,0.9)"; };
+    // copyLottielabBtn.onmouseleave = () => { copyLottielabBtn.style.background = "rgba(255,255,255,0.08)"; copyLottielabBtn.style.color = "rgba(255,255,255,0.7)"; };
 
     const copyRawBtn = document.createElement("button");
     Object.assign(copyRawBtn.style, { background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "12px", fontWeight: "500", padding: "6px 12px", fontFamily: "inherit", transition: "all 150ms ease" });
@@ -1776,7 +1777,7 @@ function showPreview(html, jsxCode) {
     copyAIBtn.onmouseenter = () => { copyAIBtn.style.background = "#818cf8"; };
     copyAIBtn.onmouseleave = () => { copyAIBtn.style.background = "#6366f1"; };
 
-    headerRight.append(sizeLabel, cancelBtn, copyPaperBtn, copyOpenPencilBtn, copyFigmaBtn, copyLottielabBtn, copyRawBtn, copyAIBtn);
+    headerRight.append(sizeLabel, cancelBtn, copyPaperBtn, copyOpenPencilBtn, copyFigmaBtn, /* copyLottielabBtn, */ copyRawBtn, copyAIBtn);
     header.append(title, headerRight);
 
     // Toolbar with zoom controls
@@ -1924,7 +1925,7 @@ function showPreview(html, jsxCode) {
     copyPaperBtn.addEventListener("click", () => close("copy-paper"));
     copyOpenPencilBtn.addEventListener("click", () => close("copy-openpencil"));
     copyFigmaBtn.addEventListener("click", () => close("copy-figma"));
-    copyLottielabBtn.addEventListener("click", () => close("copy-lottielab"));
+    // copyLottielabBtn.addEventListener("click", () => close("copy-lottielab"));
     copyRawBtn.addEventListener("click", () => close("copy-raw"));
     copyAIBtn.addEventListener("click", () => close("copy-ai"));
     backdrop.addEventListener("click", (e) => { if (e.target === backdrop) close("cancel"); });
