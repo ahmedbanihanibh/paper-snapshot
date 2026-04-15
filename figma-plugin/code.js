@@ -461,7 +461,14 @@ async function createNode(layer, parent, parentStyles) {
     else if (s["text-transform"] === "lowercase") text.textCase = "LOWER";
     else if (s["text-transform"] === "capitalize") text.textCase = "TITLE";
 
-    text.textAutoResize = "WIDTH_AND_HEIGHT";
+    // If max-width is set, constrain text width and wrap
+    var textMaxW = px(s["max-width"] || s["max-inline-size"]);
+    if (textMaxW > 0) {
+      text.textAutoResize = "HEIGHT";
+      text.resize(textMaxW, text.height || 40);
+    } else {
+      text.textAutoResize = "WIDTH_AND_HEIGHT";
+    }
 
     // Wrap text in a frame if it has background, border, padding, or explicit height
     const hasBg = s["background-color"] && s["background-color"] !== "rgba(0, 0, 0, 0)" && s["background-color"] !== "transparent";

@@ -177,13 +177,41 @@
       text: "",
     };
 
-    // Collect text content and child elements
+    // Check if all children are inline text (spans with text + text nodes)
+    // If so, merge them into a single text string for the parent element
+    var allInlineText = true;
+    var mergedText = "";
+    for (const child of el.childNodes) {
+      if (child.nodeType === Node.TEXT_NODE) {
+        const t = child.textContent;
+        if (t.trim()) mergedText += t.trim();
+      } else if (child.nodeType === Node.ELEMENT_NODE) {
+        const childStyles = parseStyle(child.getAttribute("style") || "");
+        const childDisplay = childStyles.display || "";
+        const childTag = child.tagName.toLowerCase();
+        // Inline elements (span, a with display:inline) with only text → merge
+        if ((childDisplay === "inline" || childDisplay === "inline-block" || childTag === "span" || childTag === "a" || childTag === "strong" || childTag === "em" || childTag === "b" || childTag === "i")
+            && child.children.length === 0 && child.textContent.trim()) {
+          mergedText += child.textContent.trim();
+        } else {
+          allInlineText = false;
+          break;
+        }
+      }
+    }
+
+    // If ALL children are inline text, treat as single text element
+    if (allInlineText && mergedText) {
+      layer.text = mergedText;
+      return layer;
+    }
+
+    // Otherwise, collect text content and child elements normally
     for (const child of el.childNodes) {
       if (child.nodeType === Node.TEXT_NODE) {
         const text = child.textContent.trim();
         if (text) {
           if (el.children.length === 0) {
-            // Pure text element
             layer.text += (layer.text ? " " : "") + text;
           } else {
             layer.children.push({ type: "TEXT_NODE", text });
