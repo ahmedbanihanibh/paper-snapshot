@@ -363,10 +363,8 @@ async function createNode(layer, parent, parentStyles) {
   // ── ELEMENT: create frame/rectangle/text ───────────────────────────────
   const s = layer.styles || {};
 
-  // Skip absolutely/fixed positioned elements (invisible hover overlays, etc.)
-  if (s.position === "absolute" || s.position === "fixed") {
-    return null;
-  }
+  // Track if element is absolutely positioned (will use Figma absolute positioning)
+  var isAbsolutePos = s.position === "absolute" || s.position === "fixed";
 
   // Determine if this element is an empty spacer (no text, no children, no background)
   var hasBgColor = s["background-color"] && s["background-color"] !== "rgba(0, 0, 0, 0)" && s["background-color"] !== "transparent";
@@ -601,6 +599,25 @@ async function createNode(layer, parent, parentStyles) {
   if (s.overflow === "hidden") frame.clipsContent = true;
 
   parent.appendChild(frame);
+
+  // If absolutely positioned, set Figma absolute positioning within parent
+  if (isAbsolutePos) {
+    frame.layoutPositioning = "ABSOLUTE";
+    // Position from CSS top/left/right/bottom
+    var cssTop = px(s.top) || px(s["inset-block-start"]);
+    var cssLeft = px(s.left) || px(s["inset-inline-start"]);
+    var cssRight = px(s.right) || px(s["inset-inline-end"]);
+    var cssBottom = px(s.bottom) || px(s["inset-block-end"]);
+    if (cssTop) frame.y = cssTop;
+    if (cssLeft) frame.x = cssLeft;
+    // Figma absolute positioning uses constraints for right/bottom
+    if (cssRight && !cssLeft) {
+      frame.constraints = { horizontal: "MAX", vertical: frame.constraints ? frame.constraints.vertical : "MIN" };
+    }
+    if (cssBottom && !cssTop) {
+      frame.constraints = { horizontal: frame.constraints ? frame.constraints.horizontal : "MIN", vertical: "MAX" };
+    }
+  }
 
   // ── Recurse children ──────────────────────────────────────────────────
   // Track child layers alongside Figma nodes for post-processing
