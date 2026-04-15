@@ -44,6 +44,27 @@ async function copyToClipboardForPaper(html) {
   ]);
 }
 
+// Copy for OpenPencil — wraps HTML in <x-openpencil-html> so OpenPencil recognizes the paste
+async function copyToClipboardForOpenPencil(html) {
+  function waitForFocus() {
+    if (document.hasFocus()) {
+      return Promise.resolve();
+    }
+    return new Promise((resolve) => {
+      window.addEventListener("focus", () => resolve(), { once: true });
+    });
+  }
+
+  await waitForFocus();
+  const openPencilHtml = `<x-openpencil-html>${html}</x-openpencil-html>`;
+  await navigator.clipboard.write([
+    new ClipboardItem({
+      "text/plain": new Blob([html], { type: "text/plain" }),
+      "text/html": new Blob([openPencilHtml], { type: "text/html" }),
+    }),
+  ]);
+}
+
 // ============================================================================
 // ELEMENT PICKER — Direct port from Paper Snapshot: element-picker.ts
 // Only change: "x-paper-toast" → "ui2code-toast", attribute name
@@ -1201,6 +1222,13 @@ function showPreview(html, jsxCode) {
     copyPaperBtn.onmouseenter = () => { copyPaperBtn.style.background = "rgba(255,255,255,0.14)"; copyPaperBtn.style.color = "rgba(255,255,255,0.9)"; };
     copyPaperBtn.onmouseleave = () => { copyPaperBtn.style.background = "rgba(255,255,255,0.08)"; copyPaperBtn.style.color = "rgba(255,255,255,0.7)"; };
 
+    const copyOpenPencilBtn = document.createElement("button");
+    Object.assign(copyOpenPencilBtn.style, { background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "12px", fontWeight: "500", padding: "6px 12px", fontFamily: "inherit", transition: "all 150ms ease" });
+    copyOpenPencilBtn.textContent = "Copy for OpenPencil";
+    copyOpenPencilBtn.title = "Copy as OpenPencil-compatible snapshot (paste directly into OpenPencil app)";
+    copyOpenPencilBtn.onmouseenter = () => { copyOpenPencilBtn.style.background = "rgba(255,255,255,0.14)"; copyOpenPencilBtn.style.color = "rgba(255,255,255,0.9)"; };
+    copyOpenPencilBtn.onmouseleave = () => { copyOpenPencilBtn.style.background = "rgba(255,255,255,0.08)"; copyOpenPencilBtn.style.color = "rgba(255,255,255,0.7)"; };
+
     const copyRawBtn = document.createElement("button");
     Object.assign(copyRawBtn.style, { background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "12px", fontWeight: "500", padding: "6px 12px", fontFamily: "inherit", transition: "all 150ms ease" });
     copyRawBtn.textContent = "Copy React CSS";
@@ -1215,7 +1243,7 @@ function showPreview(html, jsxCode) {
     copyAIBtn.onmouseenter = () => { copyAIBtn.style.background = "#818cf8"; };
     copyAIBtn.onmouseleave = () => { copyAIBtn.style.background = "#6366f1"; };
 
-    headerRight.append(sizeLabel, cancelBtn, copyPaperBtn, copyRawBtn, copyAIBtn);
+    headerRight.append(sizeLabel, cancelBtn, copyPaperBtn, copyOpenPencilBtn, copyRawBtn, copyAIBtn);
     header.append(title, headerRight);
 
     // Toolbar with zoom controls
@@ -1361,6 +1389,7 @@ function showPreview(html, jsxCode) {
 
     cancelBtn.addEventListener("click", () => close("cancel"));
     copyPaperBtn.addEventListener("click", () => close("copy-paper"));
+    copyOpenPencilBtn.addEventListener("click", () => close("copy-openpencil"));
     copyRawBtn.addEventListener("click", () => close("copy-raw"));
     copyAIBtn.addEventListener("click", () => close("copy-ai"));
     backdrop.addEventListener("click", (e) => { if (e.target === backdrop) close("cancel"); });
@@ -1476,6 +1505,17 @@ chrome.action.onClicked.addListener(async (tab) => {
                   target: { tabId: tab.id },
                   func: showToast,
                   args: ["Copied for Paper! Paste into Paper app."],
+                });
+              } else if (action === "copy-openpencil") {
+                await chrome.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  func: copyToClipboardForOpenPencil,
+                  args: [serializationResult.rawHtml],
+                });
+                await chrome.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  func: showToast,
+                  args: ["Copied for OpenPencil! Paste into OpenPencil app with Cmd+V."],
                 });
               } else if (action === "copy-raw") {
                 await chrome.scripting.executeScript({
