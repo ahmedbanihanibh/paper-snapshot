@@ -832,6 +832,40 @@ async function elementSerializer(selector) {
     return str.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
   }
 
+  // Resolve the actual text content of a ::before/::after pseudo-element
+  // Handles: content: "string", content: open-quote, content: close-quote, content: attr(...)
+  function resolvePseudoContent(element, pseudo, styles) {
+    if (!styles.content) return "";
+    const raw = styles.content;
+    // CSS content: none or normal
+    if (raw === "none" || raw === "normal") return "";
+    // String literal: content: '"' or content: 'text'
+    // The computed value comes as a string, possibly with quotes
+    if (raw === "open-quote") {
+      // Resolve from the quotes property on the element or ancestors
+      const quotesVal = window.getComputedStyle(element).quotes;
+      if (quotesVal && quotesVal !== "none" && quotesVal !== "auto") {
+        // quotes: '"' '"' ''' ''' — extract the opening quote
+        const parts = quotesVal.match(/["']([^"']+)["']/g);
+        if (parts && parts.length > 0) return parts[0].replace(/["']/g, "");
+      }
+      return "\u201C"; // fallback: left double quotation mark
+    }
+    if (raw === "close-quote") {
+      const quotesVal = window.getComputedStyle(element).quotes;
+      if (quotesVal && quotesVal !== "none" && quotesVal !== "auto") {
+        const parts = quotesVal.match(/["']([^"']+)["']/g);
+        if (parts && parts.length > 1) return parts[1].replace(/["']/g, "");
+      }
+      return "\u201D"; // fallback: right double quotation mark
+    }
+    // String value like: "»" or "• "
+    const strMatch = raw.match(/^["'](.*)["']$/);
+    if (strMatch) return strMatch[1];
+    // Counter or attr() — just return empty for now
+    return "";
+  }
+
   function resolveParentBgColor(element) {
     const parent = element?.parentElement;
     if (parent) {
@@ -1031,7 +1065,8 @@ async function elementSerializer(selector) {
     if (!dryRun) {
       const beforeStyles = resolveComputedStyles(target, { pseudo: "::before" });
       if (Object.keys(beforeStyles).length && !isScaledToZeroAndOutOfFlow(beforeStyles)) {
-        children.push(`<div style="${toInlineStyles(beforeStyles)}"></div>`);
+        const beforeText = resolvePseudoContent(target, "::before", beforeStyles);
+        children.push(`<div style="${toInlineStyles(beforeStyles)}">${encodeHTML(beforeText)}</div>`);
       }
       styles = resolveComputedStyles(target, { isRoot: __isRoot });
 
@@ -1133,7 +1168,8 @@ async function elementSerializer(selector) {
 
     const afterStyles = resolveComputedStyles(target, { pseudo: "::after" });
     if (Object.keys(afterStyles).length && !isScaledToZeroAndOutOfFlow(afterStyles)) {
-      children.push(`<div style="${toInlineStyles(afterStyles)}"></div>`);
+      const afterText = resolvePseudoContent(target, "::after", afterStyles);
+      children.push(`<div style="${toInlineStyles(afterStyles)}">${encodeHTML(afterText)}</div>`);
     }
 
     const attributesToSerialize = [];
