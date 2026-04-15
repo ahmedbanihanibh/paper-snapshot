@@ -346,11 +346,14 @@ async function createNode(layer, parent, parentStyles) {
 
     text.textAutoResize = "WIDTH_AND_HEIGHT";
 
-    // If the element has background/border, wrap in a frame
+    // Wrap text in a frame if it has background, border, padding, or explicit height
     const hasBg = s["background-color"] && s["background-color"] !== "rgba(0, 0, 0, 0)" && s["background-color"] !== "transparent";
     const hasBorder = s["border-width"] && px(s["border-width"]) > 0 && s["border-style"] !== "none";
+    var hasPadding = px(s["padding-left"]) > 0 || px(s["padding-right"]) > 0 || px(s["padding-top"]) > 0 || px(s["padding-bottom"]) > 0
+      || px(s["padding-inline-start"]) > 0 || px(s["padding-inline-end"]) > 0;
+    var hasExplicitH = px(s.height) > 0 || px(s["block-size"]) > 0;
 
-    if (hasBg || hasBorder) {
+    if (hasBg || hasBorder || hasPadding || hasExplicitH) {
       const frame = figma.createFrame();
       frame.name = layer.tag || "container";
       frame.resize(w, h);
