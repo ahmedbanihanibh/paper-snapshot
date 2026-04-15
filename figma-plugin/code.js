@@ -666,6 +666,19 @@ async function createNode(layer, parent, parentStyles) {
   // If absolutely positioned, set Figma absolute positioning within parent
   if (isAbsolutePos) {
     frame.layoutPositioning = "ABSOLUTE";
+
+    // Resolve percentage dimensions relative to parent
+    var parentW = parent.width || 100;
+    var parentH = parent.height || 100;
+    var absChildW = childW;
+    var absChildH = s.height || s["block-size"] || "";
+    if (isPercent100(absChildH) || absChildH === "100%") {
+      frame.resize(frame.width, parentH);
+    }
+    if (isPercent100(absChildW) || absChildW === "100%") {
+      frame.resize(parentW, frame.height);
+    }
+
     // Position from CSS top/left/right/bottom
     var cssTop = px(s.top) || px(s["inset-block-start"]);
     var cssLeft = px(s.left) || px(s["inset-inline-start"]);
