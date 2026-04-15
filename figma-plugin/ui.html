@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 12px;
+    color: var(--figma-color-text, #333);
+    background: var(--figma-color-bg, #fff);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: 100vh;
+  }
+  h2 { font-size: 14px; font-weight: 600; }
+  .desc { color: var(--figma-color-text-secondary, #888); line-height: 1.5; }
+  .paste-area {
+    flex: 1;
+    min-height: 120px;
+    border: 2px dashed var(--figma-color-border, #ccc);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: text;
+    transition: border-color 150ms, background 150ms;
+    padding: 16px;
+    overflow: auto;
+    text-align: center;
+    color: var(--figma-color-text-secondary, #888);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .paste-area:focus {
+    outline: none;
+    border-color: #6366f1;
+    background: rgba(99, 102, 241, 0.04);
+  }
+  .paste-area.has-data {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.04);
+    justify-content: flex-start;
+    align-items: flex-start;
+    text-align: left;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 10px;
+    color: var(--figma-color-text, #333);
+    word-break: break-all;
+    white-space: pre-wrap;
+  }
+  .btn {
+    background: #6366f1;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 150ms;
+    font-family: inherit;
+  }
+  .btn:hover { background: #818cf8; }
+  .btn:disabled { background: #ccc; cursor: default; }
+  .status {
+    font-size: 11px;
+    color: var(--figma-color-text-secondary, #888);
+    min-height: 16px;
+  }
+  .status.success { color: #10b981; }
+  .status.error { color: #ef4444; }
+</style>
+</head>
+<body>
+  <h2>Import UI Snapshot</h2>
+  <p class="desc">
+    Copy an element with the UI2Code extension, then click below and press <strong>Cmd+V</strong> to paste.
+  </p>
+  <div class="paste-area" id="paste-area" tabindex="0" contenteditable="true">
+    Click here, then Cmd+V to paste snapshot
+  </div>
+  <button class="btn" id="import-btn" disabled>Import to Figma</button>
+  <div class="status" id="status"></div>
+
+<script>
+  const pasteArea = document.getElementById("paste-area");
+  const importBtn = document.getElementById("import-btn");
+  const statusEl = document.getElementById("status");
+
+  let parsedLayers = null;
+
+  // ── Parse CSS color string to {r, g, b, a} (0-1 range) ───────────────────
+  function parseColor(str) {
+    if (!str || str === "transparent" || str === "rgba(0, 0, 0, 0)") return null;
+    str = str.trim();
+
+    // hex
+    if (str.startsWith("#")) {
+      let hex = str.slice(1);
+      if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+      if (hex.length === 8) {
+        return {
+          r: parseInt(hex.slice(0,2),16)/255,
+          g: parseInt(hex.slice(2,4),16)/255,
+          b: parseInt(hex.slice(4,6),16)/255,
+          a: parseInt(hex.slice(6,8),16)/255
+        };
+      }
+      return {
+        r: parseInt(hex.slice(0,2),16)/255,
+        g: parseInt(hex.slice(2,4),16)/255,
+        b: parseInt(hex.slice(4,6),16)/255,
+        a: 1
+      };
+    }
+
+    // rgb/rgba
+    const rgbMatch = str.match(/rgba?\(\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\s*\)/);
+    if (rgbMatch) {
+      return {
+        r: parseFloat(rgbMatch[1])/255,
+        g: parseFloat(rgbMatch[2])/255,
+        b: parseFloat(rgbMatch[3])/255,
+        a: rgbMatch[4] !== undefined ? parseFloat(rgbMatch[4]) : 1
+      };
+    }
+
+    return null;
+  }
+
+  // ── Parse inline style string into object ─────────────────────────────────
+  function parseStyle(styleStr) {
+    const styles = {};
+    if (!styleStr) return styles;
+    for (const part of styleStr.split(";")) {
+      const idx = part.indexOf(":");
+      if (idx < 0) continue;
+      const name = part.slice(0, idx).trim();
+      const val = part.slice(idx + 1).trim();
+      if (name) styles[name] = val;
+    }
+    return styles;
+  }
+
+  // ── Parse px value to number ──────────────────────────────────────────────
+  function px(val) {
+    if (!val) return 0;
+    return parseFloat(val) || 0;
+  }
+
+  // ── Recursively parse HTML element into layer tree ────────────────────────
+  function parseElement(el) {
+    // Skip empty text-only nodes
+    if (el.nodeType === Node.TEXT_NODE) {
+      const text = el.textContent.trim();
+      if (!text) return null;
+      return { type: "TEXT_NODE", text };
+    }
+
+    if (el.nodeType !== Node.ELEMENT_NODE) return null;
+
+    const tag = el.tagName.toLowerCase();
+    const styles = parseStyle(el.getAttribute("style") || "");
+
+    // Determine if this is an SVG
+    if (tag === "svg") {
+      return { type: "SVG", svg: el.outerHTML, styles };
+    }
+
+    const layer = {
+      type: "ELEMENT",
+      tag,
+      styles,
+      children: [],
+      text: "",
+    };
+
+    // Collect text content and child elements
+    for (const child of el.childNodes) {
+      if (child.nodeType === Node.TEXT_NODE) {
+        const text = child.textContent.trim();
+        if (text) {
+          if (el.children.length === 0) {
+            // Pure text element
+            layer.text += (layer.text ? " " : "") + text;
+          } else {
+            layer.children.push({ type: "TEXT_NODE", text });
+          }
+        }
+      } else if (child.nodeType === Node.ELEMENT_NODE) {
+        const parsed = parseElement(child);
+        if (parsed) layer.children.push(parsed);
+      }
+    }
+
+    return layer;
+  }
+
+  // ── Handle paste event ────────────────────────────────────────────────────
+  pasteArea.addEventListener("paste", (e) => {
+    e.preventDefault();
+    const html = e.clipboardData.getData("text/html");
+    const plain = e.clipboardData.getData("text/plain");
+
+    const content = html || plain;
+    if (!content) {
+      statusEl.textContent = "No content found on clipboard";
+      statusEl.className = "status error";
+      return;
+    }
+
+    // Parse the HTML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(content, "text/html");
+
+    // Find the root element (skip wrapper tags from clipboard)
+    let root = doc.body.firstElementChild;
+    if (!root) {
+      // Try using the plain text as HTML
+      const doc2 = new DOMParser().parseFromString(plain, "text/html");
+      root = doc2.body.firstElementChild;
+    }
+    if (!root) {
+      statusEl.textContent = "Could not parse HTML from clipboard";
+      statusEl.className = "status error";
+      return;
+    }
+
+    // Parse into layer tree
+    parsedLayers = parseElement(root);
+
+    if (parsedLayers) {
+      pasteArea.className = "paste-area has-data";
+      pasteArea.textContent = JSON.stringify(parsedLayers, null, 2).substring(0, 2000) + "...";
+      importBtn.disabled = false;
+      statusEl.textContent = "Parsed! Click Import to create Figma layers.";
+      statusEl.className = "status success";
+    } else {
+      statusEl.textContent = "Failed to parse the HTML structure";
+      statusEl.className = "status error";
+    }
+  });
+
+  // ── Import button ─────────────────────────────────────────────────────────
+  importBtn.addEventListener("click", () => {
+    if (!parsedLayers) return;
+    importBtn.disabled = true;
+    statusEl.textContent = "Creating Figma layers...";
+    statusEl.className = "status";
+    parent.postMessage({ pluginMessage: { type: "import", layers: parsedLayers } }, "*");
+  });
+
+  // ── Receive messages from code.js ─────────────────────────────────────────
+  window.onmessage = (event) => {
+    const msg = event.data.pluginMessage;
+    if (!msg) return;
+    if (msg.type === "done") {
+      statusEl.textContent = "Imported " + msg.count + " layers!";
+      statusEl.className = "status success";
+      importBtn.disabled = false;
+    } else if (msg.type === "error") {
+      statusEl.textContent = "Error: " + msg.error;
+      statusEl.className = "status error";
+      importBtn.disabled = false;
+    }
+  };
+
+  // Focus paste area on load
+  pasteArea.focus();
+</script>
+</body>
+</html>

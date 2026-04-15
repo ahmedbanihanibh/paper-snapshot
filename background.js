@@ -66,6 +66,119 @@ async function copyToClipboardForOpenPencil(html) {
 }
 
 // ============================================================================
+// FIGMA — SVG foreignObject approach (best without proprietary binary format)
+// Figma accepts SVG paste natively via DataTransfer's image/svg+xml
+// ============================================================================
+async function copyToClipboardForFigma(rawHtml) {
+  function waitForFocus() {
+    if (document.hasFocus()) return Promise.resolve();
+    return new Promise(resolve => window.addEventListener("focus", resolve, { once: true }));
+  }
+  await waitForFocus();
+
+  const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
+  <foreignObject width="800" height="600" requiredExtensions="http://www.w3.org/1999/xhtml">
+    <body xmlns="http://www.w3.org/1999/xhtml" style="margin:0;padding:0;background:transparent">
+      ${rawHtml}
+    </body>
+  </foreignObject>
+</svg>`;
+
+  // Use execCommand copy event so we can set image/svg+xml on DataTransfer
+  // (navigator.clipboard.write rejects image/svg+xml in most browsers)
+  return new Promise((resolve) => {
+    const handler = (e) => {
+      e.preventDefault();
+      e.clipboardData.setData("text/plain", rawHtml);
+      e.clipboardData.setData("text/html", rawHtml);
+      e.clipboardData.setData("image/svg+xml", svgContent);
+      document.removeEventListener("copy", handler, true);
+      resolve();
+    };
+    document.addEventListener("copy", handler, true);
+    document.execCommand("copy");
+  });
+}
+
+// ============================================================================
+// LOTTIELAB — Clipboard format: <div id="lottielab-paste">
+//   <span id="layers" data-contents="URL_ENCODED_JSON"></span>
+// </div>
+// Encoding: encodeURIComponent(JSON.stringify(layersArray))
+// Layer type: image-layer wrapping Lottie ty:2 spec
+// ============================================================================
+async function copyToClipboardForLottielab(rawHtml) {
+  function waitForFocus() {
+    if (document.hasFocus()) return Promise.resolve();
+    return new Promise(resolve => window.addEventListener("focus", resolve, { once: true }));
+  }
+
+  // Rasterize HTML to PNG via canvas + SVG foreignObject
+  async function rasterize(html, width = 800, height = 600) {
+    return new Promise((resolve) => {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+        <foreignObject width="${width}" height="${height}">
+          <div xmlns="http://www.w3.org/1999/xhtml">${html}</div>
+        </foreignObject>
+      </svg>`;
+      const blob = new Blob([svg], { type: "image/svg+xml" });
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = width; canvas.height = height;
+        canvas.getContext("2d").drawImage(img, 0, 0);
+        URL.revokeObjectURL(url);
+        resolve(canvas.toDataURL("image/png"));
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+      img.src = url;
+    });
+  }
+
+  const pngDataURL = await rasterize(rawHtml);
+  const timestamp = Date.now();
+  const assetId = `img_ui2code_${timestamp}`;
+
+  const lottieLayers = [
+    {
+      layerType: "image-layer",
+      name: "UI Snapshot",
+      layer: {
+        ddd: 0, ind: 1, ty: 2, nm: "UI Snapshot", refId: assetId, sr: 1,
+        ks: {
+          o: { a: 0, k: 100, ix: 11 },
+          r: { a: 0, k: 0, ix: 10 },
+          p: { a: 0, k: [400, 300, 0], ix: 2 },
+          a: { a: 0, k: [400, 300, 0], ix: 1 },
+          s: { a: 0, k: [100, 100, 100], ix: 6 },
+        },
+        ao: 0, ip: 0, op: 60, st: 0, bm: 0,
+      },
+      assets: [
+        { id: assetId, w: 800, h: 600, u: "", p: pngDataURL, e: 1 },
+      ],
+    },
+  ];
+
+  const lottiePasteHTML = `<div id="lottielab-paste"><span id="layers" data-contents="${encodeURIComponent(JSON.stringify(lottieLayers))}"></span></div>`;
+
+  await waitForFocus();
+
+  return new Promise((resolve) => {
+    const handler = (e) => {
+      e.preventDefault();
+      e.clipboardData.setData("text/plain", "UI Snapshot");
+      e.clipboardData.setData("text/html", lottiePasteHTML);
+      document.removeEventListener("copy", handler, true);
+      resolve();
+    };
+    document.addEventListener("copy", handler, true);
+    document.execCommand("copy");
+  });
+}
+
+// ============================================================================
 // ELEMENT PICKER — Direct port from Paper Snapshot: element-picker.ts
 // Only change: "x-paper-toast" → "ui2code-toast", attribute name
 // ============================================================================
@@ -1229,6 +1342,20 @@ function showPreview(html, jsxCode) {
     copyOpenPencilBtn.onmouseenter = () => { copyOpenPencilBtn.style.background = "rgba(255,255,255,0.14)"; copyOpenPencilBtn.style.color = "rgba(255,255,255,0.9)"; };
     copyOpenPencilBtn.onmouseleave = () => { copyOpenPencilBtn.style.background = "rgba(255,255,255,0.08)"; copyOpenPencilBtn.style.color = "rgba(255,255,255,0.7)"; };
 
+    const copyFigmaBtn = document.createElement("button");
+    Object.assign(copyFigmaBtn.style, { background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "12px", fontWeight: "500", padding: "6px 12px", fontFamily: "inherit", transition: "all 150ms ease" });
+    copyFigmaBtn.textContent = "Copy for Figma";
+    copyFigmaBtn.title = "Copy as SVG for Figma (paste into canvas with Cmd+V)";
+    copyFigmaBtn.onmouseenter = () => { copyFigmaBtn.style.background = "rgba(255,255,255,0.14)"; copyFigmaBtn.style.color = "rgba(255,255,255,0.9)"; };
+    copyFigmaBtn.onmouseleave = () => { copyFigmaBtn.style.background = "rgba(255,255,255,0.08)"; copyFigmaBtn.style.color = "rgba(255,255,255,0.7)"; };
+
+    const copyLottielabBtn = document.createElement("button");
+    Object.assign(copyLottielabBtn.style, { background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "12px", fontWeight: "500", padding: "6px 12px", fontFamily: "inherit", transition: "all 150ms ease" });
+    copyLottielabBtn.textContent = "Copy for Lottielab";
+    copyLottielabBtn.title = "Copy as Lottielab image layer (paste into editor with Cmd+V)";
+    copyLottielabBtn.onmouseenter = () => { copyLottielabBtn.style.background = "rgba(255,255,255,0.14)"; copyLottielabBtn.style.color = "rgba(255,255,255,0.9)"; };
+    copyLottielabBtn.onmouseleave = () => { copyLottielabBtn.style.background = "rgba(255,255,255,0.08)"; copyLottielabBtn.style.color = "rgba(255,255,255,0.7)"; };
+
     const copyRawBtn = document.createElement("button");
     Object.assign(copyRawBtn.style, { background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "12px", fontWeight: "500", padding: "6px 12px", fontFamily: "inherit", transition: "all 150ms ease" });
     copyRawBtn.textContent = "Copy React CSS";
@@ -1243,7 +1370,7 @@ function showPreview(html, jsxCode) {
     copyAIBtn.onmouseenter = () => { copyAIBtn.style.background = "#818cf8"; };
     copyAIBtn.onmouseleave = () => { copyAIBtn.style.background = "#6366f1"; };
 
-    headerRight.append(sizeLabel, cancelBtn, copyPaperBtn, copyOpenPencilBtn, copyRawBtn, copyAIBtn);
+    headerRight.append(sizeLabel, cancelBtn, copyPaperBtn, copyOpenPencilBtn, copyFigmaBtn, copyLottielabBtn, copyRawBtn, copyAIBtn);
     header.append(title, headerRight);
 
     // Toolbar with zoom controls
@@ -1390,6 +1517,8 @@ function showPreview(html, jsxCode) {
     cancelBtn.addEventListener("click", () => close("cancel"));
     copyPaperBtn.addEventListener("click", () => close("copy-paper"));
     copyOpenPencilBtn.addEventListener("click", () => close("copy-openpencil"));
+    copyFigmaBtn.addEventListener("click", () => close("copy-figma"));
+    copyLottielabBtn.addEventListener("click", () => close("copy-lottielab"));
     copyRawBtn.addEventListener("click", () => close("copy-raw"));
     copyAIBtn.addEventListener("click", () => close("copy-ai"));
     backdrop.addEventListener("click", (e) => { if (e.target === backdrop) close("cancel"); });
@@ -1516,6 +1645,28 @@ chrome.action.onClicked.addListener(async (tab) => {
                   target: { tabId: tab.id },
                   func: showToast,
                   args: ["Copied for OpenPencil! Paste into OpenPencil app with Cmd+V."],
+                });
+              } else if (action === "copy-figma") {
+                await chrome.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  func: copyToClipboardForFigma,
+                  args: [serializationResult.rawHtml],
+                });
+                await chrome.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  func: showToast,
+                  args: ["Copied as SVG for Figma! Paste into canvas with Cmd+V."],
+                });
+              } else if (action === "copy-lottielab") {
+                await chrome.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  func: copyToClipboardForLottielab,
+                  args: [serializationResult.rawHtml],
+                });
+                await chrome.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  func: showToast,
+                  args: ["Copied for Lottielab! Paste into editor with Cmd+V."],
                 });
               } else if (action === "copy-raw") {
                 await chrome.scripting.executeScript({

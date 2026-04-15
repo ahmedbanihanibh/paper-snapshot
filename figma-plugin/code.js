@@ -1,0 +1,437 @@
+"use strict";
+
+// ============================================================================
+// UI2Code Snapshot Import — Figma Plugin
+// Receives parsed HTML layer tree from ui.html, creates native Figma nodes
+// ============================================================================
+
+figma.showUI(__html__, { width: 420, height: 480, themeColors: true });
+
+// ── Color helpers ───────────────────────────────────────────────────────────
+function parseColor(str) {
+  if (!str || str === "transparent" || str === "rgba(0, 0, 0, 0)") return null;
+  str = str.trim();
+
+  if (str.startsWith("#")) {
+    let hex = str.slice(1);
+    if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    if (hex.length === 8) {
+      return {
+        r: parseInt(hex.slice(0,2),16)/255,
+        g: parseInt(hex.slice(2,4),16)/255,
+        b: parseInt(hex.slice(4,6),16)/255,
+        a: parseInt(hex.slice(6,8),16)/255
+      };
+    }
+    return {
+      r: parseInt(hex.slice(0,2),16)/255,
+      g: parseInt(hex.slice(2,4),16)/255,
+      b: parseInt(hex.slice(4,6),16)/255,
+      a: 1
+    };
+  }
+
+  const m = str.match(/rgba?\(\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\s*\)/);
+  if (m) {
+    return {
+      r: parseFloat(m[1])/255,
+      g: parseFloat(m[2])/255,
+      b: parseFloat(m[3])/255,
+      a: m[4] !== undefined ? parseFloat(m[4]) : 1
+    };
+  }
+  return null;
+}
+
+function colorToFill(colorStr) {
+  const c = parseColor(colorStr);
+  if (!c) return null;
+  return { type: "SOLID", color: { r: c.r, g: c.g, b: c.b }, opacity: c.a };
+}
+
+function px(val) {
+  if (!val) return 0;
+  return parseFloat(val) || 0;
+}
+
+// ── Parse border-radius (handles "8px", "8px 4px", "8px 4px 2px 1px") ─────
+function parseBorderRadius(val) {
+  if (!val) return 0;
+  const parts = val.split(/\s+/).map(v => parseFloat(v) || 0);
+  if (parts.length === 1) return parts[0];
+  return parts; // [tl, tr, br, bl]
+}
+
+// ── Parse box-shadow into Figma effects ────────────────────────────────────
+function parseBoxShadow(val) {
+  if (!val || val === "none") return [];
+  const effects = [];
+  // Simple parser for: "offsetX offsetY blur spread color"
+  const shadowRegex = /(inset\s+)?(-?[\d.]+)px\s+(-?[\d.]+)px\s+([\d.]+)px(?:\s+([\d.]+)px)?\s+(rgba?\([^)]+\)|#[a-fA-F0-9]+)/g;
+  let match;
+  while ((match = shadowRegex.exec(val)) !== null) {
+    const isInner = !!match[1];
+    const c = parseColor(match[6]);
+    if (c) {
+      effects.push({
+        type: isInner ? "INNER_SHADOW" : "DROP_SHADOW",
+        color: { r: c.r, g: c.g, b: c.b, a: c.a },
+        offset: { x: parseFloat(match[2]), y: parseFloat(match[3]) },
+        radius: parseFloat(match[4]),
+        spread: match[5] ? parseFloat(match[5]) : 0,
+        visible: true,
+        blendMode: "NORMAL",
+      });
+    }
+  }
+  return effects;
+}
+
+// ── Map CSS display/flex to Figma layoutMode ───────────────────────────────
+function getLayoutMode(styles) {
+  const display = styles.display;
+  if (display === "flex" || display === "inline-flex") {
+    const dir = styles["flex-direction"] || "row";
+    return dir.startsWith("column") ? "VERTICAL" : "HORIZONTAL";
+  }
+  // Block elements stack vertically
+  if (display === "block" || display === "list-item" || !display) {
+    return "VERTICAL";
+  }
+  return "NONE";
+}
+
+// ── Map CSS align-items / justify-content to Figma ─────────────────────────
+function mapAlignment(val) {
+  if (!val) return "MIN";
+  if (val === "center") return "CENTER";
+  if (val === "flex-end" || val === "end") return "MAX";
+  if (val === "space-between") return "SPACE_BETWEEN";
+  return "MIN";
+}
+
+// ── Font weight string to Figma style ──────────────────────────────────────
+function fontWeightToStyle(weight) {
+  const w = parseInt(weight) || 400;
+  if (w <= 100) return "Thin";
+  if (w <= 200) return "ExtraLight";
+  if (w <= 300) return "Light";
+  if (w <= 400) return "Regular";
+  if (w <= 500) return "Medium";
+  if (w <= 600) return "SemiBold";
+  if (w <= 700) return "Bold";
+  if (w <= 800) return "ExtraBold";
+  return "Black";
+}
+
+// ── Extract font family from CSS value ─────────────────────────────────────
+function extractFontFamily(val) {
+  if (!val) return "Inter";
+  // Take the first font family, strip quotes
+  const first = val.split(",")[0].trim().replace(/['"]/g, "");
+  // Map common system fonts to Inter
+  const systemFonts = ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "system-ui", "sans-serif", "serif", "monospace", "Helvetica Neue", "Helvetica", "Arial"];
+  if (systemFonts.includes(first)) return "Inter";
+  return first;
+}
+
+// ── Try loading a font, fallback to Inter Regular ──────────────────────────
+async function tryLoadFont(family, style) {
+  try {
+    await figma.loadFontAsync({ family, style });
+    return { family, style };
+  } catch(e) {
+    // Try with "Regular" if the style didn't work
+    if (style !== "Regular") {
+      try {
+        await figma.loadFontAsync({ family, style: "Regular" });
+        return { family, style: "Regular" };
+      } catch(e2) {}
+    }
+    // Fallback to Inter
+    try {
+      await figma.loadFontAsync({ family: "Inter", style: style });
+      return { family: "Inter", style };
+    } catch(e3) {
+      await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+      return { family: "Inter", style: "Regular" };
+    }
+  }
+}
+
+// ── Count total nodes (for progress reporting) ─────────────────────────────
+function countNodes(layer) {
+  if (!layer) return 0;
+  let count = 1;
+  if (layer.children) {
+    for (const child of layer.children) {
+      count += countNodes(child);
+    }
+  }
+  return count;
+}
+
+// ── MAIN: Recursively create Figma nodes from layer tree ────────────────────
+let nodeCount = 0;
+
+async function createNode(layer, parent) {
+  if (!layer) return null;
+  nodeCount++;
+
+  // ── TEXT_NODE: pure text child ──────────────────────────────────────────
+  if (layer.type === "TEXT_NODE") {
+    const font = await tryLoadFont("Inter", "Regular");
+    const text = figma.createText();
+    text.fontName = font;
+    text.characters = layer.text || "";
+    text.fontSize = 14;
+    text.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
+    parent.appendChild(text);
+    return text;
+  }
+
+  // ── SVG: use createNodeFromSvg ─────────────────────────────────────────
+  if (layer.type === "SVG") {
+    try {
+      const svgNode = figma.createNodeFromSvg(layer.svg);
+      svgNode.name = "SVG";
+      parent.appendChild(svgNode);
+      return svgNode;
+    } catch(e) {
+      // If SVG parsing fails, create a placeholder
+      const rect = figma.createRectangle();
+      rect.name = "SVG (parse failed)";
+      rect.resize(100, 100);
+      rect.fills = [{ type: "SOLID", color: { r: 0.9, g: 0.9, b: 0.9 } }];
+      parent.appendChild(rect);
+      return rect;
+    }
+  }
+
+  // ── ELEMENT: create frame/rectangle/text ───────────────────────────────
+  const s = layer.styles || {};
+  const w = Math.max(px(s.width) || px(s["min-width"]) || 100, 1);
+  const h = Math.max(px(s.height) || px(s["min-height"]) || 40, 1);
+
+  // Determine if this is a text-only element
+  const isTextOnly = layer.text && layer.children.length === 0;
+  const hasChildren = layer.children && layer.children.length > 0;
+
+  if (isTextOnly) {
+    // ── Text element ──────────────────────────────────────────────────────
+    const family = extractFontFamily(s["font-family"]);
+    const weight = s["font-weight"] || "400";
+    const fontStyle = fontWeightToStyle(weight);
+    const font = await tryLoadFont(family, fontStyle);
+
+    const text = figma.createText();
+    text.fontName = font;
+    text.characters = layer.text;
+    text.fontSize = px(s["font-size"]) || 14;
+
+    // Text color
+    const textColor = colorToFill(s.color);
+    if (textColor) text.fills = [textColor];
+
+    // Text alignment
+    const ta = s["text-align"];
+    if (ta === "center") text.textAlignHorizontal = "CENTER";
+    else if (ta === "right") text.textAlignHorizontal = "RIGHT";
+    else text.textAlignHorizontal = "LEFT";
+
+    // Line height
+    const lh = px(s["line-height"]);
+    if (lh > 0) text.lineHeight = { value: lh, unit: "PIXELS" };
+
+    // Letter spacing
+    const ls = px(s["letter-spacing"]);
+    if (ls !== 0) text.letterSpacing = { value: ls, unit: "PIXELS" };
+
+    // Text decoration
+    var textDec = s["text-decoration"] || "";
+    if (textDec.indexOf("underline") >= 0) text.textDecoration = "UNDERLINE";
+    if (textDec.indexOf("line-through") >= 0) text.textDecoration = "STRIKETHROUGH";
+
+    // Text transform
+    if (s["text-transform"] === "uppercase") text.textCase = "UPPER";
+    else if (s["text-transform"] === "lowercase") text.textCase = "LOWER";
+    else if (s["text-transform"] === "capitalize") text.textCase = "TITLE";
+
+    text.textAutoResize = "WIDTH_AND_HEIGHT";
+
+    // If the element has background/border, wrap in a frame
+    const hasBg = s["background-color"] && s["background-color"] !== "rgba(0, 0, 0, 0)" && s["background-color"] !== "transparent";
+    const hasBorder = s["border-width"] && px(s["border-width"]) > 0 && s["border-style"] !== "none";
+
+    if (hasBg || hasBorder) {
+      const frame = figma.createFrame();
+      frame.name = layer.tag || "container";
+      frame.resize(w, h);
+      frame.layoutMode = "HORIZONTAL";
+      frame.primaryAxisAlignItems = mapAlignment(s["justify-content"] || s["text-align"]);
+      frame.counterAxisAlignItems = mapAlignment(s["align-items"]);
+      frame.paddingTop = px(s["padding-top"]);
+      frame.paddingBottom = px(s["padding-bottom"]);
+      frame.paddingLeft = px(s["padding-left"]);
+      frame.paddingRight = px(s["padding-right"]);
+      frame.primaryAxisSizingMode = "AUTO";
+      frame.counterAxisSizingMode = "AUTO";
+
+      // Background
+      const bg = colorToFill(s["background-color"]);
+      frame.fills = bg ? [bg] : [];
+
+      // Border radius
+      const br = parseBorderRadius(s["border-radius"]);
+      if (typeof br === "number") {
+        frame.cornerRadius = br;
+      } else if (Array.isArray(br)) {
+        frame.topLeftRadius = br[0] || 0;
+        frame.topRightRadius = br[1] || 0;
+        frame.bottomRightRadius = br[2] || 0;
+        frame.bottomLeftRadius = br[3] || 0;
+      }
+
+      // Border
+      if (hasBorder) {
+        const borderColor = colorToFill(s["border-color"]);
+        if (borderColor) {
+          frame.strokes = [borderColor];
+          frame.strokeWeight = px(s["border-width"]) || 1;
+          frame.strokeAlign = "INSIDE";
+        }
+      }
+
+      // Box shadow
+      const shadows = parseBoxShadow(s["box-shadow"]);
+      if (shadows.length) frame.effects = shadows;
+
+      // Opacity
+      if (s.opacity) frame.opacity = parseFloat(s.opacity);
+
+      parent.appendChild(frame);
+      frame.appendChild(text);
+      return frame;
+    }
+
+    parent.appendChild(text);
+    return text;
+  }
+
+  // ── Container element (frame) ───────────────────────────────────────────
+  const frame = figma.createFrame();
+  frame.name = layer.tag || "div";
+  frame.resize(w, h);
+
+  // Layout
+  const layoutMode = getLayoutMode(s);
+  if (layoutMode !== "NONE") {
+    frame.layoutMode = layoutMode;
+    frame.primaryAxisAlignItems = mapAlignment(
+      layoutMode === "HORIZONTAL" ? s["justify-content"] : s["align-items"]
+    );
+    frame.counterAxisAlignItems = mapAlignment(
+      layoutMode === "HORIZONTAL" ? s["align-items"] : s["justify-content"]
+    );
+
+    const gap = px(s.gap) || px(s["row-gap"]) || px(s["column-gap"]);
+    if (gap > 0) frame.itemSpacing = gap;
+
+    frame.primaryAxisSizingMode = "AUTO";
+    frame.counterAxisSizingMode = "AUTO";
+  }
+
+  // Padding
+  frame.paddingTop = px(s["padding-top"]);
+  frame.paddingBottom = px(s["padding-bottom"]);
+  frame.paddingLeft = px(s["padding-left"]);
+  frame.paddingRight = px(s["padding-right"]);
+
+  // Background
+  const bg = colorToFill(s["background-color"] || s.background);
+  frame.fills = bg ? [bg] : [];
+
+  // Border radius
+  const br = parseBorderRadius(s["border-radius"]);
+  if (typeof br === "number") {
+    frame.cornerRadius = br;
+  } else if (Array.isArray(br)) {
+    frame.topLeftRadius = br[0] || 0;
+    frame.topRightRadius = br[1] || 0;
+    frame.bottomRightRadius = br[2] || 0;
+    frame.bottomLeftRadius = br[3] || 0;
+  }
+
+  // Border
+  const hasBorder = s["border-width"] && px(s["border-width"]) > 0 && s["border-style"] !== "none";
+  if (hasBorder) {
+    const borderColor = colorToFill(s["border-color"]);
+    if (borderColor) {
+      frame.strokes = [borderColor];
+      frame.strokeWeight = px(s["border-width"]) || 1;
+      frame.strokeAlign = "INSIDE";
+    }
+  }
+
+  // Box shadow
+  const shadows = parseBoxShadow(s["box-shadow"]);
+  if (shadows.length) frame.effects = shadows;
+
+  // Opacity
+  if (s.opacity) frame.opacity = parseFloat(s.opacity);
+
+  // Clip content (overflow hidden)
+  if (s.overflow === "hidden") frame.clipsContent = true;
+
+  parent.appendChild(frame);
+
+  // ── Recurse children ──────────────────────────────────────────────────
+  if (hasChildren) {
+    for (const child of layer.children) {
+      await createNode(child, frame);
+    }
+  }
+
+  // After appending children, set fill sizing where appropriate
+  if (layoutMode !== "NONE") {
+    for (const child of frame.children) {
+      if ("layoutSizingHorizontal" in child) {
+        // Text nodes should hug, containers can fill
+        if (child.type === "TEXT") {
+          child.layoutSizingHorizontal = "HUG";
+        }
+      }
+    }
+  }
+
+  return frame;
+}
+
+// ── Handle messages from UI ─────────────────────────────────────────────────
+figma.ui.onmessage = async (msg) => {
+  if (msg.type === "import") {
+    try {
+      nodeCount = 0;
+      const total = countNodes(msg.layers);
+      console.log("Importing", total, "nodes...");
+
+      const rootNode = await createNode(msg.layers, figma.currentPage);
+
+      if (rootNode) {
+        // Position at center of viewport
+        const vp = figma.viewport.center;
+        rootNode.x = Math.round(vp.x - (rootNode.width || 0) / 2);
+        rootNode.y = Math.round(vp.y - (rootNode.height || 0) / 2);
+
+        // Select and focus
+        figma.currentPage.selection = [rootNode];
+        figma.viewport.scrollAndZoomIntoView([rootNode]);
+      }
+
+      figma.ui.postMessage({ type: "done", count: nodeCount });
+    } catch(err) {
+      console.error("Import error:", err);
+      figma.ui.postMessage({ type: "error", error: String(err) });
+    }
+  }
+};
