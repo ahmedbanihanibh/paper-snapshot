@@ -305,9 +305,18 @@ async function createNode(layer, parent, parentStyles) {
       text.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 } }];
     }
 
-    // Inherit line-height from parent
-    var inheritLh = px(parentStyles["line-height"]);
-    if (inheritLh > 0) text.lineHeight = { value: inheritLh, unit: "PIXELS" };
+    // Inherit line-height from parent (handle unitless multiplier like "1.5")
+    var inheritLhRaw = parentStyles["line-height"];
+    if (inheritLhRaw) {
+      var inheritLhVal = parseFloat(inheritLhRaw);
+      if (inheritLhVal > 0) {
+        // If no "px" suffix and value < 10, treat as multiplier (1.5 = 1.5 * fontSize)
+        if (inheritLhRaw.indexOf("px") < 0 && inheritLhVal < 10) {
+          inheritLhVal = Math.round(inheritLhVal * (px(parentStyles["font-size"]) || 14));
+        }
+        text.lineHeight = { value: inheritLhVal, unit: "PIXELS" };
+      }
+    }
 
     // Inherit letter-spacing from parent
     var inheritLs = px(parentStyles["letter-spacing"]);
@@ -426,9 +435,17 @@ async function createNode(layer, parent, parentStyles) {
     else if (ta === "right") text.textAlignHorizontal = "RIGHT";
     else text.textAlignHorizontal = "LEFT";
 
-    // Line height
-    const lh = px(s["line-height"]);
-    if (lh > 0) text.lineHeight = { value: lh, unit: "PIXELS" };
+    // Line height (handle unitless multiplier like "1.5")
+    var lhRaw = s["line-height"];
+    if (lhRaw) {
+      var lhVal = parseFloat(lhRaw);
+      if (lhVal > 0) {
+        if (lhRaw.indexOf("px") < 0 && lhVal < 10) {
+          lhVal = Math.round(lhVal * (px(s["font-size"]) || 14));
+        }
+        text.lineHeight = { value: lhVal, unit: "PIXELS" };
+      }
+    }
 
     // Letter spacing
     const ls = px(s["letter-spacing"]);
