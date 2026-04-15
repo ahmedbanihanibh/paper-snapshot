@@ -670,28 +670,63 @@ async function createNode(layer, parent, parentStyles) {
     // Resolve percentage dimensions relative to parent
     var parentW = parent.width || 100;
     var parentH = parent.height || 100;
-    var absChildW = childW;
     var absChildH = s.height || s["block-size"] || "";
-    if (isPercent100(absChildH) || absChildH === "100%") {
+    if (isPercent100(absChildH)) {
       frame.resize(frame.width, parentH);
     }
-    if (isPercent100(absChildW) || absChildW === "100%") {
+    if (isPercent100(childW)) {
       frame.resize(parentW, frame.height);
     }
-
-    // Position from CSS top/left/right/bottom
-    var cssTop = px(s.top) || px(s["inset-block-start"]);
-    var cssLeft = px(s.left) || px(s["inset-inline-start"]);
-    var cssRight = px(s.right) || px(s["inset-inline-end"]);
-    var cssBottom = px(s.bottom) || px(s["inset-block-end"]);
-    if (cssTop) frame.y = cssTop;
-    if (cssLeft) frame.x = cssLeft;
-    // Figma absolute positioning uses constraints for right/bottom
-    if (cssRight && !cssLeft) {
-      frame.constraints = { horizontal: "MAX", vertical: frame.constraints ? frame.constraints.vertical : "MIN" };
+    // Handle aspect-ratio (e.g., "1 / 1")
+    var ar = s["aspect-ratio"];
+    if (ar && ar !== "auto") {
+      var arParts = ar.split("/").map(function(v) { return parseFloat(v.trim()); });
+      if (arParts.length === 2 && arParts[0] > 0 && arParts[1] > 0) {
+        var arRatio = arParts[0] / arParts[1];
+        frame.resize(Math.round(frame.height * arRatio), frame.height);
+      }
     }
-    if (cssBottom && !cssTop) {
-      frame.constraints = { horizontal: frame.constraints ? frame.constraints.horizontal : "MIN", vertical: "MAX" };
+
+    // Position from CSS top/left/right/bottom (check property existence, not just value)
+    var hasTop = s.top !== undefined || s["inset-block-start"] !== undefined;
+    var hasLeft = s.left !== undefined || s["inset-inline-start"] !== undefined;
+    var hasRight = s.right !== undefined || s["inset-inline-end"] !== undefined;
+    var hasBottom = s.bottom !== undefined || s["inset-block-end"] !== undefined;
+
+    // Parse position values (handle percentages relative to parent)
+    function parsePos(val, parentSize) {
+      if (!val && val !== "0px" && val !== "0") return null;
+      if (typeof val === "string" && val.indexOf("%") >= 0) {
+        return (parseFloat(val) / 100) * parentSize;
+      }
+      return parseFloat(val) || 0;
+    }
+    var posTop = parsePos(s.top || s["inset-block-start"], parentH);
+    var posLeft = parsePos(s.left || s["inset-inline-start"], parentW);
+    var posRight = parsePos(s.right || s["inset-inline-end"], parentW);
+
+    // Apply CSS transform: translate(x, y) offset
+    var tx = 0, ty = 0;
+    var transformStr = s.transform || "";
+    var translateMatch = transformStr.match(/translate\(\s*(-?[\d.]+)(%?)\s*,\s*(-?[\d.]+)(%?)\s*\)/);
+    if (translateMatch) {
+      tx = parseFloat(translateMatch[1]);
+      ty = parseFloat(translateMatch[3]);
+      if (translateMatch[2] === "%") tx = (tx / 100) * frame.width;
+      if (translateMatch[4] === "%") ty = (ty / 100) * frame.height;
+    }
+
+    if (hasRight && !hasLeft) {
+      // right: Npx → x = parentW - frameW - right
+      frame.x = parentW - frame.width - (posRight || 0) + tx;
+    } else if (hasLeft) {
+      frame.x = (posLeft || 0) + tx;
+    }
+    if (hasTop) {
+      frame.y = (posTop || 0) + ty;
+    }
+    if (hasBottom && !hasTop) {
+      frame.y = parentH - frame.height + ty;
     }
   }
 
