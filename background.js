@@ -113,62 +113,91 @@ async function copyToClipboardForLottielab(rawHtml) {
     return new Promise(resolve => window.addEventListener("focus", resolve, { once: true }));
   }
 
-  // Rasterize HTML to PNG via canvas + SVG foreignObject
-  async function rasterize(html, width = 800, height = 600) {
-    return new Promise((resolve) => {
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
-        <foreignObject width="${width}" height="${height}">
-          <div xmlns="http://www.w3.org/1999/xhtml">${html}</div>
-        </foreignObject>
-      </svg>`;
-      const blob = new Blob([svg], { type: "image/svg+xml" });
-      const url = URL.createObjectURL(blob);
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = width; canvas.height = height;
-        canvas.getContext("2d").drawImage(img, 0, 0);
-        URL.revokeObjectURL(url);
-        resolve(canvas.toDataURL("image/png"));
-      };
-      img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
-      img.src = url;
-    });
+  // Lottielab animatable property (static value, no keyframes)
+  function sp(value) {
+    return { staticValue: value, defaultFrame: 0, keyframes: [] };
   }
 
-  const pngDataURL = await rasterize(rawHtml);
-  const timestamp = Date.now();
-  const assetId = `img_ui2code_${timestamp}`;
+  // Parse CSS color to Lottielab RGB (0-255 range)
+  function parseCssColor(str) {
+    if (!str) return null;
+    const m = str.match(/rgba?\(\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\s*\)/);
+    if (m) return { r: Math.round(parseFloat(m[1])), g: Math.round(parseFloat(m[2])), b: Math.round(parseFloat(m[3])) };
+    if (str.startsWith("#")) {
+      let hex = str.slice(1);
+      if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+      return { r: parseInt(hex.slice(0,2),16), g: parseInt(hex.slice(2,4),16), b: parseInt(hex.slice(4,6),16) };
+    }
+    return null;
+  }
 
-  const lottieLayers = [
-    {
-      layerType: "image-layer",
-      name: "UI Snapshot",
-      layer: {
-        ddd: 0, ind: 1, ty: 2, nm: "UI Snapshot", refId: assetId, sr: 1,
-        ks: {
-          o: { a: 0, k: 100, ix: 11 },
-          r: { a: 0, k: 0, ix: 10 },
-          p: { a: 0, k: [400, 300, 0], ix: 2 },
-          a: { a: 0, k: [400, 300, 0], ix: 1 },
-          s: { a: 0, k: [100, 100, 100], ix: 6 },
-        },
-        ao: 0, ip: 0, op: 60, st: 0, bm: 0,
-      },
-      assets: [
-        { id: assetId, w: 800, h: 600, u: "", p: pngDataURL, e: 1 },
-      ],
+  // Parse root element dimensions and styles
+  const tmpDiv = document.createElement("div");
+  tmpDiv.innerHTML = rawHtml;
+  const rootEl = tmpDiv.firstElementChild;
+  const rootStyle = rootEl ? rootEl.getAttribute("style") || "" : "";
+  const widthMatch = rootStyle.match(/width:\s*([\d.]+)px/);
+  const heightMatch = rootStyle.match(/(?:min-)?height:\s*([\d.]+)px/);
+  const w = widthMatch ? parseFloat(widthMatch[1]) : 400;
+  const h = heightMatch ? parseFloat(heightMatch[1]) : 300;
+  const bgMatch = rootStyle.match(/background(?:-color)?:\s*([^;]+)/);
+  const bgColor = bgMatch ? parseCssColor(bgMatch[1].trim()) : { r: 255, g: 255, b: 255 };
+  const brMatch = rootStyle.match(/border-radius:\s*([\d.]+)px/);
+  const borderRadius = brMatch ? parseFloat(brMatch[1]) : 0;
+
+  // Lottielab transform object
+  function makeTransform(x, y, opacity) {
+    return {
+      position: { isLocked: false, staticValue: { x: x, y: y }, defaultFrame: 0, keyframes: [] },
+      scale: { aspectRatioLocked: false, staticValue: [1, 1], defaultFrame: 0, keyframes: [] },
+      rotation: sp(0),
+      origin: { isLocked: true, staticValue: { x: 0, y: 0 }, defaultFrame: 0, keyframes: [] },
+      skew: sp(0),
+      skewAxis: sp(0),
+      opacity: sp(opacity !== undefined ? opacity : 100),
+    };
+  }
+
+  // Build shape-layer with rectangle geometry (exact Lottielab format)
+  const shapeLayer = {
+    layerType: "shape-layer",
+    name: "UI Snapshot",
+    locked: false,
+    visibility: sp(true),
+    fixedFrames: [],
+    transform: makeTransform(w / 2, h / 2, 100),
+    pathDirection: 1,
+    geometry: {
+      type: "rectangle",
+      dimensions: { aspectRatioLocked: false, staticValue: [w, h], defaultFrame: 0, keyframes: [] },
+      cornerRadius: sp(borderRadius),
     },
-  ];
+    styles: [
+      {
+        type: "fill",
+        hidden: false,
+        opacity: sp(100),
+        paint: { type: "solid", staticValue: bgColor || { r: 255, g: 255, b: 255 }, defaultFrame: 0, keyframes: [] },
+      },
+    ],
+    trimPath: {
+      start: sp(0),
+      end: sp(100),
+      offset: sp(0),
+    },
+    blendMode: "normal",
+    effects: [],
+    animations: [],
+  };
 
-  const lottiePasteHTML = `<div id="lottielab-paste"><span id="layers" data-contents="${encodeURIComponent(JSON.stringify(lottieLayers))}"></span></div>`;
+  const lottieLayers = [shapeLayer];
+  const lottiePasteHTML = `\n    <meta charset="utf-8">\n    <div id="lottielab-paste">\n      <span id="layers" data-contents="${encodeURIComponent(JSON.stringify(lottieLayers))}"></span>\n    </div>\n  `;
 
   await waitForFocus();
 
   return new Promise((resolve) => {
     const handler = (e) => {
       e.preventDefault();
-      e.clipboardData.setData("text/plain", "UI Snapshot");
       e.clipboardData.setData("text/html", lottiePasteHTML);
       document.removeEventListener("copy", handler, true);
       resolve();
