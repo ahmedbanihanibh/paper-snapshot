@@ -41,7 +41,7 @@ function parseColor(str) {
     };
   }
   // Parse color(srgb r g b / a) — values are 0-1 floats
-  var cm = str.match(/color\(\s*srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\s*\)/);
+  var cm = str.match(/color\(\s*srgb\s+([\d.e+-]+)\s+([\d.e+-]+)\s+([\d.e+-]+)(?:\s*\/\s*([\d.]+))?\s*\)/);
   if (cm) {
     return {
       r: parseFloat(cm[1]),
@@ -49,6 +49,47 @@ function parseColor(str) {
       b: parseFloat(cm[3]),
       a: cm[4] !== undefined ? parseFloat(cm[4]) : 1
     };
+  }
+  // Parse lab(L a b) and lab(L a b / alpha) — CIE Lab color
+  var labMatch = str.match(/lab\(\s*([\d.e+-]+)\s+([\d.e+-]+)\s+([\d.e+-]+)(?:\s*\/\s*([\d.]+))?\s*\)/);
+  if (labMatch) {
+    var L = parseFloat(labMatch[1]);
+    var la = parseFloat(labMatch[2]);
+    var lb = parseFloat(labMatch[3]);
+    var alpha = labMatch[4] !== undefined ? parseFloat(labMatch[4]) : 1;
+    // Lab to XYZ (D65 illuminant)
+    var fy = (L + 16) / 116;
+    var fx = la / 500 + fy;
+    var fz = fy - lb / 200;
+    var delta = 6/29;
+    var xr = fx > delta ? fx*fx*fx : 3*delta*delta*(fx - 4/29);
+    var yr = L > 8 ? fy*fy*fy : L / 903.3;
+    var zr = fz > delta ? fz*fz*fz : 3*delta*delta*(fz - 4/29);
+    // XYZ to linear sRGB (D65)
+    var lr = 3.2406*xr - 1.5372*yr - 0.4986*zr;
+    var lg = -0.9689*xr + 1.8758*yr + 0.0415*zr;
+    var lbl = 0.0557*xr - 0.204*yr + 1.057*zr;
+    // Linear to sRGB gamma
+    function gammaEnc(c) { return c <= 0.0031308 ? 12.92*c : 1.055*Math.pow(Math.max(c,0),1/2.4)-0.055; }
+    return { r: Math.max(0,Math.min(1,gammaEnc(lr))), g: Math.max(0,Math.min(1,gammaEnc(lg))), b: Math.max(0,Math.min(1,gammaEnc(lbl))), a: alpha };
+  }
+  // Parse oklab(L a b) and oklab(L a b / alpha) — OKLab color
+  var oklabMatch = str.match(/oklab\(\s*([\d.e+-]+)\s+([\d.e+-]+)\s+([\d.e+-]+)(?:\s*\/\s*([\d.]+))?\s*\)/);
+  if (oklabMatch) {
+    var oL = parseFloat(oklabMatch[1]);
+    var oa = parseFloat(oklabMatch[2]);
+    var ob = parseFloat(oklabMatch[3]);
+    var oAlpha = oklabMatch[4] !== undefined ? parseFloat(oklabMatch[4]) : 1;
+    // OKLab to linear sRGB via LMS
+    var l_ = oL + 0.3963377774*oa + 0.2158037573*ob;
+    var m_ = oL - 0.1055613458*oa - 0.0638541728*ob;
+    var s_ = oL - 0.0894841775*oa - 1.291485548*ob;
+    var ol = l_*l_*l_, om = m_*m_*m_, os = s_*s_*s_;
+    var olr = 4.0767416621*ol - 3.3077115913*om + 0.2309699292*os;
+    var olg = -1.2684380046*ol + 2.6097574011*om - 0.3413193965*os;
+    var olb = -0.0041960863*ol - 0.7034186147*om + 1.707614701*os;
+    function gammaEnc2(c) { return c <= 0.0031308 ? 12.92*c : 1.055*Math.pow(Math.max(c,0),1/2.4)-0.055; }
+    return { r: Math.max(0,Math.min(1,gammaEnc2(olr))), g: Math.max(0,Math.min(1,gammaEnc2(olg))), b: Math.max(0,Math.min(1,gammaEnc2(olb))), a: oAlpha };
   }
   return null;
 }
