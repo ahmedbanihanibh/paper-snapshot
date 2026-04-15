@@ -120,10 +120,15 @@ async function copyToClipboardForJitter(rawHtml) {
 
   var nodeCounter = 0;
   var nodes = [];
+  // Generate a random file key like Figma uses
+  var fileKey = Array.from(crypto.getRandomValues(new Uint8Array(12))).map(function(b) { return b.toString(36); }).join("").slice(0, 22);
 
+  var lastFigmaId = "";
   function genId() {
     nodeCounter++;
-    return "ui2code_" + nodeCounter + ":" + nodeCounter;
+    // Figma-style ID: fileKey:pageNum:nodeNum
+    lastFigmaId = nodeCounter + ":" + (nodeCounter * 10);
+    return fileKey + ":" + lastFigmaId;
   }
 
   function parseStyleStr(styleStr) {
@@ -281,7 +286,7 @@ async function copyToClipboardForJitter(rawHtml) {
         item: {
           type: "text",
           name: tag,
-          figmaId: id.split(":").pop(),
+          figmaId: lastFigmaId,
           x: x, y: y,
           width: textW, height: Math.max(textH, 20),
           angle: 0, scale: 1,
@@ -311,26 +316,23 @@ async function copyToClipboardForJitter(rawHtml) {
     }
 
     // Container element → layerGrp
-    nodes.push({
-      id: id,
-      item: {
-        type: "layerGrp",
-        name: tag,
-        figmaId: id.split(":").pop(),
-        x: x, y: y,
-        width: w, height: h,
-        angle: 0, scale: 1,
-        background: hasBg,
-        fillColor: fillColor,
-        strokeEnabled: false,
-        shadowEnabled: false,
-        opacity: opacity,
-        isHidden: false, isLocked: false,
-        cornerRadius: cornerRadius,
-        clipsContent: true
-      },
-      position: { parentId: parentId, index: idx }
-    });
+    var grpItem = {
+      type: "layerGrp",
+      name: tag,
+      figmaId: lastFigmaId,
+      x: x, y: y,
+      width: w, height: h,
+      angle: 0, scale: 1,
+      background: !!hasBg,
+      strokeEnabled: false,
+      shadowEnabled: false,
+      opacity: opacity,
+      isHidden: false, isLocked: false,
+      cornerRadius: cornerRadius,
+      clipsContent: true
+    };
+    if (hasBg && fillColor) grpItem.fillColor = fillColor;
+    nodes.push({ id: id, item: grpItem, position: { parentId: parentId, index: idx } });
 
     // Recurse children
     var childIdx = 0;
