@@ -267,7 +267,9 @@ async function copyToClipboardForJitter(rawHtml) {
         var childS = parseStyleStr(child.getAttribute("style") || "");
         if (childS.position === "absolute" || childS.position === "fixed") continue;
 
-        var cw = px(childS.width) || px(childS["inline-size"]) || contentW;
+        // For horizontal flex children without explicit width, use reasonable default (not full parent width)
+        var cwExplicit = px(childS.width) || px(childS["inline-size"]);
+        var cw = cwExplicit || (isColumn ? contentW : (px(childS["min-width"]) || 100));
         var ch2 = px(childS.height) || px(childS["block-size"]) || px(childS["min-height"]) || 40;
         var hasMarginAuto = childS["margin-top"] === "auto" || childS["margin-block-start"] === "auto";
         childInfos.push({ el: child, s: childS, w: cw, h: ch2, marginAuto: hasMarginAuto });
@@ -302,13 +304,18 @@ async function copyToClipboardForJitter(rawHtml) {
         curY += (tl2._height || 24) + gap;
       } else {
         // Element child — recurse
-        var childLayers = buildLayers(info.el, curX, curY, info.w, info.h);
-        layers = layers.concat(childLayers);
-        if (isColumn || display === "block") {
-          curY += info.h + gap;
-        } else {
-          curX += info.w + gap;
+        var childMarginL = px(info.s["margin-left"]) || px(info.s["margin-inline-start"]) || 0;
+        var childPadL = px(info.s["padding-left"]) || px(info.s["padding-inline-start"]) || 0;
+        var childLayers = buildLayers(info.el, curX + childMarginL, curY, info.w, info.h);
+        if (childLayers.length > 0) {
+          layers = layers.concat(childLayers);
+          if (isColumn || display === "block") {
+            curY += info.h + gap;
+          } else {
+            curX += info.w + childMarginL + gap;
+          }
         }
+        // If no layers produced (e.g., SVG-only span), don't advance cursor
       }
     }
 
