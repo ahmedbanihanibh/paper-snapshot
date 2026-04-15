@@ -168,25 +168,68 @@ async function copyToClipboardForJitter(rawHtml) {
     return "extrabold";
   }
 
-  // Convert an element to a Jitter layer node (nested children format)
-  function buildLayer(el) {
-    if (!(el instanceof Element)) return null;
+  // Build a text layer item
+  function makeText(text, s, x, y, parentW) {
+    var fs = px(s["font-size"]) || 16;
+    var fw = parseInt(s["font-weight"]) || 400;
+    var lhRaw = s["line-height"];
+    var lh = 150;
+    if (lhRaw) { var lv = parseFloat(lhRaw); if (lv > 0) { lh = (lhRaw.indexOf("px") < 0 && lv < 10) ? lv * 100 : (lv / fs) * 100; } }
+    var ls = px(s["letter-spacing"]) || 0;
+    var maxW = px(s["max-width"] || s["max-inline-size"]);
+    var tw = maxW > 0 ? maxW : parentW;
+    // Estimate text height
+    var charsPerLine = Math.max(Math.floor(tw / (fs * 0.5)), 1);
+    var numLines = Math.ceil(text.length / charsPerLine);
+    var textH = Math.max(numLines * fs * (lh / 100), fs * 1.5);
+    var co = []; for (var oi = 0; oi < text.length; oi++) co.push(0);
+    var opacity = s.opacity ? Math.round(parseFloat(s.opacity) * 100) : 100;
+
+    return {
+      id: nanoid(),
+      item: {
+        type: "text", text: text,
+        font: { type: "googlefont", name: fontName(s["font-family"]), weight: fw, fontStyle: fontStyleName(fw) },
+        fontSize: fs, lineHeight: Math.round(lh), letterSpacing: Math.round(ls * 10) / 10,
+        textAlign: s["text-align"] || "left", verticalAlign: "top", autoResize: "height",
+        x: x, y: y, width: tw, height: Math.round(textH),
+        angle: 0, scale: 1, opacity: opacity,
+        background: true, fillColor: rgbToHex(s.color),
+        case: "normal", kerning: true, ligatures: true,
+        strokeEnabled: false, shadowEnabled: false,
+        characterStyleOverrides: co, styleOverrideTable: {}
+      },
+      _height: Math.round(textH) // estimated height for layout
+    };
+  }
+
+  // Recursively flatten element tree into positioned Jitter layers
+  // parentX/Y = absolute position of this element's content area (after padding)
+  // parentW/H = content area dimensions
+  function buildLayers(el, parentX, parentY, parentW, parentH) {
+    if (!(el instanceof Element)) return [];
     var tag = el.tagName.toLowerCase();
     var s = parseStyleStr(el.getAttribute("style") || "");
 
-    // Skip absolute/fixed positioned elements
-    if (s.position === "absolute" || s.position === "fixed") return null;
-    // Skip SVGs for now
-    if (tag === "svg") return null;
+    if (s.position === "absolute" || s.position === "fixed") return [];
+    if (tag === "svg") return [];
 
-    var w = px(s.width) || px(s["inline-size"]) || px(s["min-width"]) || 100;
-    var h = px(s.height) || px(s["block-size"]) || px(s["min-height"]) || 40;
-    var opacity = s.opacity ? Math.round(parseFloat(s.opacity) * 100) : 100;
-    var corner = px(s["border-radius"]) || px(s["border-top-left-radius"]) || 0;
-    var bgColor = s["background-color"];
-    var hasBg = bgColor && bgColor !== "rgba(0, 0, 0, 0)" && bgColor !== "transparent";
+    var padT = px(s["padding-top"]) || px(s["padding-block-start"]) || 0;
+    var padB = px(s["padding-bottom"]) || px(s["padding-block-end"]) || 0;
+    var padL = px(s["padding-left"]) || px(s["padding-inline-start"]) || 0;
+    var padR = px(s["padding-right"]) || px(s["padding-inline-end"]) || 0;
 
-    // Check if all children are inline text → merge into single text layer
+    var w = px(s.width) || px(s["inline-size"]) || parentW;
+    var h = px(s.height) || px(s["block-size"]) || px(s["min-height"]) || parentH;
+    var contentW = w - padL - padR;
+    var contentH = h - padT - padB;
+
+    var display = s.display || "block";
+    var flexDir = s["flex-direction"] || "row";
+    var isColumn = display === "flex" && flexDir === "column";
+    var gap = px(s.gap) || px(s["row-gap"]) || 0;
+
+    // Check for inline text merge
     var merged = "", allInline = true;
     for (var ci = 0; ci < el.childNodes.length; ci++) {
       var ch = el.childNodes[ci];
@@ -203,89 +246,103 @@ async function copyToClipboardForJitter(rawHtml) {
     if (!allInline) merged = "";
     if (!merged && el.children.length === 0 && el.textContent.trim()) merged = el.textContent.trim();
 
-    // Text layer
+    // If text-only, return a positioned text layer
     if (merged) {
-      var fs = px(s["font-size"]) || 16;
-      var fw = parseInt(s["font-weight"]) || 400;
-      var lhRaw = s["line-height"];
-      var lh = 150;
-      if (lhRaw) { var lv = parseFloat(lhRaw); if (lv > 0) { lh = (lhRaw.indexOf("px") < 0 && lv < 10) ? lv * 100 : (lv / fs) * 100; } }
-      var ls = px(s["letter-spacing"]) || 0;
-      var maxW = px(s["max-width"] || s["max-inline-size"]);
-      var tw = maxW > 0 ? maxW : w;
-      var co = []; for (var oi = 0; oi < merged.length; oi++) co.push(0);
-
-      return {
-        id: nanoid(),
-        item: {
-          type: "text", text: merged,
-          font: { type: "googlefont", name: fontName(s["font-family"]), weight: fw, fontStyle: fontStyleName(fw) },
-          fontSize: fs, lineHeight: Math.round(lh), letterSpacing: Math.round(ls * 10) / 10,
-          textAlign: s["text-align"] || "left", verticalAlign: "top", autoResize: "height",
-          x: 0, y: 0, width: tw, height: Math.max(fs * 2, 20),
-          angle: 0, scale: 1, opacity: opacity,
-          background: true, fillColor: rgbToHex(s.color),
-          case: "normal", kerning: true, ligatures: true,
-          strokeEnabled: false, shadowEnabled: false,
-          characterStyleOverrides: co, styleOverrideTable: {}
-        }
-      };
+      var tl = makeText(merged, s, parentX, parentY, contentW > 0 ? contentW : parentW);
+      return [tl];
     }
 
-    // Group layer
-    var children = [];
+    // Container: collect children with computed positions
+    var layers = [];
+    var curX = parentX + padL;
+    var curY = parentY + padT;
+
+    // First pass: build all children and compute sizes
+    var childInfos = [];
     for (var i = 0; i < el.childNodes.length; i++) {
       var child = el.childNodes[i];
       if (child.nodeType === 1) {
-        var layer = buildLayer(child);
-        if (layer) children.push(layer);
+        var childTag = child.tagName.toLowerCase();
+        if (childTag === "svg") continue;
+        var childS = parseStyleStr(child.getAttribute("style") || "");
+        if (childS.position === "absolute" || childS.position === "fixed") continue;
+
+        var cw = px(childS.width) || px(childS["inline-size"]) || contentW;
+        var ch2 = px(childS.height) || px(childS["block-size"]) || px(childS["min-height"]) || 40;
+        var hasMarginAuto = childS["margin-top"] === "auto" || childS["margin-block-start"] === "auto";
+        childInfos.push({ el: child, s: childS, w: cw, h: ch2, marginAuto: hasMarginAuto });
       } else if (child.nodeType === 3 && child.textContent.trim()) {
-        var txt = child.textContent.trim();
-        var pfs = px(s["font-size"]) || 16;
-        var pco = []; for (var pi = 0; pi < txt.length; pi++) pco.push(0);
-        children.push({
-          id: nanoid(),
-          item: {
-            type: "text", text: txt,
-            font: { type: "googlefont", name: fontName(s["font-family"]), weight: parseInt(s["font-weight"]) || 400, fontStyle: fontStyleName(s["font-weight"]) },
-            fontSize: pfs, lineHeight: 150, letterSpacing: 0,
-            textAlign: "left", verticalAlign: "top", autoResize: "height",
-            x: 0, y: 0, width: w, height: Math.max(pfs * 2, 20),
-            angle: 0, scale: 1, opacity: 100,
-            background: true, fillColor: rgbToHex(s.color),
-            case: "normal", kerning: true, ligatures: true,
-            strokeEnabled: false, shadowEnabled: false,
-            characterStyleOverrides: pco, styleOverrideTable: {}
-          }
-        });
+        childInfos.push({ text: child.textContent.trim(), s: s, w: contentW, h: 24 });
       }
     }
 
-    return {
-      id: nanoid(),
-      item: {
-        type: "layerGrp",
-        x: 0, y: 0, width: w, height: h,
-        cornerRadius: corner,
-        angle: 0, scale: 1, opacity: opacity,
-        name: tag,
-        background: !!hasBg,
-        fillColor: hasBg ? rgbToHex(bgColor) : "#cccccc",
-        strokeEnabled: false, shadowEnabled: false
-      },
-      children: children.length > 0 ? children : undefined
-    };
+    // For column flex with margin-top:auto, compute the auto margin
+    var totalChildH = 0;
+    var autoMarginIdx = -1;
+    for (var ci2 = 0; ci2 < childInfos.length; ci2++) {
+      if (childInfos[ci2].marginAuto) { autoMarginIdx = ci2; break; }
+      totalChildH += childInfos[ci2].h + (ci2 > 0 ? gap : 0);
+    }
+
+    // Second pass: position children
+    for (var ci3 = 0; ci3 < childInfos.length; ci3++) {
+      var info = childInfos[ci3];
+
+      // margin-top: auto pushes to bottom
+      if (info.marginAuto && isColumn) {
+        var remainingH = 0;
+        for (var ri = ci3; ri < childInfos.length; ri++) remainingH += childInfos[ri].h + (ri > ci3 ? gap : 0);
+        curY = parentY + h - padB - remainingH;
+      }
+
+      if (info.text) {
+        // Bare text node
+        var tl2 = makeText(info.text, info.s, curX, curY, contentW);
+        layers.push(tl2);
+        curY += (tl2._height || 24) + gap;
+      } else {
+        // Element child — recurse
+        var childLayers = buildLayers(info.el, curX, curY, info.w, info.h);
+        layers = layers.concat(childLayers);
+        if (isColumn || display === "block") {
+          curY += info.h + gap;
+        } else {
+          curX += info.w + gap;
+        }
+      }
+    }
+
+    return layers;
   }
 
-  // Build the layer tree from root element
-  var rootLayer = buildLayer(root);
-  if (!rootLayer) return;
-
+  // Build from root
   var rootS = parseStyleStr(root.getAttribute("style") || "");
   var artW = px(rootS.width) || px(rootS["inline-size"]) || 640;
   var artH = px(rootS.height) || px(rootS["block-size"]) || px(rootS["min-height"]) || 360;
+  var rootBg = rootS["background-color"];
+  var rootHasBg = rootBg && rootBg !== "rgba(0, 0, 0, 0)" && rootBg !== "transparent";
 
-  // Wrap in artboard with operationsTree + layersTree
+  // Flatten all layers with computed positions
+  var allLayers = buildLayers(root, 0, 0, artW, artH);
+
+  // Add background rect if root has background
+  if (rootHasBg) {
+    var corner = px(rootS["border-radius"]) || px(rootS["border-top-left-radius"]) || 0;
+    allLayers.unshift({
+      id: nanoid(),
+      item: {
+        type: "rect",
+        x: 0, y: 0, width: artW, height: artH,
+        cornerRadius: corner,
+        angle: 0, scale: 1, opacity: 100,
+        name: "Background",
+        background: true, fillColor: rgbToHex(rootBg),
+        strokeEnabled: false, shadowEnabled: false
+      }
+    });
+  }
+
+  // Wrap in artboard
   var artboard = {
     id: nanoid(),
     item: {
@@ -294,14 +351,14 @@ async function copyToClipboardForJitter(rawHtml) {
       x: 0, y: 0,
       width: artW, height: artH,
       angle: 0, scale: 1, opacity: 100,
-      background: true,
+      background: false,
       fillColor: "#ffffff",
       shadowEnabled: false,
       duration: 4000
     },
     children: [
       { id: nanoid(), item: { type: "operationsTree" } },
-      { id: nanoid(), item: { type: "layersTree" }, children: rootLayer.children || [rootLayer] }
+      { id: nanoid(), item: { type: "layersTree" }, children: allLayers }
     ]
   };
 
