@@ -102,8 +102,8 @@ async function copyToClipboardForFigma(rawHtml) {
 
 // ============================================================================
 // JITTER — Clipboard format: text/plain with JSON
-// Format: { type: "figmaPluginV2", fileName: "...", nodes: [...] }
-// Node types: layerGrp (frame/group), text, shape (vector paths)
+// Internal format: { layers: [{ id, item: {type:"artboard",...}, children }], operations: [] }
+// Nested tree with artboard root → operationsTree + layersTree → layerGrp/text/rect
 // ============================================================================
 async function copyToClipboardForJitter(rawHtml) {
   function waitForFocus() {
@@ -112,284 +112,201 @@ async function copyToClipboardForJitter(rawHtml) {
   }
   await waitForFocus();
 
-  // Parse the HTML into a DOM tree
   const parser = new DOMParser();
   const doc = parser.parseFromString(rawHtml, "text/html");
   const root = doc.body.firstElementChild;
   if (!root) return;
 
-  var nodeCounter = 0;
-  var nodes = [];
-  // Generate a random file key like Figma uses
-  var fileKey = Array.from(crypto.getRandomValues(new Uint8Array(12))).map(function(b) { return b.toString(36); }).join("").slice(0, 22);
-
-  var lastFigmaId = "";
-  function genId() {
-    nodeCounter++;
-    // Figma-style ID: fileKey:pageNum:nodeNum
-    lastFigmaId = nodeCounter + ":" + (nodeCounter * 10);
-    return fileKey + ":" + lastFigmaId;
+  // Nanoid-style random ID generator (21 chars)
+  function nanoid() {
+    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+    var id = "";
+    var bytes = crypto.getRandomValues(new Uint8Array(21));
+    for (var i = 0; i < 21; i++) id += chars[bytes[i] % 64];
+    return id;
   }
 
-  function parseStyleStr(styleStr) {
-    var styles = {};
-    if (!styleStr) return styles;
-    styleStr.split(";").forEach(function(part) {
-      var idx = part.indexOf(":");
-      if (idx < 0) return;
-      var name = part.slice(0, idx).trim();
-      var val = part.slice(idx + 1).trim();
-      if (name) styles[name] = val;
+  function parseStyleStr(str) {
+    var s = {};
+    if (!str) return s;
+    str.split(";").forEach(function(p) {
+      var i = p.indexOf(":"); if (i < 0) return;
+      var k = p.slice(0, i).trim(), v = p.slice(i + 1).trim();
+      if (k) s[k] = v;
     });
-    return styles;
+    return s;
   }
 
-  function pxVal(val) {
-    if (!val) return 0;
-    if (typeof val === "string" && val.indexOf("%") >= 0) return 0;
-    return parseFloat(val) || 0;
+  function px(v) {
+    if (!v) return 0;
+    if (typeof v === "string" && v.indexOf("%") >= 0) return 0;
+    return parseFloat(v) || 0;
   }
 
-  function rgbToHex(colorStr) {
-    if (!colorStr) return null;
-    var m = colorStr.match(/rgba?\(\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)/);
-    if (m) {
-      var r = Math.round(parseFloat(m[1]));
-      var g = Math.round(parseFloat(m[2]));
-      var b = Math.round(parseFloat(m[3]));
-      return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-    }
-    if (colorStr.startsWith("#")) return colorStr;
-    return null;
+  function rgbToHex(c) {
+    if (!c) return "#000000";
+    var m = c.match(/rgba?\(\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)/);
+    if (m) return "#" + ((1 << 24) + (Math.round(+m[1]) << 16) + (Math.round(+m[2]) << 8) + Math.round(+m[3])).toString(16).slice(1);
+    if (c.startsWith("#")) return c;
+    return "#000000";
   }
 
-  function extractFontName(fontFamily) {
-    if (!fontFamily) return "Inter";
-    var first = fontFamily.split(",")[0].trim().replace(/['"]/g, "");
-    // Strip " Variable" suffix
-    first = first.replace(/ Variable$/i, "");
-    // Map system fonts to Inter
-    var systemFonts = ["-apple-system", "BlinkMacSystemFont", "system-ui", "Segoe UI", "SF Pro Display"];
-    if (systemFonts.indexOf(first) >= 0) return "Inter";
-    return first;
+  function fontName(ff) {
+    if (!ff) return "Inter";
+    var f = ff.split(",")[0].trim().replace(/['"]/g, "").replace(/ Variable$/i, "");
+    if (["-apple-system","BlinkMacSystemFont","system-ui","Segoe UI","SF Pro Display"].indexOf(f) >= 0) return "Inter";
+    return f;
   }
 
-  function fontWeightNum(w) {
-    if (!w) return 400;
-    var n = parseInt(w);
-    return isNaN(n) ? 400 : n;
+  function fontStyleName(w) {
+    var n = parseInt(w) || 400;
+    if (n <= 300) return "light";
+    if (n <= 400) return "regular";
+    if (n <= 500) return "medium";
+    if (n <= 600) return "semibold";
+    if (n <= 700) return "bold";
+    return "extrabold";
   }
 
-  function processElement(el, parentId, indexCounter) {
-    if (!(el instanceof Element)) return;
-
+  // Convert an element to a Jitter layer node (nested children format)
+  function buildLayer(el) {
+    if (!(el instanceof Element)) return null;
     var tag = el.tagName.toLowerCase();
     var s = parseStyleStr(el.getAttribute("style") || "");
-    var id = genId();
-    var idx = "a" + indexCounter;
 
-    // Skip position:absolute/fixed elements for now (decorative overlays)
-    if (s.position === "absolute" || s.position === "fixed") return;
+    // Skip absolute/fixed positioned elements
+    if (s.position === "absolute" || s.position === "fixed") return null;
+    // Skip SVGs for now
+    if (tag === "svg") return null;
 
-    var w = pxVal(s.width) || pxVal(s["inline-size"]) || pxVal(s["min-width"]) || 100;
-    var h = pxVal(s.height) || pxVal(s["block-size"]) || pxVal(s["min-height"]) || 40;
-    var x = 0;
-    var y = 0;
+    var w = px(s.width) || px(s["inline-size"]) || px(s["min-width"]) || 100;
+    var h = px(s.height) || px(s["block-size"]) || px(s["min-height"]) || 40;
     var opacity = s.opacity ? Math.round(parseFloat(s.opacity) * 100) : 100;
-    var cornerRadius = pxVal(s["border-radius"]) || pxVal(s["border-top-left-radius"]) || 0;
-
-    // Background color
+    var corner = px(s["border-radius"]) || px(s["border-top-left-radius"]) || 0;
     var bgColor = s["background-color"];
     var hasBg = bgColor && bgColor !== "rgba(0, 0, 0, 0)" && bgColor !== "transparent";
-    var fillColor = hasBg ? rgbToHex(bgColor) : null;
 
-    // SVG element
-    if (tag === "svg") {
-      // SVGs become layerGrp with vector children — skip for now, too complex
-      // Jitter can import SVG paths but we'd need to normalize coordinates
-      return;
-    }
-
-    // Check if text-only element
-    var textContent = "";
-    var isTextOnly = false;
-
-    // Check if all children are inline text
-    var allInline = true;
-    var mergedText = "";
+    // Check if all children are inline text → merge into single text layer
+    var merged = "", allInline = true;
     for (var ci = 0; ci < el.childNodes.length; ci++) {
-      var child = el.childNodes[ci];
-      if (child.nodeType === 3) { // TEXT_NODE
-        var t = child.textContent.trim();
-        if (t) mergedText += t;
-      } else if (child.nodeType === 1) { // ELEMENT_NODE
-        var childS = parseStyleStr(child.getAttribute("style") || "");
-        var childTag = child.tagName.toLowerCase();
-        var childDisplay = childS.display || "";
-        var isInlineTag = childTag === "span" || childTag === "a" || childTag === "strong" || childTag === "em" || childTag === "b" || childTag === "i";
-        var isBlockDisplay = childDisplay === "block" || childDisplay === "flex" || childDisplay === "grid";
-        if (isInlineTag && !isBlockDisplay && child.children.length === 0 && child.textContent.trim()) {
-          mergedText += child.textContent.trim();
-        } else if (childTag === "svg") {
-          allInline = false;
-          break;
-        } else {
-          allInline = false;
-          break;
-        }
+      var ch = el.childNodes[ci];
+      if (ch.nodeType === 3) { if (ch.textContent.trim()) merged += ch.textContent.trim(); }
+      else if (ch.nodeType === 1) {
+        var cs = parseStyleStr(ch.getAttribute("style") || "");
+        var ct = ch.tagName.toLowerCase();
+        var isInl = ["span","a","strong","em","b","i"].indexOf(ct) >= 0;
+        var isBlk = ["block","flex","grid"].indexOf(cs.display || "") >= 0;
+        if (isInl && !isBlk && ch.children.length === 0 && ch.textContent.trim()) { merged += ch.textContent.trim(); }
+        else { allInline = false; break; }
       }
     }
+    if (!allInline) merged = "";
+    if (!merged && el.children.length === 0 && el.textContent.trim()) merged = el.textContent.trim();
 
-    if (allInline && mergedText) {
-      isTextOnly = true;
-      textContent = mergedText;
-    } else if (el.children.length === 0 && el.textContent.trim()) {
-      isTextOnly = true;
-      textContent = el.textContent.trim();
-    }
-
-    if (isTextOnly && textContent) {
-      // Create text node
-      var fontSize = pxVal(s["font-size"]) || 16;
-      var textColor = rgbToHex(s.color) || "#000000";
-      var fontName = extractFontName(s["font-family"]);
-      var fontWeight = fontWeightNum(s["font-weight"]);
-      var lineHeight = 0;
+    // Text layer
+    if (merged) {
+      var fs = px(s["font-size"]) || 16;
+      var fw = parseInt(s["font-weight"]) || 400;
       var lhRaw = s["line-height"];
-      if (lhRaw) {
-        var lhVal = parseFloat(lhRaw);
-        if (lhVal > 0) {
-          if (lhRaw.indexOf("px") < 0 && lhVal < 10) {
-            lineHeight = lhVal * 100; // Jitter uses percentage (112.5 = 112.5%)
-          } else {
-            lineHeight = (lhVal / fontSize) * 100;
-          }
-        }
-      }
-      var letterSpacing = pxVal(s["letter-spacing"]) || 0;
-      // Jitter letterSpacing is in percentage of fontSize
-      var lsPercent = fontSize > 0 ? (letterSpacing / fontSize) * 100 : 0;
-      var textAlign = s["text-align"] || "left";
-      var maxW = pxVal(s["max-width"] || s["max-inline-size"]);
-      var textW = maxW > 0 ? maxW : w;
+      var lh = 150;
+      if (lhRaw) { var lv = parseFloat(lhRaw); if (lv > 0) { lh = (lhRaw.indexOf("px") < 0 && lv < 10) ? lv * 100 : (lv / fs) * 100; } }
+      var ls = px(s["letter-spacing"]) || 0;
+      var maxW = px(s["max-width"] || s["max-inline-size"]);
+      var tw = maxW > 0 ? maxW : w;
+      var co = []; for (var oi = 0; oi < merged.length; oi++) co.push(0);
 
-      // Estimate height from text
-      var charsPerLine = Math.max(Math.floor(textW / (fontSize * 0.55)), 1);
-      var numLines = Math.ceil(textContent.length / charsPerLine);
-      var textH = numLines * fontSize * (lineHeight / 100 || 1.5);
-
-      var charOverrides = [];
-      for (var oi = 0; oi < textContent.length; oi++) charOverrides.push(0);
-
-      nodes.push({
-        id: id,
+      return {
+        id: nanoid(),
         item: {
-          type: "text",
-          name: tag,
-          figmaId: lastFigmaId,
-          x: x, y: y,
-          width: textW, height: Math.max(textH, 20),
-          angle: 0, scale: 1,
-          background: true,
-          fillColor: textColor,
-          strokeEnabled: false,
-          shadowEnabled: false,
-          opacity: opacity,
-          isHidden: false, isLocked: false,
-          font: { type: "googlefont", name: fontName, weight: fontWeight },
-          fontSize: fontSize,
-          textAlign: textAlign,
-          verticalAlign: "top",
-          autoResize: "height",
-          case: "normal",
-          kerning: true,
-          ligatures: true,
-          lineHeight: lineHeight || 150,
-          letterSpacing: lsPercent,
-          characterStyleOverrides: charOverrides,
-          styleOverrideTable: {},
-          text: textContent
-        },
-        position: { parentId: parentId, index: idx }
-      });
-      return;
+          type: "text", text: merged,
+          font: { type: "googlefont", name: fontName(s["font-family"]), weight: fw, fontStyle: fontStyleName(fw) },
+          fontSize: fs, lineHeight: Math.round(lh), letterSpacing: Math.round(ls * 10) / 10,
+          textAlign: s["text-align"] || "left", verticalAlign: "top", autoResize: "height",
+          x: 0, y: 0, width: tw, height: Math.max(fs * 2, 20),
+          angle: 0, scale: 1, opacity: opacity,
+          background: true, fillColor: rgbToHex(s.color),
+          case: "normal", kerning: true, ligatures: true,
+          strokeEnabled: false, shadowEnabled: false,
+          characterStyleOverrides: co, styleOverrideTable: {}
+        }
+      };
     }
 
-    // Container element → layerGrp
-    var grpItem = {
-      type: "layerGrp",
-      name: tag,
-      figmaId: lastFigmaId,
-      x: x, y: y,
-      width: w, height: h,
-      angle: 0, scale: 1,
-      background: !!hasBg,
-      strokeEnabled: false,
-      shadowEnabled: false,
-      opacity: opacity,
-      isHidden: false, isLocked: false,
-      cornerRadius: cornerRadius,
-      clipsContent: true
-    };
-    if (hasBg && fillColor) grpItem.fillColor = fillColor;
-    nodes.push({ id: id, item: grpItem, position: { parentId: parentId, index: idx } });
-
-    // Recurse children
-    var childIdx = 0;
-    for (var i = 0; i < el.children.length; i++) {
-      processElement(el.children[i], id, childIdx);
-      childIdx++;
-    }
-    // Also check for text nodes among children
-    for (var ti = 0; ti < el.childNodes.length; ti++) {
-      var textNode = el.childNodes[ti];
-      if (textNode.nodeType === 3 && textNode.textContent.trim()) {
-        var textId = genId();
-        var text = textNode.textContent.trim();
-        var pFontSize = pxVal(s["font-size"]) || 16;
-        var pColor = rgbToHex(s.color) || "#000000";
-        var co = [];
-        for (var coi = 0; coi < text.length; coi++) co.push(0);
-        nodes.push({
-          id: textId,
+    // Group layer
+    var children = [];
+    for (var i = 0; i < el.childNodes.length; i++) {
+      var child = el.childNodes[i];
+      if (child.nodeType === 1) {
+        var layer = buildLayer(child);
+        if (layer) children.push(layer);
+      } else if (child.nodeType === 3 && child.textContent.trim()) {
+        var txt = child.textContent.trim();
+        var pfs = px(s["font-size"]) || 16;
+        var pco = []; for (var pi = 0; pi < txt.length; pi++) pco.push(0);
+        children.push({
+          id: nanoid(),
           item: {
-            type: "text",
-            name: "text",
-            figmaId: textId.split(":").pop(),
-            x: 0, y: 0,
-            width: w, height: Math.max(pFontSize * 1.5, 20),
-            angle: 0, scale: 1,
-            background: true,
-            fillColor: pColor,
+            type: "text", text: txt,
+            font: { type: "googlefont", name: fontName(s["font-family"]), weight: parseInt(s["font-weight"]) || 400, fontStyle: fontStyleName(s["font-weight"]) },
+            fontSize: pfs, lineHeight: 150, letterSpacing: 0,
+            textAlign: "left", verticalAlign: "top", autoResize: "height",
+            x: 0, y: 0, width: w, height: Math.max(pfs * 2, 20),
+            angle: 0, scale: 1, opacity: 100,
+            background: true, fillColor: rgbToHex(s.color),
+            case: "normal", kerning: true, ligatures: true,
             strokeEnabled: false, shadowEnabled: false,
-            opacity: 100, isHidden: false, isLocked: false,
-            font: { type: "googlefont", name: extractFontName(s["font-family"]), weight: fontWeightNum(s["font-weight"]) },
-            fontSize: pFontSize,
-            textAlign: "left", verticalAlign: "top",
-            autoResize: "height", case: "normal",
-            kerning: true, ligatures: true,
-            lineHeight: 150, letterSpacing: 0,
-            characterStyleOverrides: co,
-            styleOverrideTable: {},
-            text: text
-          },
-          position: { parentId: id, index: "a" + childIdx }
+            characterStyleOverrides: pco, styleOverrideTable: {}
+          }
         });
-        childIdx++;
       }
     }
+
+    return {
+      id: nanoid(),
+      item: {
+        type: "layerGrp",
+        x: 0, y: 0, width: w, height: h,
+        cornerRadius: corner,
+        angle: 0, scale: 1, opacity: opacity,
+        name: tag,
+        background: !!hasBg,
+        fillColor: hasBg ? rgbToHex(bgColor) : "#cccccc",
+        strokeEnabled: false, shadowEnabled: false
+      },
+      children: children.length > 0 ? children : undefined
+    };
   }
 
-  processElement(root, null, 0);
+  // Build the layer tree from root element
+  var rootLayer = buildLayer(root);
+  if (!rootLayer) return;
 
-  var jitterPayload = JSON.stringify({
-    type: "figmaPluginV2",
-    fileName: "UI2Code Snapshot",
-    nodes: nodes
-  });
+  var rootS = parseStyleStr(root.getAttribute("style") || "");
+  var artW = px(rootS.width) || px(rootS["inline-size"]) || 640;
+  var artH = px(rootS.height) || px(rootS["block-size"]) || px(rootS["min-height"]) || 360;
 
-  // Jitter reads from text/plain
-  await navigator.clipboard.writeText(jitterPayload);
+  // Wrap in artboard with operationsTree + layersTree
+  var artboard = {
+    id: nanoid(),
+    item: {
+      type: "artboard",
+      name: "UI2Code Scene",
+      x: 0, y: 0,
+      width: artW, height: artH,
+      angle: 0, scale: 1, opacity: 100,
+      background: true,
+      fillColor: "#ffffff",
+      shadowEnabled: false,
+      duration: 4000
+    },
+    children: [
+      { id: nanoid(), item: { type: "operationsTree" } },
+      { id: nanoid(), item: { type: "layersTree" }, children: rootLayer.children || [rootLayer] }
+    ]
+  };
+
+  var payload = JSON.stringify({ layers: [artboard], operations: [] });
+  await navigator.clipboard.writeText(payload);
 }
 
 // ============================================================================
