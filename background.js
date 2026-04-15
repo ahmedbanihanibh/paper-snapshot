@@ -101,6 +101,296 @@ async function copyToClipboardForFigma(rawHtml) {
 }
 
 // ============================================================================
+// JITTER — Clipboard format: text/plain with JSON
+// Format: { type: "figmaPluginV2", fileName: "...", nodes: [...] }
+// Node types: layerGrp (frame/group), text, shape (vector paths)
+// ============================================================================
+async function copyToClipboardForJitter(rawHtml) {
+  function waitForFocus() {
+    if (document.hasFocus()) return Promise.resolve();
+    return new Promise(resolve => window.addEventListener("focus", resolve, { once: true }));
+  }
+  await waitForFocus();
+
+  // Parse the HTML into a DOM tree
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(rawHtml, "text/html");
+  const root = doc.body.firstElementChild;
+  if (!root) return;
+
+  var nodeCounter = 0;
+  var nodes = [];
+
+  function genId() {
+    nodeCounter++;
+    return "ui2code_" + nodeCounter + ":" + nodeCounter;
+  }
+
+  function parseStyleStr(styleStr) {
+    var styles = {};
+    if (!styleStr) return styles;
+    styleStr.split(";").forEach(function(part) {
+      var idx = part.indexOf(":");
+      if (idx < 0) return;
+      var name = part.slice(0, idx).trim();
+      var val = part.slice(idx + 1).trim();
+      if (name) styles[name] = val;
+    });
+    return styles;
+  }
+
+  function pxVal(val) {
+    if (!val) return 0;
+    if (typeof val === "string" && val.indexOf("%") >= 0) return 0;
+    return parseFloat(val) || 0;
+  }
+
+  function rgbToHex(colorStr) {
+    if (!colorStr) return null;
+    var m = colorStr.match(/rgba?\(\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)/);
+    if (m) {
+      var r = Math.round(parseFloat(m[1]));
+      var g = Math.round(parseFloat(m[2]));
+      var b = Math.round(parseFloat(m[3]));
+      return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+    if (colorStr.startsWith("#")) return colorStr;
+    return null;
+  }
+
+  function extractFontName(fontFamily) {
+    if (!fontFamily) return "Inter";
+    var first = fontFamily.split(",")[0].trim().replace(/['"]/g, "");
+    // Strip " Variable" suffix
+    first = first.replace(/ Variable$/i, "");
+    // Map system fonts to Inter
+    var systemFonts = ["-apple-system", "BlinkMacSystemFont", "system-ui", "Segoe UI", "SF Pro Display"];
+    if (systemFonts.indexOf(first) >= 0) return "Inter";
+    return first;
+  }
+
+  function fontWeightNum(w) {
+    if (!w) return 400;
+    var n = parseInt(w);
+    return isNaN(n) ? 400 : n;
+  }
+
+  function processElement(el, parentId, indexCounter) {
+    if (!(el instanceof Element)) return;
+
+    var tag = el.tagName.toLowerCase();
+    var s = parseStyleStr(el.getAttribute("style") || "");
+    var id = genId();
+    var idx = "a" + indexCounter;
+
+    // Skip position:absolute/fixed elements for now (decorative overlays)
+    if (s.position === "absolute" || s.position === "fixed") return;
+
+    var w = pxVal(s.width) || pxVal(s["inline-size"]) || pxVal(s["min-width"]) || 100;
+    var h = pxVal(s.height) || pxVal(s["block-size"]) || pxVal(s["min-height"]) || 40;
+    var x = 0;
+    var y = 0;
+    var opacity = s.opacity ? Math.round(parseFloat(s.opacity) * 100) : 100;
+    var cornerRadius = pxVal(s["border-radius"]) || pxVal(s["border-top-left-radius"]) || 0;
+
+    // Background color
+    var bgColor = s["background-color"];
+    var hasBg = bgColor && bgColor !== "rgba(0, 0, 0, 0)" && bgColor !== "transparent";
+    var fillColor = hasBg ? rgbToHex(bgColor) : null;
+
+    // SVG element
+    if (tag === "svg") {
+      // SVGs become layerGrp with vector children — skip for now, too complex
+      // Jitter can import SVG paths but we'd need to normalize coordinates
+      return;
+    }
+
+    // Check if text-only element
+    var textContent = "";
+    var isTextOnly = false;
+
+    // Check if all children are inline text
+    var allInline = true;
+    var mergedText = "";
+    for (var ci = 0; ci < el.childNodes.length; ci++) {
+      var child = el.childNodes[ci];
+      if (child.nodeType === 3) { // TEXT_NODE
+        var t = child.textContent.trim();
+        if (t) mergedText += t;
+      } else if (child.nodeType === 1) { // ELEMENT_NODE
+        var childS = parseStyleStr(child.getAttribute("style") || "");
+        var childTag = child.tagName.toLowerCase();
+        var childDisplay = childS.display || "";
+        var isInlineTag = childTag === "span" || childTag === "a" || childTag === "strong" || childTag === "em" || childTag === "b" || childTag === "i";
+        var isBlockDisplay = childDisplay === "block" || childDisplay === "flex" || childDisplay === "grid";
+        if (isInlineTag && !isBlockDisplay && child.children.length === 0 && child.textContent.trim()) {
+          mergedText += child.textContent.trim();
+        } else if (childTag === "svg") {
+          allInline = false;
+          break;
+        } else {
+          allInline = false;
+          break;
+        }
+      }
+    }
+
+    if (allInline && mergedText) {
+      isTextOnly = true;
+      textContent = mergedText;
+    } else if (el.children.length === 0 && el.textContent.trim()) {
+      isTextOnly = true;
+      textContent = el.textContent.trim();
+    }
+
+    if (isTextOnly && textContent) {
+      // Create text node
+      var fontSize = pxVal(s["font-size"]) || 16;
+      var textColor = rgbToHex(s.color) || "#000000";
+      var fontName = extractFontName(s["font-family"]);
+      var fontWeight = fontWeightNum(s["font-weight"]);
+      var lineHeight = 0;
+      var lhRaw = s["line-height"];
+      if (lhRaw) {
+        var lhVal = parseFloat(lhRaw);
+        if (lhVal > 0) {
+          if (lhRaw.indexOf("px") < 0 && lhVal < 10) {
+            lineHeight = lhVal * 100; // Jitter uses percentage (112.5 = 112.5%)
+          } else {
+            lineHeight = (lhVal / fontSize) * 100;
+          }
+        }
+      }
+      var letterSpacing = pxVal(s["letter-spacing"]) || 0;
+      // Jitter letterSpacing is in percentage of fontSize
+      var lsPercent = fontSize > 0 ? (letterSpacing / fontSize) * 100 : 0;
+      var textAlign = s["text-align"] || "left";
+      var maxW = pxVal(s["max-width"] || s["max-inline-size"]);
+      var textW = maxW > 0 ? maxW : w;
+
+      // Estimate height from text
+      var charsPerLine = Math.max(Math.floor(textW / (fontSize * 0.55)), 1);
+      var numLines = Math.ceil(textContent.length / charsPerLine);
+      var textH = numLines * fontSize * (lineHeight / 100 || 1.5);
+
+      var charOverrides = [];
+      for (var oi = 0; oi < textContent.length; oi++) charOverrides.push(0);
+
+      nodes.push({
+        id: id,
+        item: {
+          type: "text",
+          name: tag,
+          figmaId: id.split(":").pop(),
+          x: x, y: y,
+          width: textW, height: Math.max(textH, 20),
+          angle: 0, scale: 1,
+          background: true,
+          fillColor: textColor,
+          strokeEnabled: false,
+          shadowEnabled: false,
+          opacity: opacity,
+          isHidden: false, isLocked: false,
+          font: { type: "googlefont", name: fontName, weight: fontWeight },
+          fontSize: fontSize,
+          textAlign: textAlign,
+          verticalAlign: "top",
+          autoResize: "height",
+          case: "normal",
+          kerning: true,
+          ligatures: true,
+          lineHeight: lineHeight || 150,
+          letterSpacing: lsPercent,
+          characterStyleOverrides: charOverrides,
+          styleOverrideTable: {},
+          text: textContent
+        },
+        position: { parentId: parentId, index: idx }
+      });
+      return;
+    }
+
+    // Container element → layerGrp
+    nodes.push({
+      id: id,
+      item: {
+        type: "layerGrp",
+        name: tag,
+        figmaId: id.split(":").pop(),
+        x: x, y: y,
+        width: w, height: h,
+        angle: 0, scale: 1,
+        background: hasBg,
+        fillColor: fillColor,
+        strokeEnabled: false,
+        shadowEnabled: false,
+        opacity: opacity,
+        isHidden: false, isLocked: false,
+        cornerRadius: cornerRadius,
+        clipsContent: true
+      },
+      position: { parentId: parentId, index: idx }
+    });
+
+    // Recurse children
+    var childIdx = 0;
+    for (var i = 0; i < el.children.length; i++) {
+      processElement(el.children[i], id, childIdx);
+      childIdx++;
+    }
+    // Also check for text nodes among children
+    for (var ti = 0; ti < el.childNodes.length; ti++) {
+      var textNode = el.childNodes[ti];
+      if (textNode.nodeType === 3 && textNode.textContent.trim()) {
+        var textId = genId();
+        var text = textNode.textContent.trim();
+        var pFontSize = pxVal(s["font-size"]) || 16;
+        var pColor = rgbToHex(s.color) || "#000000";
+        var co = [];
+        for (var coi = 0; coi < text.length; coi++) co.push(0);
+        nodes.push({
+          id: textId,
+          item: {
+            type: "text",
+            name: "text",
+            figmaId: textId.split(":").pop(),
+            x: 0, y: 0,
+            width: w, height: Math.max(pFontSize * 1.5, 20),
+            angle: 0, scale: 1,
+            background: true,
+            fillColor: pColor,
+            strokeEnabled: false, shadowEnabled: false,
+            opacity: 100, isHidden: false, isLocked: false,
+            font: { type: "googlefont", name: extractFontName(s["font-family"]), weight: fontWeightNum(s["font-weight"]) },
+            fontSize: pFontSize,
+            textAlign: "left", verticalAlign: "top",
+            autoResize: "height", case: "normal",
+            kerning: true, ligatures: true,
+            lineHeight: 150, letterSpacing: 0,
+            characterStyleOverrides: co,
+            styleOverrideTable: {},
+            text: text
+          },
+          position: { parentId: id, index: "a" + childIdx }
+        });
+        childIdx++;
+      }
+    }
+  }
+
+  processElement(root, null, 0);
+
+  var jitterPayload = JSON.stringify({
+    type: "figmaPluginV2",
+    fileName: "UI2Code Snapshot",
+    nodes: nodes
+  });
+
+  // Jitter reads from text/plain
+  await navigator.clipboard.writeText(jitterPayload);
+}
+
+// ============================================================================
 // LOTTIELAB — Clipboard format: <div id="lottielab-paste">
 //   <span id="layers" data-contents="URL_ENCODED_JSON"></span>
 // </div>
@@ -1763,6 +2053,13 @@ function showPreview(html, jsxCode) {
     // copyLottielabBtn.onmouseenter = () => { copyLottielabBtn.style.background = "rgba(255,255,255,0.14)"; copyLottielabBtn.style.color = "rgba(255,255,255,0.9)"; };
     // copyLottielabBtn.onmouseleave = () => { copyLottielabBtn.style.background = "rgba(255,255,255,0.08)"; copyLottielabBtn.style.color = "rgba(255,255,255,0.7)"; };
 
+    const copyJitterBtn = document.createElement("button");
+    Object.assign(copyJitterBtn.style, { background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "12px", fontWeight: "500", padding: "6px 12px", fontFamily: "inherit", transition: "all 150ms ease" });
+    copyJitterBtn.textContent = "Copy for Jitter";
+    copyJitterBtn.title = "Copy as Jitter layers (paste into timeline with Cmd+V)";
+    copyJitterBtn.onmouseenter = () => { copyJitterBtn.style.background = "rgba(255,255,255,0.14)"; copyJitterBtn.style.color = "rgba(255,255,255,0.9)"; };
+    copyJitterBtn.onmouseleave = () => { copyJitterBtn.style.background = "rgba(255,255,255,0.08)"; copyJitterBtn.style.color = "rgba(255,255,255,0.7)"; };
+
     const copyRawBtn = document.createElement("button");
     Object.assign(copyRawBtn.style, { background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "12px", fontWeight: "500", padding: "6px 12px", fontFamily: "inherit", transition: "all 150ms ease" });
     copyRawBtn.textContent = "Copy React CSS";
@@ -1777,7 +2074,7 @@ function showPreview(html, jsxCode) {
     copyAIBtn.onmouseenter = () => { copyAIBtn.style.background = "#818cf8"; };
     copyAIBtn.onmouseleave = () => { copyAIBtn.style.background = "#6366f1"; };
 
-    headerRight.append(sizeLabel, cancelBtn, copyPaperBtn, copyOpenPencilBtn, copyFigmaBtn, /* copyLottielabBtn, */ copyRawBtn, copyAIBtn);
+    headerRight.append(sizeLabel, cancelBtn, copyPaperBtn, copyOpenPencilBtn, copyFigmaBtn, copyJitterBtn, /* copyLottielabBtn, */ copyRawBtn, copyAIBtn);
     header.append(title, headerRight);
 
     // Toolbar with zoom controls
@@ -1925,6 +2222,7 @@ function showPreview(html, jsxCode) {
     copyPaperBtn.addEventListener("click", () => close("copy-paper"));
     copyOpenPencilBtn.addEventListener("click", () => close("copy-openpencil"));
     copyFigmaBtn.addEventListener("click", () => close("copy-figma"));
+    copyJitterBtn.addEventListener("click", () => close("copy-jitter"));
     // copyLottielabBtn.addEventListener("click", () => close("copy-lottielab"));
     copyRawBtn.addEventListener("click", () => close("copy-raw"));
     copyAIBtn.addEventListener("click", () => close("copy-ai"));
@@ -2063,6 +2361,17 @@ chrome.action.onClicked.addListener(async (tab) => {
                   target: { tabId: tab.id },
                   func: showToast,
                   args: ["Copied as SVG for Figma! Paste into canvas with Cmd+V."],
+                });
+              } else if (action === "copy-jitter") {
+                await chrome.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  func: copyToClipboardForJitter,
+                  args: [serializationResult.rawHtml],
+                });
+                await chrome.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  func: showToast,
+                  args: ["Copied for Jitter! Paste into timeline with Cmd+V."],
                 });
               } else if (action === "copy-lottielab") {
                 await chrome.scripting.executeScript({
