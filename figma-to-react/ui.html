@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+    margin: 0;
+    padding: 12px;
+    font-size: 12px;
+    color: #222;
+    background: #fff;
+  }
+  h1 { font-size: 13px; margin: 0 0 4px 0; }
+  p.hint { margin: 0 0 12px 0; color: #666; }
+  .row { display: flex; gap: 8px; margin-bottom: 10px; }
+  button {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    background: #18a0fb;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  button.secondary { background: #f5f5f5; color: #222; }
+  button:disabled { opacity: 0.5; cursor: default; }
+
+  .tabs {
+    display: flex; gap: 4px; border-bottom: 1px solid #eee; margin-bottom: 8px;
+    overflow-x: auto; overflow-y: hidden; white-space: nowrap;
+    scrollbar-width: thin;
+  }
+  .tabs::-webkit-scrollbar { height: 4px; }
+  .tabs::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+  .tab {
+    padding: 6px 10px; border: none; background: transparent;
+    color: #666; cursor: pointer; font-size: 11px;
+    border-bottom: 2px solid transparent; border-radius: 0; flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  .tab.active { color: #18a0fb; border-bottom-color: #18a0fb; }
+
+  .modeTabs { display: flex; gap: 0; margin-bottom: 8px; background: #f0f0f0; border-radius: 6px; padding: 2px; }
+  .modeTab {
+    flex: 1; padding: 5px 8px; border: none; background: transparent;
+    color: #555; cursor: pointer; font-size: 11px; border-radius: 4px; font-weight: 500;
+  }
+  .modeTab.active { background: #fff; color: #222; box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+
+  pre {
+    background: #f6f8fa; border: 1px solid #e5e7eb; border-radius: 6px;
+    padding: 10px; font-size: 11px; line-height: 1.4; overflow: auto;
+    height: 360px; margin: 0; white-space: pre;
+  }
+  #previewWrap {
+    border: 1px solid #333; border-radius: 6px; height: 360px;
+    display: flex; flex-direction: column; background: #262626; position: relative;
+  }
+  #previewToolbar {
+    display: flex; align-items: center; gap: 6px; padding: 4px 8px;
+    border-bottom: 1px solid #333; background: #1f1f1f; font-size: 11px; color: #bbb;
+    flex: 0 0 auto;
+  }
+  #previewToolbar button {
+    flex: 0 0 auto; padding: 2px 8px; font-size: 11px; font-weight: 500;
+    background: #2f2f2f; color: #eee; border: 1px solid #3a3a3a; border-radius: 4px;
+  }
+  #previewToolbar .zoomLabel { min-width: 44px; text-align: center; font-variant-numeric: tabular-nums; }
+  #previewScroll { flex: 1 1 auto; overflow: auto; background: #262626; }
+  #previewFrame { border: 0; display: block; background: transparent; transform-origin: 0 0; }
+  .status { font-size: 11px; color: #666; margin: 8px 0; min-height: 14px; }
+  .status.error { color: #d73a49; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+  <h1>Figma → React Exporter</h1>
+  <p class="hint">Select a frame (or nothing to export all page frames), then click Export.</p>
+
+  <div class="row">
+    <button id="export">Export selection</button>
+    <button id="copy" class="secondary">Copy</button>
+    <button id="download" class="secondary">Download .tsx</button>
+  </div>
+
+  <div class="row" style="gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:10px;">
+    <label style="font-size:11px; color:#555; display:flex; align-items:center; gap:6px;">
+      Parse mode:
+      <select id="parseMode" style="font-size:11px; padding:3px 6px; border:1px solid #ddd; border-radius:4px;">
+        <option value="flatten" selected>Flatten to SVG (one inline SVG per selection) — recommended</option>
+        <option value="smart">Smart (SVG for atoms, structured for layouts)</option>
+        <option value="structured">Fully structured (walk everything)</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="modeTabs">
+    <button class="modeTab active" data-mode="code">Code</button>
+    <button class="modeTab" data-mode="preview">Preview</button>
+  </div>
+
+  <pre id="out">// Exported component will appear here.</pre>
+  <div id="previewWrap" class="hidden">
+    <div id="previewToolbar">
+      <button id="zoomOut" title="Zoom out">−</button>
+      <span class="zoomLabel" id="zoomLabel">100%</span>
+      <button id="zoomIn" title="Zoom in">+</button>
+      <button id="zoomFit" title="Fit to width">Fit</button>
+      <button id="zoom100" title="Actual size">1:1</button>
+      <button id="clipToggle" title="Toggle Figma's Clip content on the root frame">Clip: off</button>
+      <span style="margin-left:auto" id="dims"></span>
+    </div>
+    <div id="previewScroll">
+      <iframe id="previewFrame" sandbox="allow-same-origin"></iframe>
+    </div>
+  </div>
+
+  <div class="status" id="status">Ready.</div>
+
+<script>
+  const out = document.getElementById("out");
+  const previewWrap = document.getElementById("previewWrap");
+  const previewFrame = document.getElementById("previewFrame");
+  const previewScroll = document.getElementById("previewScroll");
+  const zoomLabel = document.getElementById("zoomLabel");
+  const dimsEl = document.getElementById("dims");
+  const statusEl = document.getElementById("status");
+  const tabsEl = document.getElementById("tabs");
+  let components = [];
+  let activeIdx = 0;
+  let mode = "code";
+  let zoom = 1;
+  let userZoomed = false;
+  let clipRoot = false; // preview shows full design by default so off-frame content is visible
+
+  function setStatus(msg, isError) {
+    statusEl.textContent = msg;
+    statusEl.className = "status" + (isError ? " error" : "");
+  }
+
+  function getTabs() {
+    // When there are >= 2 components, prepend an "All" virtual tab that
+    // composites every component into one canvas-style preview / one file.
+    return components.length >= 2
+      ? [{ name: "All (canvas)", __all: true }, ...components]
+      : components.slice();
+  }
+
+  function renderTabs() {
+    tabsEl.innerHTML = "";
+    const tabs = getTabs();
+    tabs.forEach((c, i) => {
+      const b = document.createElement("button");
+      b.className = "tab" + (i === activeIdx ? " active" : "");
+      b.textContent = c.name;
+      if (c.__all) b.style.fontWeight = "600";
+      b.onclick = () => {
+        activeIdx = i;
+        userZoomed = false;
+        renderTabs();
+        renderActive();
+        b.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+      };
+      tabsEl.appendChild(b);
+    });
+  }
+
+  // Build one combined .tsx file with every component as a named export plus
+  // a default CanvasAll that renders them laid out at Figma canvas positions.
+  function buildAllFile() {
+    if (components.length === 0) return "";
+    const minX = Math.min(...components.map((c) => c.canvasX || 0));
+    const minY = Math.min(...components.map((c) => c.canvasY || 0));
+    const maxRight = Math.max(...components.map((c) => (c.canvasX || 0) + (c.width || 0)));
+    const maxBottom = Math.max(...components.map((c) => (c.canvasY || 0) + (c.height || 0)));
+    const totalW = Math.max(0, maxRight - minX);
+    const totalH = Math.max(0, maxBottom - minY);
+
+    // Strip each component's leading `// Generated ...` header and rename its
+    // default export so every function lives in the same file with a unique name.
+    const seen = new Map();
+    const parts = components.map((c) => {
+      let base = c.name;
+      const count = (seen.get(base) || 0) + 1;
+      seen.set(base, count);
+      const unique = count === 1 ? base : `${base}${count}`;
+      // Swap "export default function X()" → "export function X()"
+      let body = c.file
+        .replace(/^\/\/ Generated from Figma[^\n]*\n?/, "")
+        .replace(/^\/\/ Source node:[^\n]*\n?/, "")
+        .replace(/^\s*\n+/, "")
+        .replace(
+          /export\s+default\s+function\s+[A-Za-z_$][\w$]*\s*\(/,
+          `export function ${unique}(`
+        );
+      return { name: unique, body, c };
+    });
+
+    const renders = parts
+      .map(({ name, c }) => {
+        const left = (c.canvasX || 0) - minX;
+        const top = (c.canvasY || 0) - minY;
+        return `      <div style={{ position: "absolute", left: ${left}, top: ${top} }}><${name} /></div>`;
+      })
+      .join("\n");
+
+    const composite = [
+      `export default function CanvasAll() {`,
+      `  return (`,
+      `    <div style={{ position: "relative", width: ${totalW}, height: ${totalH} }}>`,
+      renders,
+      `    </div>`,
+      `  );`,
+      `}`,
+      ``,
+    ].join("\n");
+
+    const header = [
+      `// Combined export — ${components.length} components from Figma`,
+      `// Canvas bounding box: ${totalW} × ${totalH}`,
+      ``,
+    ].join("\n");
+
+    return (
+      header + parts.map((p) => p.body.trim()).join("\n\n") + "\n\n" + composite
+    );
+  }
+
+  // Build one big HTML doc with every component absolutely positioned at its
+  // canvas location (normalized to (0,0)).
+  function buildAllHtml() {
+    if (components.length === 0) return { html: "", width: 0, height: 0 };
+    const minX = Math.min(...components.map((c) => c.canvasX || 0));
+    const minY = Math.min(...components.map((c) => c.canvasY || 0));
+    const maxRight = Math.max(...components.map((c) => (c.canvasX || 0) + (c.width || 0)));
+    const maxBottom = Math.max(...components.map((c) => (c.canvasY || 0) + (c.height || 0)));
+    const totalW = Math.max(0, maxRight - minX);
+    const totalH = Math.max(0, maxBottom - minY);
+    const inner = components
+      .map(
+        (c) =>
+          `<div style="position:absolute;left:${(c.canvasX || 0) - minX}px;top:${(c.canvasY || 0) - minY}px;width:${c.width}px;height:${c.height}px;">${c.html || ""}</div>`
+      )
+      .join("");
+    const wrapper = `<div style="position:relative;width:${totalW}px;height:${totalH}px;">${inner}</div>`;
+    return { html: wrapper, width: totalW, height: totalH };
+  }
+  // Returns the "thing" represented by the current tab: either a real
+  // component { name, file, html, width, height, ... } or the synthesized
+  // All-canvas view with the same shape.
+  function currentView() {
+    const tabs = getTabs();
+    const t = tabs[activeIdx];
+    if (!t) return null;
+    if (t.__all) {
+      const { html, width, height } = buildAllHtml();
+      return {
+        name: "CanvasAll",
+        file: buildAllFile(),
+        html,
+        width,
+        height,
+        __all: true,
+      };
+    }
+    return t;
+  }
+
+  function applyZoom() {
+    const c = currentView();
+    if (!c) return;
+    const w = c.width || 800;
+    const h = c.height || 600;
+    previewFrame.style.width = w + "px";
+    previewFrame.style.height = h + "px";
+    previewFrame.style.transform = "scale(" + zoom + ")";
+    // reserve scaled space inside the scroller
+    previewFrame.style.marginRight = Math.max(0, w * zoom - w) + "px";
+    previewFrame.style.marginBottom = Math.max(0, h * zoom - h) + "px";
+    zoomLabel.textContent = Math.round(zoom * 100) + "%";
+    dimsEl.textContent = w + " × " + h;
+  }
+  function fitZoom() {
+    const c = currentView();
+    if (!c || !c.width) return;
+    const pad = 16;
+    const available = Math.max(100, previewScroll.clientWidth - pad);
+    zoom = Math.min(1, available / c.width);
+    applyZoom();
+  }
+
+  function renderActive() {
+    if (components.length === 0) {
+      out.textContent = "// No components.";
+      previewFrame.srcdoc = "";
+      return;
+    }
+    const c = currentView();
+    if (!c) return;
+    if (mode === "code") {
+      out.classList.remove("hidden");
+      previewWrap.classList.add("hidden");
+      out.textContent = c.file;
+    } else {
+      out.classList.add("hidden");
+      previewWrap.classList.remove("hidden");
+      // When clipRoot is off, override overflow:hidden on the root element only —
+      // nested clipping (image crops, etc.) stays intact. This exposes any
+      // content Figma positioned past the frame's bounds (e.g. a wide dock).
+      const overrideCss = clipRoot
+        ? ""
+        : `body > *:first-child { overflow: visible !important; }`;
+      const doc = `<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;padding:0;background:#262626;font-family:-apple-system,BlinkMacSystemFont,Inter,sans-serif;}${overrideCss}</style></head><body>${c.html || ""}</body></html>`;
+      previewFrame.srcdoc = doc;
+      // size the iframe to the component immediately (even before load), then fit-zoom
+      applyZoom();
+      previewFrame.onload = () => {
+        if (!userZoomed) fitZoom();
+      };
+      // fallback in case the iframe is already loaded / reused
+      if (!userZoomed) requestAnimationFrame(fitZoom);
+    }
+  }
+
+  document.getElementById("zoomIn").onclick = () => { userZoomed = true; zoom = Math.min(4, zoom * 1.25); applyZoom(); };
+  document.getElementById("zoomOut").onclick = () => { userZoomed = true; zoom = Math.max(0.05, zoom / 1.25); applyZoom(); };
+  document.getElementById("zoomFit").onclick = () => { userZoomed = false; fitZoom(); };
+  document.getElementById("zoom100").onclick = () => { userZoomed = true; zoom = 1; applyZoom(); };
+  const clipBtn = document.getElementById("clipToggle");
+  clipBtn.onclick = () => {
+    clipRoot = !clipRoot;
+    clipBtn.textContent = "Clip: " + (clipRoot ? "on" : "off");
+    renderActive();
+  };
+  window.addEventListener("resize", () => { if (!userZoomed && mode === "preview") fitZoom(); });
+
+  document.querySelectorAll(".modeTab").forEach((el) => {
+    el.onclick = () => {
+      mode = el.dataset.mode;
+      document.querySelectorAll(".modeTab").forEach((x) => x.classList.toggle("active", x === el));
+      renderActive();
+    };
+  });
+
+  function copyText(text) {
+    // Figma UI sandbox blocks navigator.clipboard; use execCommand fallback.
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.top = "-1000px";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+    ta.remove();
+    return ok;
+  }
+
+  document.getElementById("export").onclick = () => {
+    setStatus("Exporting…");
+    const mode = document.getElementById("parseMode").value;
+    parent.postMessage({ pluginMessage: { type: "export", mode } }, "*");
+  };
+  document.getElementById("copy").onclick = () => {
+    const c = currentView();
+    if (!c) return;
+    if (copyText(c.file)) setStatus("Copied " + c.name + ".tsx to clipboard.");
+    else setStatus("Copy failed — try Download .tsx instead.", true);
+  };
+  document.getElementById("download").onclick = () => {
+    const c = currentView();
+    if (!c) return;
+    const blob = new Blob([c.file], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = c.name + ".tsx";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    setStatus("Downloaded " + c.name + ".tsx");
+  };
+
+  let warnings = [];
+  window.onmessage = (e) => {
+    const msg = e.data.pluginMessage;
+    if (!msg) return;
+    if (msg.type === "progress") { warnings = []; setStatus(msg.message); }
+    if (msg.type === "warn") {
+      warnings.push(msg.message);
+      console.warn("[figma-to-react]", msg.message);
+    }
+    if (msg.type === "error") setStatus(msg.message, true);
+    if (msg.type === "result") {
+      components = msg.components;
+      activeIdx = 0;
+      userZoomed = false;
+      renderTabs();
+      renderActive();
+      const warnSuffix = warnings.length ? ` (${warnings.length} node${warnings.length === 1 ? "" : "s"} skipped — see console)` : "";
+      setStatus("Exported " + components.length + " component(s)" + warnSuffix + ".");
+    }
+  };
+</script>
+</body>
+</html>
