@@ -1080,6 +1080,861 @@ function showFocusPrompt() {
 }
 
 // ============================================================================
+// PAPER-COMPATIBLE SERIALIZER: authoritative source used by spec-crawler
+// ============================================================================
+async function elementSerializer(selector) {
+  const alwaysSerialize = ["display"];
+  const toast = document.getElementsByTagName("ui2code-toast")[0];
+  const styleNames = Array.from(window.getComputedStyle(document.body));
+  styleNames.push("aspect-ratio", "text-underline-offset", "text-decoration-thickness", "transform-box");
+  // Ensure animation/transition longhands are captured so pasted markup replays motion.
+  // (getComputedStyle already enumerates these on every modern browser, but push them
+  //  defensively — duplicates just re-read the same key and are harmless.)
+  for (const animProp of [
+    "transition", "transition-property", "transition-duration",
+    "transition-timing-function", "transition-delay", "transition-behavior",
+    "animation", "animation-name", "animation-duration", "animation-timing-function",
+    "animation-delay", "animation-iteration-count", "animation-direction",
+    "animation-fill-mode", "animation-play-state",
+  ]) {
+    if (!styleNames.includes(animProp)) styleNames.push(animProp);
+  }
+
+  let totalNodesToProcess = 0;
+
+  function setToastProgress(processedNodesCount) {
+    if (processedNodesCount === null || !toast) {
+      const shadowRoot = toast?.shadowRoot;
+      if (shadowRoot && toast) {
+        const progressEl = shadowRoot.querySelector(".toast__progress");
+        if (progressEl) {
+          progressEl.classList.add("no-transition");
+          toast.style.setProperty("--ui2code-progress", "0");
+          requestAnimationFrame(() => {
+            progressEl.classList.remove("no-transition");
+            toast?.style.removeProperty("--ui2code-progress");
+          });
+        } else {
+          toast.style.removeProperty("--ui2code-progress");
+        }
+      } else if (toast) {
+        toast.style.removeProperty("--ui2code-progress");
+      }
+      toast?.style.removeProperty("--ui2code-suffix");
+      toast?.style.removeProperty("--ui2code-suffix-width");
+      return;
+    }
+    if (!toast) return;
+    const percentage = Math.min(Math.ceil((processedNodesCount / totalNodesToProcess) * 100), 100);
+    if (totalNodesToProcess > 50) {
+      toast.style.setProperty("--ui2code-progress", percentage.toString());
+      if (totalNodesToProcess > 100) {
+        toast.style.setProperty("--ui2code-suffix", `"${percentage.toString()}%"`);
+        toast.style.setProperty("--ui2code-suffix-width", "48px");
+      }
+    } else {
+      toast.style.removeProperty("--ui2code-suffix-width");
+    }
+  }
+
+  function isScaledToZeroAndOutOfFlow(styles) {
+    return (
+      ["matrix(0, 0, 0, 1, 0, 0)", "matrix(0, 0, 0, 0, 0, 0)", "scaleX(0)", "scale(0)", "scaleY(0)"].includes(styles.transform || "") &&
+      ["absolute", "fixed"].includes(styles.position || "")
+    );
+  }
+
+  function isChildOfSVG(node) {
+    let parent = node.parentElement;
+    while (parent) {
+      if (parent instanceof SVGElement) return true;
+      parent = parent.parentElement;
+    }
+    return false;
+  }
+
+  function toInlineStyles(styles) {
+    return Object.entries(styles).map(([key, value]) => `${key}: ${value.replaceAll('"', "'")};`).join(" ");
+  }
+
+  function encodeHTML(str) {
+    return str.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
+  }
+
+  // Resolve the actual text content of a ::before/::after pseudo-element
+  function resolvePseudoContent(element, pseudo, styles) {
+    if (!styles.content) return "";
+    const raw = styles.content;
+    if (raw === "none" || raw === "normal") return "";
+
+    // For open-quote / close-quote, use the browser's computed content
+    // which is already the resolved quote character as a string like '"'
+    if (raw === "open-quote" || raw === "close-quote") {
+      // Try getting the actual rendered content from the pseudo-element
+      const computed = window.getComputedStyle(element, pseudo);
+      const computedContent = computed.content;
+      if (computedContent && computedContent !== "none" && computedContent !== "normal"
+          && computedContent !== "open-quote" && computedContent !== "close-quote") {
+        // Strip wrapping quotes from computed value: '"' → " or "\201C" → \u201C
+        const stripped = computedContent.replace(/^["']|["']$/g, "");
+        if (stripped) return stripped;
+      }
+      // Fallback to curly quotes
+      return raw === "open-quote" ? "\u201C" : "\u201D";
+    }
+
+    // String value like: "»" or "• " — strip wrapping quotes
+    const strMatch = raw.match(/^["'](.*)["']$/);
+    if (strMatch) return strMatch[1];
+    // Bare string without quotes
+    if (raw.length <= 3 && raw !== "''") return raw;
+    return "";
+  }
+
+  function resolveParentBgColor(element) {
+    const parent = element?.parentElement;
+    if (parent) {
+      const backgroundColor = window.getComputedStyle(parent).backgroundColor;
+      if (backgroundColor && backgroundColor !== "rgba(0, 0, 0, 0)" && backgroundColor !== "transparent") return backgroundColor;
+      return resolveParentBgColor(parent);
+    }
+    return "";
+  }
+
+  function resolveComputedStyles(element, { isRoot = false, pseudo } = {}) {
+    const styles = {};
+    const computedStylesValues = new Map();
+
+    if (pseudo) {
+      const computedStyles = window.getComputedStyle(element, pseudo);
+      for (const key of styleNames) {
+        computedStylesValues.set(key, computedStyles.getPropertyValue(key));
+      }
+    } else {
+      const computedStyles = element.computedStyleMap();
+      for (const key of styleNames) {
+        const value = computedStyles.get(key);
+        if (value) computedStylesValues.set(key, value.toString());
+      }
+    }
+
+    const referenceStyleValues = new Map();
+    const referenceElement = document.createElement("link");
+    referenceElement.textContent = element.textContent;
+    referenceElement.style.margin = "0";
+    referenceElement.style.fill = "black";
+    referenceElement.style.color = "black";
+    referenceElement.style.fontSize = "1px";
+    referenceElement.style.width = "auto";
+    referenceElement.style.height = "auto";
+    referenceElement.style.textAlign = "initial";
+    referenceElement.style.borderColor = "hotpink";
+    referenceElement.style.setProperty("z-index", "auto", "important");
+    referenceElement.style.setProperty("border-width", "0px", "important");
+
+    if (isRoot) {
+      referenceElement.style.color = "hotpink";
+      referenceElement.style.lineHeight = "0.1234";
+      referenceElement.style.fontFamily = '"Papyrus"';
+      referenceElement.style.listStyleType = "initial";
+    }
+
+    // Place the reference element so its computed baseline is read in the same
+    // cascade context as `element`. Sibling placement is ideal (identical
+    // inherited context), but it THROWS HierarchyRequestError for two real cases
+    // that used to abort the whole capture: an element inside an SVG subtree
+    // (an HTML <link> is not a valid SVG-namespace sibling), and an element that
+    // a virtualised list detached mid-walk (no parent to insert beside). Fall
+    // back to the element's own parent, then into the element itself, then to
+    // body. A later fallback shifts the inherited baseline by one level at most,
+    // which mislabels a few inherited properties as non-default — verbose, but
+    // correct — and only for the elements sibling placement cannot handle.
+    let placed = false;
+    const tryPlace = (fn) => { if (placed) return; try { fn(); placed = true; } catch { /* try next */ } };
+    if (element.parentElement?.lastElementChild === element) {
+      tryPlace(() => element.insertAdjacentElement("afterend", referenceElement));
+    } else {
+      tryPlace(() => element.insertAdjacentElement("beforebegin", referenceElement));
+    }
+    tryPlace(() => element.parentElement.appendChild(referenceElement));
+    tryPlace(() => element.appendChild(referenceElement));
+    tryPlace(() => document.body.appendChild(referenceElement));
+    if (!placed) {
+      // Could not place it anywhere in this document — skip the diff for this
+      // node and keep every computed value, rather than throwing.
+      referenceElement.remove?.();
+    } else if (pseudo) {
+      const referenceComputedStyles = window.getComputedStyle(referenceElement, pseudo);
+      for (const key of styleNames) {
+        referenceStyleValues.set(key, referenceComputedStyles.getPropertyValue(key));
+      }
+    } else {
+      const referenceComputedStyles = referenceElement.computedStyleMap();
+      for (const key of styleNames) {
+        const value = referenceComputedStyles.get(key);
+        if (value) referenceStyleValues.set(key, value.toString());
+      }
+    }
+    referenceElement.remove();
+
+    for (const key of styleNames) {
+      const value = computedStylesValues.get(key);
+      const referenceValue = referenceStyleValues.get(key);
+      if (value && !value.startsWith("--") && (value !== referenceValue || alwaysSerialize.includes(key))) {
+        styles[key] = value.replaceAll('"', "'");
+      }
+    }
+
+    if (isRoot) {
+      const box = element.getBoundingClientRect();
+      const width = Math.ceil(box.width) + "px";
+      if (box.width > 200 || box.height > 200 || styles.width?.includes("%") || styles.height?.includes("%")) {
+        // Set explicit width so layout columns/grids work correctly
+        styles.width = width;
+        // Use min-height instead of fixed height so content isn't clipped
+        styles["min-height"] = Math.ceil(box.height) + "px";
+        styles.height = "auto";
+      }
+      // Remove overflow clipping on root — let full content show
+      delete styles["overflow"];
+      delete styles["overflow-x"];
+      delete styles["overflow-y"];
+      delete styles["overflow-block"];
+      delete styles["overflow-inline"];
+    }
+
+    const rootBackgroundInvisible =
+      isRoot && element instanceof Element &&
+      (!computedStylesValues.get("background-color") || computedStylesValues.get("background-color") === "rgba(0, 0, 0, 0)");
+
+    if (rootBackgroundInvisible) {
+      styles["background-color"] = resolveParentBgColor(element);
+    }
+
+    if (styles["scrollbar-gutter"]?.includes("stable") && element instanceof HTMLElement) {
+      const borderLeft = parseFloat(computedStylesValues.get("border-left-width") || "0");
+      const borderRight = parseFloat(computedStylesValues.get("border-right-width") || "0");
+      const scrollbarWidth = element.offsetWidth - element.clientWidth - borderLeft - borderRight;
+      if (scrollbarWidth > 0) {
+        const isBothSides = styles["scrollbar-gutter"].includes("both");
+        const direction = computedStylesValues.get("direction") || "ltr";
+        const currentPaddingRight = parseFloat(styles["padding-right"] || "0");
+        const currentPaddingLeft = parseFloat(styles["padding-left"] || "0");
+        if (direction === "rtl") {
+          styles["padding-left"] = currentPaddingLeft + scrollbarWidth + "px";
+          if (isBothSides) styles["padding-right"] = currentPaddingRight + scrollbarWidth + "px";
+        } else {
+          styles["padding-right"] = currentPaddingRight + scrollbarWidth + "px";
+          if (isBothSides) styles["padding-left"] = currentPaddingLeft + scrollbarWidth + "px";
+        }
+      }
+    }
+
+    if (((pseudo === "::after" || pseudo === "::before") && !styles.content) || Object.keys(styles).length === 0) {
+      return {};
+    }
+
+    return styles;
+  }
+
+  function collapseWhiteSpace(node) {
+    const text = node.textContent;
+    if (!text) return "";
+
+    if (node.parentElement) {
+      const whiteSpace = window.getComputedStyle(node.parentElement).whiteSpace;
+      if (whiteSpace === "pre" || whiteSpace === "pre-wrap") return text;
+      if (whiteSpace === "pre-line") return text.replace(/[^\S\n]+/g, " ");
+    }
+
+    const trimmed = text.replace(/\s+/g, " ").trim();
+    if (trimmed) {
+      const leadingLength = text.length - text.trimStart().length;
+      const trailingLength = text.length - text.trimEnd().length;
+      let preserveLeading = false;
+      let preserveTrailing = false;
+
+      if (leadingLength > 0) {
+        const range = document.createRange();
+        range.setStart(node, 0);
+        range.setEnd(node, leadingLength);
+        preserveLeading = range.getBoundingClientRect().width > 0;
+      }
+      if (trailingLength > 0) {
+        const range = document.createRange();
+        range.setStart(node, text.length - trailingLength);
+        range.setEnd(node, text.length);
+        preserveTrailing = range.getBoundingClientRect().width > 0;
+      }
+      return (preserveLeading ? " " : "") + trimmed + (preserveTrailing ? " " : "");
+    }
+
+    const range = document.createRange();
+    range.selectNode(node);
+    if (range.getBoundingClientRect().width === 0) return "";
+    return " ";
+  }
+
+  // ── CSS ANIMATION CAPTURE ─────────────────────────────────────────────────
+  // Computed styles reference animation names but never the @keyframes bodies,
+  // so pasted markup would lose its motion. Collect every animation name used by
+  // the captured subtree (element + descendants + ::before/::after), then resolve
+  // the matching @keyframes rules from the page's stylesheets into a <style> tag.
+
+  // Collect the set of animation-name values used across the subtree.
+  function collectAnimationNames(root) {
+    const names = new Set();
+    const readEl = (el) => {
+      for (const pseudo of [null, "::before", "::after"]) {
+        let animationName;
+        try {
+          animationName = window.getComputedStyle(el, pseudo).animationName;
+        } catch {
+          continue;
+        }
+        if (!animationName || animationName === "none") continue;
+        for (const part of animationName.split(",")) {
+          const name = part.trim();
+          if (name && name !== "none") names.add(name);
+        }
+      }
+    };
+    readEl(root);
+    root.querySelectorAll("*").forEach(readEl);
+    return names;
+  }
+
+  // Extract a single `@keyframes <name> { ... }` block from raw CSS text using
+  // brace matching (used as a fallback for cross-origin sheets fetched by URL).
+  function extractKeyframesBlockFromText(cssText, name) {
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const re = new RegExp("@(?:-webkit-)?keyframes\\s+" + escaped + "\\s*\\{", "g");
+    const match = re.exec(cssText);
+    if (!match) return "";
+    let i = match.index + match[0].length;
+    let depth = 1;
+    while (i < cssText.length && depth > 0) {
+      const c = cssText[i];
+      if (c === "{") depth++;
+      else if (c === "}") depth--;
+      i++;
+    }
+    return depth === 0 ? cssText.slice(match.index, i) : "";
+  }
+
+  // Walk document.styleSheets (recursing into @media / @supports groups) and
+  // collect the cssText of every @keyframes rule whose name is in `names`.
+  // Falls back to fetching cross-origin sheets and regex-parsing their text.
+  async function collectKeyframes(names) {
+    if (!names || names.size === 0) return "";
+    const found = new Map(); // name -> cssText
+    const crossOriginHrefs = [];
+
+    const scanRules = (rules) => {
+      for (const rule of rules) {
+        if (typeof CSSKeyframesRule !== "undefined" && rule instanceof CSSKeyframesRule) {
+          if (names.has(rule.name) && !found.has(rule.name)) found.set(rule.name, rule.cssText);
+        } else if (typeof CSSGroupingRule !== "undefined" && rule instanceof CSSGroupingRule && rule.cssRules) {
+          // @media / @supports — recurse.
+          try { scanRules(rule.cssRules); } catch {}
+        } else if (rule.cssRules) {
+          try { scanRules(rule.cssRules); } catch {}
+        }
+      }
+    };
+
+    for (const sheet of Array.from(document.styleSheets)) {
+      let rules;
+      try {
+        rules = sheet.cssRules; // cross-origin sheets throw here.
+      } catch {
+        if (sheet.href) crossOriginHrefs.push(sheet.href);
+        continue;
+      }
+      if (rules) {
+        try { scanRules(rules); } catch {}
+      }
+    }
+
+    // Fallback: fetch cross-origin sheets from the page origin and parse by regex.
+    // fetch may still be CORS-blocked — wrap per-sheet and skip failures silently.
+    if (crossOriginHrefs.length && [...names].some((n) => !found.has(n))) {
+      for (const href of crossOriginHrefs) {
+        if ([...names].every((n) => found.has(n))) break;
+        try {
+          const res = await fetch(href);
+          if (!res.ok) continue;
+          const text = await res.text();
+          for (const name of names) {
+            if (found.has(name)) continue;
+            const block = extractKeyframesBlockFromText(text, name);
+            if (block) found.set(name, block);
+          }
+        } catch {}
+      }
+    }
+
+    if (found.size === 0) return "";
+    return `<style data-captured-animations>${Array.from(found.values()).join("\n")}</style>`;
+  }
+
+  async function serialize(target, { abortSignal, dryRun = false, __isRoot = true, __processedNodes = 0 } = {}) {
+    if (abortSignal?.aborted) return { html: "", processedNodes: 0 };
+    if (!dryRun) setToastProgress(__processedNodes + 1);
+
+    if (!(target instanceof Element || target instanceof SVGElement)) {
+      if (dryRun) return { html: "", processedNodes: 1 };
+      if (target instanceof Text) {
+        const normalizedText = collapseWhiteSpace(target);
+        return { html: encodeHTML(normalizedText), processedNodes: 1 };
+      }
+      return { html: "", processedNodes: 1 };
+    }
+
+    const tagName = target.tagName.toLowerCase();
+    const targetComputedStyles = window.getComputedStyle(target);
+    const isOutOfFlow = ["absolute", "fixed"].includes(targetComputedStyles.position);
+    const isNormalFlowChild = !!target.parentElement && ["block", "inline-block"].includes(window.getComputedStyle(target.parentElement).display);
+    const hasVerySmallDimensions = parseFloat(targetComputedStyles.height) === 0 || parseFloat(targetComputedStyles.width) === 0;
+    const isHiddenPixelOutOfFlow = hasVerySmallDimensions && (isOutOfFlow || isNormalFlowChild);
+    const isDisplayNone = targetComputedStyles.display === "none";
+    const isTransparentAndOutOfFlow = targetComputedStyles.opacity === "0" && isOutOfFlow;
+
+    if (isHiddenPixelOutOfFlow || isDisplayNone || isTransparentAndOutOfFlow) {
+      return { html: "", processedNodes: 1 };
+    }
+
+    let processedNodes = 1;
+    const children = [];
+    let styles = {};
+
+    if (!dryRun) {
+      const beforeStyles = resolveComputedStyles(target, { pseudo: "::before" });
+      if (Object.keys(beforeStyles).length && !isScaledToZeroAndOutOfFlow(beforeStyles)) {
+        const beforeText = resolvePseudoContent(target, "::before", beforeStyles);
+        delete beforeStyles.content; // content doesn't work on regular elements
+        const isInlinePseudo = beforeStyles.display === "inline" || beforeStyles.display === "inline-block";
+        const pseudoTag = isInlinePseudo ? "span" : "div";
+        children.push(`<${pseudoTag} style="${toInlineStyles(beforeStyles)}">${encodeHTML(beforeText)}</${pseudoTag}>`);
+      }
+      styles = resolveComputedStyles(target, { isRoot: __isRoot });
+
+      // BROWSER FIX: Elements like <fieldset>, <button>, <select>, <input>, <textarea>,
+      // <legend> have user-agent default backgrounds (Canvas, ButtonFace, Field).
+      // Paper Snapshot skips transparent backgrounds because they match the <link> reference,
+      // but paper.design has no UA stylesheet. For browser rendering, we must explicitly
+      // set background-color to override UA defaults.
+      const uaBgElements = ["fieldset", "button", "select", "input", "textarea", "legend", "hr"];
+      if (uaBgElements.includes(tagName)) {
+        if (!styles["background-color"]) styles["background-color"] = targetComputedStyles.backgroundColor;
+        if (!styles["border-style"]) styles["border-style"] = targetComputedStyles.borderStyle || "none";
+        if (!styles["border-width"]) styles["border-width"] = targetComputedStyles.borderWidth || "0px";
+        if (!styles["border-color"]) styles["border-color"] = targetComputedStyles.borderColor;
+        if (!styles["appearance"]) { styles["appearance"] = "none"; styles["-webkit-appearance"] = "none"; }
+        if (!styles["padding"] && !styles["padding-top"]) {
+          styles["padding-top"] = targetComputedStyles.paddingTop;
+          styles["padding-right"] = targetComputedStyles.paddingRight;
+          styles["padding-bottom"] = targetComputedStyles.paddingBottom;
+          styles["padding-left"] = targetComputedStyles.paddingLeft;
+        }
+        if (!styles["margin"] && !styles["margin-top"]) {
+          styles["margin-top"] = targetComputedStyles.marginTop;
+          styles["margin-right"] = targetComputedStyles.marginRight;
+          styles["margin-bottom"] = targetComputedStyles.marginBottom;
+          styles["margin-left"] = targetComputedStyles.marginLeft;
+        }
+      }
+      // Force text-decoration for <a> tags (UA adds underlines)
+      if (tagName === "a" && !styles["text-decoration"]) {
+        styles["text-decoration"] = targetComputedStyles.textDecoration || "none";
+      }
+    }
+
+    const targetAttributes = target.getAttributeNames().map((name) => [name, target.getAttribute(name) || ""]);
+
+    for (let i = 0; i < target.childNodes.length; i++) {
+      const child = target.childNodes[i];
+      const childrenToTraverse = [];
+
+      if (child instanceof SVGElement && child.tagName === "use") {
+        const href = child.getAttribute("href") || child.getAttribute("xlink:href");
+        const referencedElement = document.getElementById(href?.replace("#", "") || "");
+        if (referencedElement) {
+          if (["symbol", "svg"].includes(referencedElement.tagName)) {
+            for (const name of referencedElement.getAttributeNames()) {
+              if (["id", "class", "style"].includes(name)) continue;
+              if (!target.hasAttribute(name)) {
+                targetAttributes.push([name, referencedElement.getAttribute(name)]);
+              }
+            }
+            childrenToTraverse.push(...Array.from(referencedElement.childNodes));
+          } else {
+            childrenToTraverse.push(referencedElement);
+          }
+        }
+      } else if (target instanceof HTMLSelectElement) {
+        // Don't collect children of selects.
+      } else if (child) {
+        childrenToTraverse.push(child);
+      }
+
+      if (childrenToTraverse.length) {
+        for (const traverseChild of childrenToTraverse) {
+          if (!dryRun) await new Promise((resolve) => requestAnimationFrame(resolve));
+          const result = await serialize(traverseChild, {
+            abortSignal,
+            dryRun,
+            __isRoot: false,
+            __processedNodes: __processedNodes + processedNodes,
+          });
+          processedNodes += result.processedNodes;
+          if (!dryRun) children.push(result.html);
+        }
+      }
+    }
+
+    if (dryRun) return { html: "", processedNodes };
+
+    if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) {
+      const shouldVerticallyCenterText = target instanceof HTMLInputElement || target instanceof HTMLSelectElement;
+      const placeholder = target instanceof HTMLSelectElement ? target.firstElementChild?.textContent : target.placeholder;
+
+      if (target.type === "text" && target.value !== "") {
+        const valueStyles = { height: "fit-content" };
+        children.push(`<div style="${toInlineStyles(valueStyles)}">${target.value}</div>`);
+        if (shouldVerticallyCenterText) styles["align-content"] = "center";
+      } else if (placeholder) {
+        const placeholderStyles = resolveComputedStyles(target, { pseudo: "::placeholder" });
+        placeholderStyles.width = "100%";
+        placeholderStyles.height = "fit-content";
+        if (shouldVerticallyCenterText) {
+          styles["align-content"] = "center";
+          placeholderStyles["align-self"] = "center";
+        }
+        children.push(`<div style="${toInlineStyles(placeholderStyles)}">${placeholder}</div>`);
+      }
+    }
+
+    const afterStyles = resolveComputedStyles(target, { pseudo: "::after" });
+    if (Object.keys(afterStyles).length && !isScaledToZeroAndOutOfFlow(afterStyles)) {
+      const afterText = resolvePseudoContent(target, "::after", afterStyles);
+      delete afterStyles.content;
+      const isInlineAfter = afterStyles.display === "inline" || afterStyles.display === "inline-block";
+      const afterTag = isInlineAfter ? "span" : "div";
+      children.push(`<${afterTag} style="${toInlineStyles(afterStyles)}">${encodeHTML(afterText)}</${afterTag}>`);
+    }
+
+    const attributesToSerialize = [];
+
+    if (target instanceof HTMLImageElement) {
+      attributesToSerialize.push(["src", target.src]);
+      if (!styles.width && !styles.height) {
+        const computedStyles = window.getComputedStyle(target);
+        styles.width = computedStyles.width;
+        styles.height = computedStyles.height;
+      }
+    }
+
+    if (target instanceof HTMLBRElement) {
+      return { html: "<br>", processedNodes };
+    }
+
+    const tableElements = ["table", "thead", "tbody", "tfoot", "tr", "td", "th", "caption", "colgroup", "col"];
+    const inputs = ["input", "textarea"];
+    const finalTagName = [...tableElements, ...inputs].includes(tagName) ? "div" : tagName;
+
+    if (target instanceof SVGElement) {
+      targetAttributes.forEach(([name, value]) => {
+        if (["class", "style", "display", "overflow"].includes(name) || !value) return;
+        if (["fill", "stroke", "color"].includes(name)) {
+          if (value.startsWith("var(")) {
+            const computedValue = styles[name];
+            if (computedValue) value = computedValue;
+          } else if (value.toLowerCase() === "currentcolor") {
+            const computedValue = styles[name] ?? styles.color;
+            if (computedValue) value = computedValue;
+          }
+        }
+        attributesToSerialize.push([name, value.replaceAll('"', "'")]);
+      });
+
+      for (const [name] of attributesToSerialize) {
+        if (["width", "height"].includes(name)) continue;
+        delete styles[name];
+      }
+    }
+
+    if (Object.keys(styles).length > 0) {
+      if (styles.width || styles.height) {
+        styles.width ??= "auto";
+        styles.height ??= "auto";
+      }
+      attributesToSerialize.push(["style", toInlineStyles(styles)]);
+    }
+
+    // Preserve original class names:
+    // - "class" for hover/focus CSS rules to work
+    // - "data-class" for Claude Code to understand component structure
+    const originalClass = target.getAttribute("class");
+    if (originalClass) {
+      const safeClass = originalClass.replaceAll('"', "'");
+      attributesToSerialize.push(["class", safeClass]);
+      attributesToSerialize.push(["data-class", safeClass]);
+    }
+
+    const isElementVisible = isChildOfSVG(target) || (target.checkVisibility() && styles.display !== "contents");
+    if (isElementVisible) {
+      const html = `<${finalTagName} ${attributesToSerialize.map(([key, value]) => `${key}="${value}"`).join(" ")}>${children.join("")}</${finalTagName}>`;
+      return { html, processedNodes };
+    }
+
+    return { html: children.join(""), processedNodes };
+  }
+
+  const elementToSerialize = document.querySelector(selector);
+  if (elementToSerialize) {
+    const abortController = new AbortController();
+    function keyDownHandler(e) {
+      if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); abortController.abort(); }
+    }
+    window.addEventListener("keydown", keyDownHandler, { capture: true });
+
+    setToastProgress(null);
+    const dryRun = await serialize(elementToSerialize, { dryRun: true });
+    totalNodesToProcess = dryRun.processedNodes;
+    setToastProgress(0);
+
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    const result = await serialize(elementToSerialize, { abortSignal: abortController.signal });
+    window.removeEventListener("keydown", keyDownHandler, { capture: true });
+
+    if (abortController.signal.aborted) return { status: "aborted" };
+
+    // Extract interactive CSS rules
+    const interactiveCSS = extractInteractiveStyles(elementToSerialize);
+
+    // Resolve @keyframes for every animation used in the captured subtree so the
+    // pasted markup carries its motion (the editor's "Record CSS Anim" samples these).
+    let capturedAnimationsStyle = "";
+    try {
+      capturedAnimationsStyle = await collectKeyframes(collectAnimationNames(elementToSerialize));
+    } catch {}
+
+    // Strip page-only positioning from root
+    let rootHtml = result.html;
+    rootHtml = rootHtml.replace(/^(<\w+\s[^>]*?)style="([^"]*)"/, (match, before, styleStr) => {
+      const cleaned = styleStr
+        .replace(/\bz-index:\s*[^;]+;?\s*/g, "")
+        .replace(/\bpointer-events:\s*[^;]+;?\s*/g, "")
+        .trim();
+      return `${before}style="${cleaned}"`;
+    });
+
+    // RAW HTML version (for HTML viewers, paper.design, etc.)
+    const rawHtml = rootHtml;
+
+    // REACT JSX version for Claude Code / v0
+    const jsxCode = htmlToJsx(simplifyStyles(rootHtml));
+    let claudeOutput = `/**\n * UI Snapshot — Convert to React component.\n * Match the EXACT visual appearance: colors, spacing, typography, icons, layout.\n */\nexport default function CapturedComponent() {\n  return (\n${jsxCode}\n  );\n}\n`;
+
+    return { status: "success", html: claudeOutput, rawHtml: rawHtml, capturedAnimationsStyle: capturedAnimationsStyle };
+  }
+
+  return { status: "error", error: "Element not found" };
+
+  // Remove redundant CSS properties that duplicate shorthands or inherit from color
+  function simplifyStyles(html) {
+    // Properties to remove (they duplicate shorthand or are browser-internal)
+    const redundantProps = new Set([
+      "border-block-end-color", "border-block-start-color",
+      "border-inline-end-color", "border-inline-start-color",
+      "border-end-end-radius", "border-end-start-radius",
+      "border-start-end-radius", "border-start-start-radius",
+      "padding-block-end", "padding-block-start",
+      "padding-inline-end", "padding-inline-start",
+      "margin-block-end", "margin-block-start",
+      "margin-inline-end", "margin-inline-start",
+      "inline-size", "block-size",
+      "caret-color", "column-rule-color", "text-emphasis-color",
+      "-webkit-text-fill-color", "-webkit-text-stroke-color",
+      "unicode-bidi", "-webkit-tap-highlight-color",
+    ]);
+
+    // Properties that duplicate `color` value — remove if same as color
+    const colorDupes = new Set([
+      "outline-color", "text-decoration-color",
+    ]);
+
+    return html.replace(/style="([^"]*)"/g, (match, styleStr) => {
+      const props = {};
+      let colorVal = null;
+
+      // Parse into map
+      for (const part of styleStr.split(";")) {
+        const idx = part.indexOf(":");
+        if (idx < 0) continue;
+        const name = part.slice(0, idx).trim();
+        const val = part.slice(idx + 1).trim();
+        if (!name) continue;
+        if (name === "color") colorVal = val;
+        props[name] = val;
+      }
+
+      // Remove redundant
+      for (const name of redundantProps) {
+        delete props[name];
+      }
+
+      // Remove color duplicates that match `color`
+      if (colorVal) {
+        for (const name of colorDupes) {
+          if (props[name] === colorVal) delete props[name];
+        }
+      }
+
+      // Consolidate border-radius if all 4 corners are the same
+      const br = ["border-top-left-radius", "border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius"];
+      const brVals = br.map((p) => props[p]).filter(Boolean);
+      if (brVals.length === 4 && new Set(brVals).size === 1) {
+        props["border-radius"] = brVals[0];
+        br.forEach((p) => delete props[p]);
+      }
+
+      // Rebuild
+      const simplified = Object.entries(props)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join("; ");
+      return `style="${simplified}"`;
+    });
+  }
+
+  // Convert HTML with inline styles to React JSX with style objects
+  function htmlToJsx(html) {
+    // Convert rgb(r, g, b) to #RRGGBB
+    function rgbToHex(rgb) {
+      const m = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+      if (!m) return rgb;
+      const r = parseInt(m[1]).toString(16).padStart(2, "0");
+      const g = parseInt(m[2]).toString(16).padStart(2, "0");
+      const b = parseInt(m[3]).toString(16).padStart(2, "0");
+      if (m[4] !== undefined && parseFloat(m[4]) < 1) {
+        const a = Math.round(parseFloat(m[4]) * 255).toString(16).padStart(2, "0");
+        return `#${r}${g}${b}${a}`.toUpperCase();
+      }
+      return `#${r}${g}${b}`.toUpperCase();
+    }
+
+    // Convert CSS property name to camelCase
+    function toCamelCase(prop) {
+      if (prop.startsWith("-webkit-")) return "Webkit" + prop.slice(8).replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+      if (prop.startsWith("-moz-")) return "Moz" + prop.slice(5).replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+      return prop.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+    }
+
+    // Convert CSS style string to JSX style object string
+    function styleToJsx(styleStr) {
+      const props = [];
+      for (const part of styleStr.split(";")) {
+        const idx = part.indexOf(":");
+        if (idx < 0) continue;
+        const name = part.slice(0, idx).trim();
+        let val = part.slice(idx + 1).trim();
+        if (!name || !val) continue;
+        // Convert colors to hex
+        val = val.replace(/rgba?\(\d+,\s*\d+,\s*\d+(?:,\s*[\d.]+)?\)/g, rgbToHex);
+        const camel = toCamelCase(name);
+        props.push(`${camel}: '${val}'`);
+      }
+      return `{{ ${props.join(", ")} }}`;
+    }
+
+    // Convert HTML attributes to JSX
+    let jsx = html;
+    // Remove class and data-class attributes (noise for JSX)
+    jsx = jsx.replace(/\s+(?:class|data-class)="[^"]*"/g, "");
+    // Convert style="..." to style={{ ... }}
+    jsx = jsx.replace(/style="([^"]*)"/g, (_, s) => `style={${styleToJsx(s)}}`);
+    // HTML to JSX attribute conversions
+    jsx = jsx.replace(/\bstroke-linejoin=/g, "strokeLinejoin=");
+    jsx = jsx.replace(/\bstroke-width=/g, "strokeWidth=");
+    jsx = jsx.replace(/\bfill-rule=/g, "fillRule=");
+    jsx = jsx.replace(/\bclip-rule=/g, "clipRule=");
+    jsx = jsx.replace(/\bdata-testid=/g, "data-testid=");
+    jsx = jsx.replace(/\bfill-opacity=/g, "fillOpacity=");
+    jsx = jsx.replace(/\bstroke-dasharray=/g, "strokeDasharray=");
+    jsx = jsx.replace(/\bstroke-dashoffset=/g, "strokeDashoffset=");
+    jsx = jsx.replace(/<hr(\s)/g, "<hr$1");
+    jsx = jsx.replace(/<\/hr>/g, "");
+    jsx = jsx.replace(/<hr([^/]*)(?<!\/)>/g, "<hr$1 />");
+    jsx = jsx.replace(/<br>/g, "<br />");
+    // Indent for readability
+    jsx = "    " + jsx;
+    return jsx;
+  }
+
+  // Scan stylesheets for :hover, :focus, :active rules that apply to captured elements.
+  // Uses element.matches() for precise matching instead of class-name guessing.
+  function extractInteractiveStyles(rootEl) {
+    const interactivePseudos = [":hover", ":focus", ":active", ":focus-visible", ":focus-within"];
+    const collectedRules = [];
+    const allElements = [rootEl, ...rootEl.querySelectorAll("*")];
+    const seen = new Set();
+
+    for (const sheet of document.styleSheets) {
+      try {
+        for (const rule of sheet.cssRules) {
+          if (!(rule instanceof CSSStyleRule)) continue;
+          const sel = rule.selectorText;
+          if (!sel || seen.has(sel)) continue;
+
+          // Must contain an interactive pseudo-class
+          const hasInteractive = interactivePseudos.some((p) => sel.includes(p));
+          if (!hasInteractive) continue;
+
+          // Strip pseudo-classes to get the base selector for matching
+          let baseSelector = sel;
+          for (const p of interactivePseudos) {
+            baseSelector = baseSelector.replaceAll(p, "");
+          }
+          // Clean up double colons, empty parens
+          baseSelector = baseSelector.replace(/::?(?=[,\s{]|$)/g, "").trim();
+          if (!baseSelector) continue;
+
+          // Check if any element in our subtree matches the base selector
+          let matches = false;
+          try {
+            for (const el of allElements) {
+              if (el.matches && el.matches(baseSelector)) {
+                matches = true;
+                break;
+              }
+            }
+          } catch (e) {
+            // Invalid selector — skip
+            continue;
+          }
+          if (!matches) continue;
+
+          seen.add(sel);
+          // Keep original selector with class names (data-class won't work for hover in CSS)
+          // Instead, re-add class attributes temporarily when rendering preview
+          collectedRules.push(`${sel} { ${rule.style.cssText} }`);
+
+          // Cap at 50 rules to avoid bloating the output
+          if (collectedRules.length >= 50) break;
+        }
+      } catch (e) {
+        // Cross-origin stylesheet — skip
+      }
+      if (collectedRules.length >= 50) break;
+    }
+
+    return collectedRules.length > 0 ? collectedRules.join(" ") : "";
+  }
+}
+
+// ============================================================================
 // BACKGROUND SERVICE WORKER: Orchestrates the full flow
 // ============================================================================
 chrome.action.onClicked.addListener(async (tab) => {

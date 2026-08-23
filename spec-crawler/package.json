@@ -1,0 +1,19 @@
+{
+  "name": "spec-crawler",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Capture a web app's design spec — CSS states, overlay states, agent-driven flows — as Paper-pasteable frames. Usable as a CLI or as an MCP server.",
+  "bin": {
+    "spec-crawler": "./index.mjs",
+    "spec-crawler-mcp": "./mcp.mjs"
+  },
+  "scripts": {
+    "edge": "open -na 'Microsoft Edge' --args --remote-debugging-port=9222 --user-data-dir=\"$HOME/.spec-crawler-edge\"",
+    "crawl": "node index.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "playwright-core": "^1.62.1"
+  }
+}

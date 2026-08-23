@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "spec-crawler": {
+      "command": "node",
+      "args": ["./spec-crawler/mcp.mjs"],
+      "env": {
+        "SPEC_CRAWLER_CDP": "http://localhost:9222",
+        "SPEC_CRAWLER_OUT": "./spec-bundle"
+      }
+    },
+    "paper": {
+      "type": "http",
+      "url": "http://127.0.0.1:29979/mcp"
+    }
+  }
+}
