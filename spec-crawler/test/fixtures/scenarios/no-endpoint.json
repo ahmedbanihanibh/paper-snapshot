@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "no-endpoint",
+  "description": "Valid, but names no CDP endpoint — a live run must refuse rather than guess one.",
+  "steps": [
+    {
+      "id": "escape",
+      "action": "press",
+      "keys": "Escape",
+      "expect": { "name": "nothing is open", "kind": "noOverlays" }
+    }
+  ]
+}

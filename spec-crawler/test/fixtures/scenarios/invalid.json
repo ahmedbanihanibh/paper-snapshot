@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 2,
+  "name": "every-rejection-at-once",
+  "steps": [
+    {
+      "action": "click",
+      "target": { "point": { "x": 420, "y": 310 } }
+    },
+    {
+      "action": "teleport",
+      "target": { "specId": "n42" },
+      "expect": { "name": "somewhere else", "kind": "textVisible", "text": "there" }
+    },
+    {
+      "action": "hover",
+      "target": { "ref": "never-defined" },
+      "expect": { "name": "a tooltip appears", "kind": "surfaceAppears", "role": "tooltip" }
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>scenario fixture app</title>
+<style>
+  :root { color-scheme: light dark; font: 14px/1.4 system-ui, sans-serif; }
+  body { margin: 0; padding: 24px; }
+  #menu[hidden] { display: none; }
+  #menu { border: 1px solid #ccc; padding: 4px; width: 200px; }
+  #menu [role="menuitem"] { padding: 6px 8px; }
+  #row { padding: 8px; border: 1px solid #ddd; width: 320px; margin-top: 16px; }
+</style>
+
+<!--
+  The smallest surface that exercises the scenario grammar end to end:
+  a trigger that opens a menu (surfaceAppears / surfaceDisappears), a text field
+  (fieldValue), and a row carrying a state attribute (attribute).
+-->
+
+<button id="trigger" aria-haspopup="menu" aria-expanded="false">Open menu</button>
+
+<div id="menu" role="menu" hidden>
+  <div role="menuitem" data-action="duplicate">Duplicate</div>
+  <div role="menuitem" data-action="delete">Delete</div>
+</div>
+
+<div id="row" data-state="idle" role="row">Issue row</div>
+<label>Title <input id="title" type="text" value=""></label>
+
+<script>
+  const trigger = document.getElementById('trigger');
+  const menu = document.getElementById('menu');
+  const row = document.getElementById('row');
+
+  trigger.addEventListener('pointerdown', () => {
+    const open = menu.hidden;
+    menu.hidden = !open;
+    trigger.setAttribute('aria-expanded', String(open));
+  });
+
+  menu.addEventListener('click', (event) => {
+    const item = event.target.closest('[role="menuitem"]');
+    if (!item) return;
+    row.dataset.state = item.dataset.action;
+    menu.hidden = true;
+    trigger.setAttribute('aria-expanded', 'false');
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    menu.hidden = true;
+    trigger.setAttribute('aria-expanded', 'false');
+  });
+</script>
