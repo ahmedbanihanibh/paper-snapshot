@@ -44,7 +44,7 @@ export function animationContract(state) {
   lines.push('Captured from a live app. Reproduce this motion exactly; do not re-derive it.', '');
   lines.push(`- trigger: ${state.trigger?.label ? `"${state.trigger.label}"` : '(unknown)'}`);
   lines.push(`- surface: ${state.kind ?? 'surface'}${state.rect ? ` · ${Math.round(state.rect.width)}×${Math.round(state.rect.height)}` : ''}`);
-  lines.push(`- sampling: ${animation.frames} frames @ ~${animation.frameIntervalMs}ms`);
+  lines.push(`- sampling: ${animation.frames} frames @ ${Number.isFinite(animation.frameIntervalMs) ? `~${animation.frameIntervalMs}ms` : 'an unknown interval (too few samples to observe one)'}`);
   lines.push('');
 
   if (animation.selection) {
@@ -154,7 +154,12 @@ export function animationChecklist(state) {
     requiredNodes: nodes.map((node) => ({
       node: node.id,
       transition: node.transition?.property ?? null,
-      durationMs: Math.round(node.fit?.duration ?? node.measured?.durationMs ?? 0),
+      // null, not 0. This is the machine-enforceable checklist: a required
+      // duration of 0 for a node whose duration was never established reads as
+      // "this must be instant" and would be enforced as such.
+      durationMs: Number.isFinite(node.fit?.duration ?? node.measured?.durationMs)
+        ? Math.round(node.fit?.duration ?? node.measured?.durationMs)
+        : null,
       easing: node.fit?.easing ?? null,
       owns: node.owns ?? null,
       animate: Object.entries(node.properties).filter(([, value]) => value.driven && value.emittable !== false && value.interpolation !== 'unsupported').map(([property, value]) => ({

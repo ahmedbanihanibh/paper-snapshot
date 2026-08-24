@@ -368,12 +368,42 @@ export function scopeRecording(recording, {
   return { ...source, declared, samples, selection: { included, excluded, constrained } };
 }
 
+/**
+ * Whether a declared duration and a measured one actually agree.
+ *
+ * The old band was `max(2 * frameInterval, declared * 0.5)`. Fifty percent means
+ * a declared 300ms was "confirmed" by a measured 450ms, and with the invented
+ * 16.7ms frame interval a declared 30ms was confirmed by a measured 0. The band
+ * is now 10%, never smaller than two real sample intervals, and it is stated in
+ * the message so a reader can judge it.
+ */
+export function agreementVerdict({ declaredTiming, measuredMs, frameIntervalMs }) {
+  const declared = declaredTiming?.duration;
+  if (declared == null) {
+    return measuredMs === null
+      ? 'nothing declared and no motion window could be measured — duration unknown'
+      : 'nothing declared; measured only — treat duration as approximate';
+  }
+  if (measuredMs === null) {
+    return `declared ${Math.round(declared)}ms; no motion window could be measured — NOT verified`;
+  }
+  const sampling = Number.isFinite(frameIntervalMs) ? frameIntervalMs : null;
+  const band = Math.max(sampling !== null ? 2 * sampling : 0, declared * 0.1);
+  const sampledAt = sampling === null ? 'sample interval unknown' : `sampled at ~${Math.round(sampling)}ms/frame`;
+  return Math.abs(declared - measuredMs) <= band
+    ? `declared timing confirmed by measurement (within ${Math.round(band)}ms, ${sampledAt})`
+    : `declared ${Math.round(declared)}ms vs measured ${Math.round(measuredMs)}ms — investigate; outside the ${Math.round(band)}ms band, ${sampledAt}`;
+}
+
 /** Turn one recording into a typed, backwards-compatible motion spec. */
 export function analyseRecording(recording, meta = {}) {
-  const { declared = [], samples = [], selection = null } = recording ?? {};
+  const { declared = [], samples = [], selection = null, truncated = false } = recording ?? {};
   const ids = Array.from(new Set(samples.flatMap((sample) => Object.keys(sample.nodes ?? {}))));
   const intervals = samples.slice(1).map((sample, index) => sample.t - samples[index].t).filter((gap) => gap > 0).sort((a, b) => a - b);
-  const frameIntervalMs = intervals.length ? intervals[Math.floor(intervals.length / 2)] : 16.7;
+  // null, not 16.7. This value is published as the sampled frame rate AND used as
+  // the tolerance of the declared-vs-measured agreement check, so inventing it
+  // both reports a rate never observed and silently widens a pass band.
+  const frameIntervalMs = intervals.length ? intervals[Math.floor(intervals.length / 2)] : null;
 
   const nodes = ids.map((id) => {
     const { track, typed } = tracksOf(samples, id);
@@ -488,14 +518,18 @@ export function analyseRecording(recording, meta = {}) {
 
     const cssProps = Object.values(properties).filter((property) => property.source === 'css');
     const timingSource = cssProps.length ? cssProps : Object.values(properties);
-    const measuredMs = Math.max(0, ...timingSource.map((property) => property.durationMs ?? 0));
+    // "No window could be measured" and "measured as instant" are different facts.
+    // Collapsing both to 0 let a declared 30ms be "confirmed by measurement"
+    // against a measurement that never happened.
+    const observedDurations = timingSource.map((property) => property.durationMs).filter((value) => Number.isFinite(value));
+    const measuredMs = observedDurations.length ? Math.max(0, ...observedDurations) : null;
     const cssOnsets = Object.entries(properties).filter(([, value]) => value.source === 'css' && value.onsetMs != null).map(([key, value]) => [key, value.onsetMs]);
     const stagger = cssOnsets.length > 1 ? Math.round(Math.max(...cssOnsets.map(([, value]) => value)) - Math.min(...cssOnsets.map(([, value]) => value))) : 0;
     const worstOvershoot = Math.max(0, ...Object.values(properties).map((property) => property.overshoot ?? 0));
     const declaredEntry = declaredHere.find((entry) => entry.computedTiming?.duration != null) ?? null;
     const declaredTiming = declaredEntry?.computedTiming ?? null;
     const direction = declaredEntry?.timing?.direction ?? 'normal';
-    const fit = worstOvershoot > 0.02
+    const fit = worstOvershoot > 0.02 && measuredMs !== null
       ? fitSpring(worstOvershoot, measuredMs)
       : (declaredTiming
         ? { type: 'tween', duration: declaredTiming.duration, easing: declaredTiming.easing, direction }
@@ -506,15 +540,19 @@ export function analyseRecording(recording, meta = {}) {
       declared: declaredHere.map(({ property, animationName, type, computedTiming, keyframes, timing }) => ({ type, property, animationName, timing: computedTiming, rawTiming: timing ?? null, keyframes })),
       measured: { durationMs: measuredMs, overshoot: round(worstOvershoot, 3), frames: track.t.length, staggerMs: stagger },
       transition: firstFrame, driven: Array.from(drivenProperties), owns, fit,
-      agreement: declaredTiming?.duration != null
-        ? (Math.abs(declaredTiming.duration - measuredMs) <= Math.max(2 * frameIntervalMs, declaredTiming.duration * 0.5)
-          ? 'declared timing confirmed by measurement'
-          : `declared ${Math.round(declaredTiming.duration)}ms vs measured ${Math.round(measuredMs)}ms — investigate; measurement is sampled at ~${Math.round(frameIntervalMs)}ms/frame`)
-        : 'nothing declared; measured only — treat duration as approximate',
+      // This string is not internal: paper.mjs writes it onto the evidence
+      // artboard as the "motion check" row, where a human reads "confirmed" off a
+      // design surface. It must not say confirmed unless something was measured
+      // and the two actually agree within a stated band.
+      agreement: agreementVerdict({ declaredTiming, measuredMs, frameIntervalMs }),
     };
   }).filter((node) => Object.keys(node.properties).length > 0 || node.declared.length > 0);
 
-  const result = { ...meta, nodeCount: nodes.length, frames: samples.length, frameIntervalMs: round(frameIntervalMs, 1), nodes, emit: nodes.map((node) => ({ id: node.id, ...emitCode(node) })) };
+  const result = { ...meta, nodeCount: nodes.length, frames: samples.length,
+    frameIntervalMs: frameIntervalMs === null ? null : round(frameIntervalMs, 1),
+    // Carried through so no consumer reads a clipped recording's frame count
+    // or duration as if the interaction had finished.
+    ...(truncated ? { truncated: true } : {}), nodes, emit: nodes.map((node) => ({ id: node.id, ...emitCode(node) })) };
   if (selection) result.selection = selection;
   return result;
 }
@@ -562,8 +600,27 @@ export function emitCode(node) {
   const explicitNames = new Set(explicit.map(([key]) => key));
   const fromRect = [props.w && props.w.driven !== false && !explicitNames.has('width') ? ['width', props.w] : null, props.h && props.h.driven !== false && !explicitNames.has('height') ? ['height', props.h] : null].filter(Boolean);
   const dimensional = [...explicit, ...fromRect];
-  const defaultDuration = Math.max(0, Math.round(node.fit?.duration ?? node.measured?.durationMs ?? 0));
-  const defaultEasing = node.fit?.easing && !String(node.fit.easing).startsWith('unknown') ? node.fit.easing : 'ease-out';
+  // `analyseRecording` deliberately records the sentinel
+  // "unknown — no declared timing, curve did not overshoot" when nothing was
+  // declared and the curve gave no evidence of a curve. Substituting `ease-out`
+  // and `0ms` here threw that honesty away and printed a fabricated timing under a
+  // contract heading that tells the builder to reuse it verbatim. Unknown stays
+  // unknown: null here, and an unresolvable property is not emitted at all.
+  const fittedDuration = node.fit?.duration ?? node.measured?.durationMs ?? null;
+  const defaultDuration = Number.isFinite(fittedDuration) && fittedDuration > 0 ? Math.round(fittedDuration) : null;
+  const defaultEasing = node.fit?.easing && !String(node.fit.easing).startsWith('unknown') ? node.fit.easing : null;
+
+  /** Resolve one property's timing, or report which half could not be established. */
+  const resolveTiming = (timing, values) => {
+    const measured = Math.max(0, ...values.map((value) => value.durationMs ?? 0));
+    const duration = timing?.durationMs ?? (measured || defaultDuration);
+    const easing = timing?.easing ?? defaultEasing;
+    return {
+      durationMs: Number.isFinite(duration) && duration > 0 ? duration : null,
+      easing: easing ?? null,
+      delayMs: timing?.delayMs ?? 0,
+    };
+  };
 
   const animationEntries = [];
   if (transformAt('from') || transformAt('to')) {
@@ -573,13 +630,11 @@ export function emitCode(node) {
   if (props.opacity && props.opacity.driven !== false && props.opacity.emittable !== false) animationEntries.push(['opacity', props.opacity.timing, [props.opacity]]);
   for (const [property, value] of dimensional) animationEntries.push([property, value.timing, [value]]);
 
-  const transitionParts = animationEntries.map(([property, timing, values]) => {
-    const measured = Math.max(0, ...values.map((value) => value.durationMs ?? 0));
-    const durationMs = timing?.durationMs ?? (measured || defaultDuration);
-    const easing = timing?.easing ?? defaultEasing;
-    const delayMs = timing?.delayMs ?? 0;
-    return `${property} ${Math.round(durationMs)}ms ${easing}${delayMs ? ` ${Math.round(delayMs)}ms` : ''}`;
-  });
+  const resolved = animationEntries.map(([property, timing, values]) => ({ property, ...resolveTiming(timing, values) }));
+  const unmeasured = resolved.filter((entry) => entry.durationMs === null || entry.easing === null);
+  const transitionParts = resolved
+    .filter((entry) => entry.durationMs !== null && entry.easing !== null)
+    .map((entry) => `${entry.property} ${Math.round(entry.durationMs)}ms ${entry.easing}${entry.delayMs ? ` ${Math.round(entry.delayMs)}ms` : ''}`);
 
   const declarations = (edge) => [
     transformAt(edge) ? `  transform: ${transformAt(edge)};` : null,
@@ -613,26 +668,35 @@ export function emitCode(node) {
       ? { type: 'spring', stiffness: node.fit.stiffness, damping: node.fit.damping, mass: node.fit.mass }
       : (() => {
         const perValue = {};
-        for (const [property, timing, values] of animationEntries) {
-          const measured = Math.max(0, ...values.map((value) => value.durationMs ?? 0));
-          const durationMs = timing?.durationMs ?? (measured || defaultDuration);
-          const entry = { duration: durationMs / 1000, ease: timing?.easing ?? defaultEasing };
-          if (timing?.delayMs) entry.delay = timing.delayMs / 1000;
-          perValue[property === 'transform' ? 'default' : motionKey(property)] = entry;
+        for (const entry of resolved) {
+          // A property whose duration or easing could not be established is left
+          // out rather than given a plausible one: this object is pasted into a
+          // component, and a fabricated curve there is indistinguishable from a
+          // measured one.
+          if (entry.durationMs === null || entry.easing === null) continue;
+          const value = { duration: entry.durationMs / 1000, ease: entry.easing };
+          if (entry.delayMs) value.delay = entry.delayMs / 1000;
+          perValue[entry.property === 'transform' ? 'default' : motionKey(entry.property)] = value;
         }
-        return animationEntries.length > 1 ? perValue : (Object.values(perValue)[0] ?? {});
+        return Object.keys(perValue).length > 1 ? perValue : (Object.values(perValue)[0] ?? {});
       })();
 
-  const perProperty = animationEntries.map(([property, timing, values]) => ({
-    property,
-    durationMs: timing?.durationMs ?? (Math.max(0, ...values.map((value) => value.durationMs ?? 0)) || defaultDuration),
-    delayMs: timing?.delayMs ?? 0,
-    easing: timing?.easing ?? defaultEasing,
+  const perProperty = resolved.map((entry) => ({
+    property: entry.property,
+    durationMs: entry.durationMs,
+    delayMs: entry.delayMs,
+    easing: entry.easing,
+    ...(entry.durationMs === null || entry.easing === null ? { measured: false } : {}),
   }));
-  const spread = perProperty.length ? Math.max(...perProperty.map((item) => item.durationMs)) - Math.min(...perProperty.map((item) => item.durationMs)) : 0;
+  // Spread is only meaningful across properties whose duration was established.
+  const timed = perProperty.filter((item) => item.durationMs !== null);
+  const spread = timed.length ? Math.max(...timed.map((item) => item.durationMs)) - Math.min(...timed.map((item) => item.durationMs)) : 0;
   const notes = [];
   if (consequences.length) notes.push(`Observed but NOT animated by this element: ${consequences.join(', ')}. These follow from layout — write them instantly (or not at all). Driving a consequence applies it on the first frame and destroys the animation.`);
   if (unsupported.length) notes.push(`Unsupported compound/discrete tracks were retained as evidence but not emitted: ${unsupported.join(', ')}.`);
+  if (unmeasured.length) {
+    notes.push(`NOT EMITTED — timing could not be established for: ${unmeasured.map((entry) => `${entry.property} (${entry.durationMs === null ? 'no duration' : 'no easing'})`).join(', ')}. These properties changed, but neither a declared transition nor a measurable motion window was found, so no curve is given. Do not substitute a default: re-capture with the transition running, or read the value from the source. A guessed curve here is indistinguishable from a measured one once it is in the component.`);
+  }
   if (props.w || props.h) notes.push('Size changes during this animation: it is a layout transition. Animate the dimensional properties directly (as emitted), or use a layout-animation primitive — transform alone will not reproduce it.');
   if (spread > 60) notes.push(`Properties do not finish together (${spread}ms spread): ${perProperty.map((item) => `${item.property} ${item.durationMs}ms`).join(', ')}. Emitting one duration for all of them changes the feel.`);
 
@@ -658,7 +722,15 @@ export async function captureAnimation(driver, {
     const target = animation.effect?.target ?? null;
     const id = target?.getAttribute?.('data-spec-id') ?? null;
     return [id ?? '?', animation.constructor?.name ?? 'Animation', animation.transitionProperty ?? '', animation.animationName ?? ''].join('|');
-  })).catch(() => []);
+  // NOT `.catch(() => [])`. The before-set is what makes an animation "caused by
+  // this interaction" rather than "already running". An empty one from a failed
+  // read makes every ambient animation — a spinner, a marquee, a skeleton
+  // shimmer — fall through to `reason: 'fresh animation'` and get written into
+  // the contract as motion the builder must reproduce. A baseline that could not
+  // be taken is a failed capture, not an empty baseline.
+  })).catch((cause) => {
+    throw new Error(`Could not snapshot animations before the interaction, so nothing can be attributed to it: ${cause?.message ?? cause}`, { cause });
+  });
   await driver.startAnimationRecorder(maxMs);
   if (keys) await driver.page.keyboard.press(keys);
   else if (triggerId) {

@@ -534,6 +534,12 @@ export async function importBundle(bundleDir, options = {}) {
     imported,
     skipped,
     conflicts,
+    // Surfaced as its own list because every caller so far read only `imported`
+    // and `conflicts`. A state whose fitToContent failed keeps the fallback
+    // artboard height, so its frame is CLIPPED — and it was being printed and
+    // counted exactly like a healthy one. A truncated artboard hands the next
+    // agent a screenshot with no hint that anything is missing.
+    rejected: imported.filter((record) => record.status === 'rejected'),
     updated,
     bundleKey,
     bundleDigest,

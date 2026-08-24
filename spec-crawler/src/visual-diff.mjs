@@ -419,8 +419,18 @@ export function compareRgba(reference, candidate, options = {}) {
   };
   const diffPng = encodePng({ width, height, data: output });
   const reportHash = createHash('sha256').update(stableJson({ ...summary, diffSha256: createHash('sha256').update(diffPng).digest('hex') })).digest('hex');
-  const pass = sizeMatch && rgbaChangedPct <= changedThreshold;
-  return { ...summary, pass, reportHash, diffPng };
+  // `percent(0, 0)` is 0, so a comparison in which every pixel was masked used to
+  // report "changed 0% — PASS" having compared nothing at all. Now that captures
+  // can declare volatile regions, a mask covering the whole subject is reachable.
+  const comparedNothing = !(comparedPixels > 0);
+  const pass = sizeMatch && !comparedNothing && rgbaChangedPct <= changedThreshold;
+  return {
+    ...summary,
+    pass,
+    ...(comparedNothing ? { comparedNothing: true, reason: 'every pixel was masked or excluded, so nothing was compared' } : {}),
+    reportHash,
+    diffPng,
+  };
 }
 
 /** Decode and compare two PNGs. Neither image is ever rescaled. */

@@ -41,9 +41,20 @@ if (!values.bundle || !values.url || !values.selector) {
 }
 
 const spec = JSON.parse(readFileSync(path.join(values.bundle, 'spec.json'), 'utf8'));
-const state = values.state
-  ? spec.states.find((s) => s.id === values.state || s.id.startsWith(values.state) || s.id.includes(values.state))
-  : spec.states[0];
+// An exact id always wins. Otherwise every match is collected and an ambiguous
+// selector is an error rather than a silent first-match: `--state 1` matches
+// 001-menu, 010-dialog and 021-popover, and verifying the wrong one produces a
+// perfectly formatted verdict about a state nobody asked for.
+const state = (() => {
+  if (!values.state) return spec.states[0];
+  const exact = spec.states.find((candidate) => candidate.id === values.state);
+  if (exact) return exact;
+  const matches = spec.states.filter((candidate) => candidate.id.startsWith(values.state) || candidate.id.includes(values.state));
+  if (matches.length > 1) {
+    throw new Error(`--state ${values.state} is ambiguous; it matches ${matches.length} states:\n${matches.map((candidate) => `  ${candidate.id}`).join('\n')}`);
+  }
+  return matches[0];
+})();
 if (!state) throw new Error(`No state matching ${values.state}`);
 if (!state.shot) throw new Error(`State ${state.id} has no reference screenshot`);
 

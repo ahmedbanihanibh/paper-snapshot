@@ -304,11 +304,19 @@ export function createHandlers({
         const strip = await filmstrip(active, {
           triggerId: specId,
           onFrame: () => landmarks(active, `[data-spec-id="${specId}"]`),
-        }).catch(() => null);
-        if (strip) {
+        }).catch((cause) => ({ failed: String(cause?.message ?? cause) }));
+        if (strip?.failed) {
+          // Why a reference filmstrip is missing matters: without it the contract
+          // says "no reference filmstrip captured", which reads as "this state has
+          // no motion" rather than "the capture errored".
+          referenceFilmstrip = { unavailable: true, reason: strip.failed, durationMs: null, frames: [] };
+        } else if (strip?.status === 'arming-timed-out') {
+          referenceFilmstrip = { unavailable: true, reason: strip.reason, durationMs: null, frames: [] };
+        } else if (strip) {
           referenceFilmstrip = {
             durationMs: strip.durationMs,
             frames: strip.frames.map((frame) => ({ progress: frame.progress, atMs: frame.atMs, ...frame.sample })),
+            ...(strip.dirty ? { dirty: true, dirtyReason: strip.dirtyReason } : {}),
           };
         }
       }
@@ -383,16 +391,53 @@ export function createHandlers({
         const spec = JSON.parse(readFileSync(checklist, 'utf8'));
         const required = (spec.requiredNodes ?? []).map((entry) => entry.node);
         const mapped = Object.keys(nodeMap ?? {});
-        const missing = required.filter((node) => !mapped.includes(node));
+
+        // Coverage used to be `required` minus `Object.keys(nodeMap)` — the
+        // caller's own argument. That grades the caller against what it claimed,
+        // not against what the page did: naming a node in nodeMap was enough to
+        // mark it covered, whether or not the element existed or ever moved.
+        // `probe` returns null for a selector that does not match exactly one
+        // element, so the frames are the only honest source here.
+        const observed = new Set();
+        const boxes = new Map();
+        for (const frame of frames) {
+          for (const [node, measurement] of Object.entries(frame.nodes ?? {})) {
+            if (!measurement) continue;
+            observed.add(node);
+            const seen = boxes.get(node) ?? [];
+            seen.push(`${measurement.x},${measurement.y},${measurement.w},${measurement.h}`);
+            boxes.set(node, seen);
+          }
+        }
+        const notMapped = required.filter((node) => !mapped.includes(node));
+        const notResolved = required.filter((node) => mapped.includes(node) && !observed.has(node));
+        const staticNodes = required.filter((node) => observed.has(node) && new Set(boxes.get(node)).size <= 1);
+        const missing = [...notMapped, ...notResolved];
+
+        const detailFor = (nodes, suffix) => (spec.requiredNodes ?? [])
+          .filter((entry) => nodes.includes(entry.node))
+          .map((entry) => `${entry.node}: animates ${entry.animate.map((a) => a.property).join(', ')} — ${suffix}`);
+
         coverage = {
-          status: missing.length ? 'INCOMPLETE' : 'complete',
+          status: required.length === 0
+            ? 'no-required-nodes'
+            : (missing.length ? 'INCOMPLETE' : 'complete'),
           required: required.length,
           mapped: mapped.length,
+          observed: observed.size,
           missing,
-          detail: missing.length
-            ? (spec.requiredNodes ?? []).filter((entry) => missing.includes(entry.node))
-              .map((entry) => `${entry.node}: animates ${entry.animate.map((a) => a.property).join(', ')} — not implemented`)
-            : [],
+          notMapped,
+          notResolved,
+          // Not counted as missing: a node can legitimately animate colour or
+          // opacity without its box moving. Reported so a silent no-op is visible.
+          unchangedGeometry: staticNodes,
+          detail: [
+            ...detailFor(notMapped, 'not present in nodeMap'),
+            ...detailFor(notResolved, 'named in nodeMap but its selector matched no single element during the filmstrip'),
+          ],
+          ...(required.length === 0
+            ? { note: 'The checklist lists no required nodes, so this is not evidence of a complete implementation.' }
+            : {}),
         };
       }
 

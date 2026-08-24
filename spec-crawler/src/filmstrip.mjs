@@ -128,7 +128,9 @@ export function armFilmstripInPage(options = {}) {
       targetTag: target?.tagName?.toLowerCase?.() ?? null,
       property: animation.transitionProperty ?? null,
       animationName: animation.animationName ?? null,
-      delay: Number(rawTiming.delay) || 0,
+      // null, not 0: an unparseable delay is unknown, and a shared timeline built
+      // from a confident 0 starts the animation at the wrong moment.
+      delay: Number.isFinite(Number(rawTiming.delay)) ? Number(rawTiming.delay) : null,
       activeDuration: Number(timing.activeDuration),
       endTime: Number(timing.endTime),
       easing: timing.easing ?? rawTiming.easing ?? null,
@@ -281,9 +283,15 @@ export function cleanupFilmstripInPage({ completion = null } = {}) {
       } catch (cause) { errors.push(`ambient restore: ${String(cause?.message ?? cause)}`); }
     }
   } finally {
-    delete window.__filmstrip;
+    // Only discard the restoration data once restoration actually succeeded. The
+    // `frozen` map is the ONLY record of where ambient animations were before they
+    // were paused; deleting it after a failed restore left the page with silently
+    // paused animations and nothing able to recover them, and every later capture
+    // in the session measured that page and reported normally.
+    if (!errors.length) delete window.__filmstrip;
+    else state.unrestored = true;
   }
-  return { cleaned: true, resumed, errors };
+  return { cleaned: errors.length === 0, resumed, errors, ...(errors.length ? { recoverable: true } : {}) };
 }
 
 /** Trigger, freeze, and sample selected animations at fixed progress points. */
@@ -321,11 +329,35 @@ export async function filmstrip(driver, {
     else if (!await driver.clickById(triggerId)) throw new Error(`No element with spec id ${triggerId}.`);
     triggered = true;
 
-    await driver.page.waitForFunction(() => window.__filmstrip && !window.__filmstrip.armed, null, { timeout: 2000 }).catch(() => {});
+    // The timeout was swallowed and `armed` — which the page reports precisely so
+    // this can be asked — was read and never checked. A subject that never mounts
+    // leaves `arm()` retrying forever on requestAnimationFrame with an empty
+    // selection, and the result was reported as `no-causal-animations`: a recorded
+    // verdict that the interaction is not animated, when in truth nothing was ever
+    // observed. Those two answers must not share a status.
+    let armingTimedOut = false;
+    await driver.page
+      .waitForFunction(() => window.__filmstrip && !window.__filmstrip.armed, null, { timeout: 2000 })
+      .catch(() => { armingTimedOut = true; });
     const state = await driver.page.evaluate(readFilmstripStateInPage);
     if (state?.error) throw new Error(state.error);
     const included = state?.selection?.included ?? [];
-    if (!included.length) {
+
+    if (armingTimedOut || state?.armed) {
+      const subject = subjectSelector ?? subjectId ?? '(no explicit subject)';
+      const message = `Filmstrip never finished arming for ${subject} within 2000ms — the subject did not resolve, or animation discovery was still in flight. Nothing was observed, so this is not evidence that the interaction is unanimated.`;
+      if (strict) throw new Error(message);
+      result = {
+        status: 'arming-timed-out',
+        armed: true,
+        // Deliberately not `noAnimations`, and deliberately not `durationMs: 0`.
+        // Both would assert a measurement that was never taken.
+        durationMs: null,
+        frames: [],
+        reason: message,
+        partialSelection: state?.selection ?? { included: [], excluded: [] },
+      };
+    } else if (!included.length) {
       if (strict) throw new Error('No causal animations were selected for the explicit subject.');
       result = { status: 'no-causal-animations', noAnimations: true, durationMs: 0, frames: [], selection: state?.selection ?? { included: [], excluded: [] } };
     } else {
@@ -358,6 +390,18 @@ export async function filmstrip(driver, {
   }
   if (primaryError) throw primaryError;
   if (cleanupErrors.length && strict) throw new Error(`Filmstrip cleanup failed: ${cleanupErrors.join('; ')}`);
+  // Outside strict mode a cleanup failure was attached to the result and otherwise
+  // ignored, while the result still read `status: 'captured'`. It means the page
+  // is left with animations paused mid-transition, so every capture that follows
+  // in this session is measuring a page nobody put back.
+  if (cleanupErrors.length) {
+    return {
+      ...result,
+      cleanup,
+      dirty: true,
+      dirtyReason: `The page was not fully restored after this filmstrip: ${cleanupErrors.join('; ')}. Later captures in this session may measure paused animations — reset before trusting them.`,
+    };
+  }
   return { ...result, cleanup };
 }
 

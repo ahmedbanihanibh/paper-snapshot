@@ -80,13 +80,42 @@ test('filmstrip seeks selected animations on one interaction timeline and cleans
 });
 
 test('strict mode rejects no causal animation and still performs exact cleanup', async () => {
-  const { driver, calls } = fakeDriver({ state: { armed: true, selection: { included: [], excluded: [] } } });
+  // armed:false — arming finished, and it genuinely found nothing.
+  const { driver, calls } = fakeDriver({ state: { armed: false, selection: { included: [], excluded: [] } } });
   await assert.rejects(
     filmstrip(driver, { triggerId: 'toggle', subjectSelector: '#panel', strict: true, progress: [0], settleMs: 0 }),
     /no causal animations/i,
   );
   assert.equal(calls.cleanups, 1);
   assert.equal(calls.screenshots, 0);
+});
+
+test('a subject that never armed is not reported as an unanimated interaction', async () => {
+  // armed:true means `arm()` was still retrying on requestAnimationFrame — the
+  // subject never resolved, or discovery was still in flight. The selection is
+  // empty for a completely different reason than "there is no animation", and
+  // reporting both as `no-causal-animations` recorded a verdict about an
+  // interaction that was never observed.
+  const armedState = { armed: true, selection: { included: [], excluded: [] } };
+
+  const strict = fakeDriver({ state: armedState });
+  await assert.rejects(
+    filmstrip(strict.driver, { triggerId: 'toggle', subjectSelector: '#panel', strict: true, progress: [0], settleMs: 0 }),
+    /never finished arming/i,
+  );
+  assert.equal(strict.calls.cleanups, 1, 'cleanup still runs when arming timed out');
+  assert.equal(strict.calls.screenshots, 0);
+
+  const lenient = fakeDriver({ state: armedState });
+  const result = await filmstrip(lenient.driver, {
+    triggerId: 'toggle', subjectSelector: '#panel', progress: [0], settleMs: 0,
+  });
+  assert.equal(result.status, 'arming-timed-out');
+  assert.equal(result.armed, true);
+  assert.equal(result.noAnimations, undefined, 'must not claim the interaction is unanimated');
+  assert.equal(result.durationMs, null, 'must not report a duration of 0 it never measured');
+  assert.deepEqual(result.frames, []);
+  assert.match(result.reason, /not evidence that the interaction is unanimated/);
 });
 
 test('frame failure resumes animations and removes filmstrip state in finally', async () => {

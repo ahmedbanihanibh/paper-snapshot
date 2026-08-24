@@ -63,5 +63,15 @@ const result = await importBundle(values.bundle, {
 });
 
 console.error(`\n${values['dry-run'] ? 'would process' : 'processed'} ${result.imported.length} → ${result.file} / ${result.page}`);
-for (const item of result.imported) console.log(`${item.id}\t${item.nodeId ?? '(dry-run)'}\t${item.action ?? 'create'}${item.evidenceNodeId ? `\t+evidence ${item.evidenceNodeId}` : ''}`);
-if (result.conflicts.length) process.exitCode = 1;
+for (const item of result.imported) {
+  // A rejected state is one whose artboard could not be fitted to its content, so
+  // it kept the fallback height and its frame is clipped. It used to print exactly
+  // like a successful one and the process still exited 0.
+  const flag = item.status === 'rejected' ? `\tREJECTED (${item.fitStatus ?? 'fit failed'} — artboard clipped)` : '';
+  console.log(`${item.id}\t${item.nodeId ?? '(dry-run)'}\t${item.action ?? 'create'}${item.evidenceNodeId ? `\t+evidence ${item.evidenceNodeId}` : ''}${flag}`);
+}
+if (result.rejected.length) {
+  console.error(`\n${result.rejected.length} artboard(s) could not be fitted to their content and are clipped: ${result.rejected.map((item) => item.id).join(', ')}`);
+  console.error('Re-run to retry them — the ledger has recorded them as rejected, so they will be updated rather than duplicated.');
+}
+if (result.conflicts.length || result.rejected.length) process.exitCode = 1;

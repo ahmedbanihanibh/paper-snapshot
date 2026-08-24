@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { comparePngs, decodePng, encodePng } from '../../src/visual-diff.mjs';
+import { compareRgba, comparePngs, decodePng, encodePng } from '../../src/visual-diff.mjs';
 
 function png(width, height, pixels) {
   return encodePng({ width, height, data: Buffer.from(pixels.flat()) });
@@ -49,4 +49,35 @@ test('explicit masks exclude only requested pixels and report deterministic evid
   assert.equal(masked.maskedPixels, 1);
   assert.equal(masked.reportHash, repeated.reportHash);
   assert.deepEqual(masked.diffPng, repeated.diffPng);
+});
+
+test('a comparison in which everything was masked is not a pass', () => {
+  // percent(0, 0) is 0, so "changed 0% — PASS" was reachable having compared
+  // nothing at all. Now that a capture can declare volatile regions, a mask that
+  // covers the whole subject is reachable in practice.
+  const width = 4;
+  const height = 4;
+  const solid = (r, g, b) => ({
+    width, height,
+    data: Buffer.from(Array.from({ length: width * height }, () => [r, g, b, 255]).flat()),
+  });
+
+  const everythingMasked = compareRgba(solid(255, 0, 0), solid(0, 0, 255), {
+    masks: [{ x: 0, y: 0, width, height }],
+  });
+  assert.equal(everythingMasked.pass, false, 'nothing was compared, so nothing was verified');
+  assert.equal(everythingMasked.comparedNothing, true);
+  assert.match(everythingMasked.reason, /nothing was compared/);
+
+  // A partial mask still compares the rest, and still catches a real difference.
+  const partiallyMasked = compareRgba(solid(255, 0, 0), solid(0, 0, 255), {
+    masks: [{ x: 0, y: 0, width, height: 2 }],
+  });
+  assert.equal(partiallyMasked.pass, false);
+  assert.equal(partiallyMasked.comparedNothing, undefined);
+
+  // And an unmasked identical pair still passes.
+  const identical = compareRgba(solid(9, 9, 9), solid(9, 9, 9), {});
+  assert.equal(identical.pass, true);
+  assert.equal(identical.comparedNothing, undefined);
 });

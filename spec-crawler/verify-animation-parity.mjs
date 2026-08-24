@@ -146,9 +146,16 @@ const trace = (toggleSelector, panelSelector) => `(async () => {
         targetIdentity: targetIdentity(target),
         property: animation.transitionProperty ?? null,
         animationName: animation.animationName ?? null,
-        duration: typeof rawTiming.duration === 'number' ? rawTiming.duration : Number(rawTiming.duration) || null,
-        delay: Number(rawTiming.delay) || 0,
-        endDelay: Number(rawTiming.endDelay) || 0,
+        // Preserve a non-numeric duration verbatim. A duration of 'auto' (scroll
+        // and view-timeline driven animations) became NaN and then null, so two
+        // animations resolving 'auto' very differently compared EQUAL and fed a
+        // false timingMatch. Number(x) || 0 likewise turns a NaN delay into a
+        // confident 0.
+        duration: typeof rawTiming.duration === 'number'
+          ? rawTiming.duration
+          : (Number.isFinite(Number(rawTiming.duration)) ? Number(rawTiming.duration) : (rawTiming.duration ?? null)),
+        delay: Number.isFinite(Number(rawTiming.delay)) ? Number(rawTiming.delay) : null,
+        endDelay: Number.isFinite(Number(rawTiming.endDelay)) ? Number(rawTiming.endDelay) : null,
         activeDuration: Number(timing.activeDuration),
         easing: timing.easing ?? rawTiming.easing ?? null,
         iterations: Number(timing.iterations ?? rawTiming.iterations) || 1,
@@ -183,7 +190,14 @@ const trace = (toggleSelector, panelSelector) => `(async () => {
     result = {
       duration: timeline.durationMs,
       rows,
-      easing: descriptors[0]?.easing ?? null,
+      // The distinct set, not descriptors[0]. getAnimations() order is arbitrary,
+      // so a panel easing opacity with ease-out and height with a custom bezier
+      // reported whichever the engine happened to enumerate first, as though it
+      // were the animation's easing.
+      easing: (() => {
+        const distinct = [...new Set(descriptors.map((d) => d.easing).filter(Boolean))];
+        return distinct.length === 0 ? null : distinct.length === 1 ? distinct[0] : distinct.join(' + ');
+      })(),
       props,
       animations: timeline.animations,
       selection: { included: descriptors.map(({ animationId, property }) => ({ animationId, property, reason: 'causal panel target' })), excluded },
@@ -246,9 +260,11 @@ const canonicalAnimations = (animations) => animations.map((animation) => ({
   property: animation.property,
   animationName: animation.animationName,
   duration: Number.isFinite(animation.duration) ? +animation.duration.toFixed(3) : animation.duration,
-  delay: +animation.delay.toFixed(3),
-  endDelay: +animation.endDelay.toFixed(3),
-  activeDuration: +animation.activeDuration.toFixed(3),
+  // An unknown value stays unknown here too, so two animations with unparseable
+  // timing do not both round to 0 and compare equal.
+  delay: Number.isFinite(animation.delay) ? +animation.delay.toFixed(3) : animation.delay,
+  endDelay: Number.isFinite(animation.endDelay) ? +animation.endDelay.toFixed(3) : animation.endDelay,
+  activeDuration: Number.isFinite(animation.activeDuration) ? +animation.activeDuration.toFixed(3) : animation.activeDuration,
   easing: animation.easing,
   iterations: animation.iterations,
   iterationStart: animation.iterationStart,

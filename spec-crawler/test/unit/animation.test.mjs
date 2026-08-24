@@ -126,3 +126,64 @@ test('existing spring fit and ownership evidence remain additive and readable', 
   assert.ok(node.properties['min-height']);
   assert.ok(emitCode(node).framerMotion.transition.stiffness > 0);
 });
+
+test('an unknown easing is never replaced with a plausible default', () => {
+  // analyseRecording records the sentinel "unknown — no declared timing, curve did
+  // not overshoot" precisely so this stays honest. emitCode used to detect that
+  // sentinel and substitute `ease-out`, printing a fabricated curve under a
+  // contract heading that says "reuse this transition verbatim".
+  const emitted = emitCode({
+    properties: {
+      opacity: { from: 0, to: 1, driven: true, emittable: true, timing: null, durationMs: null },
+    },
+    measured: { durationMs: null, overshoot: 0 },
+    fit: { type: 'tween', duration: null, easing: 'unknown — no declared timing, curve did not overshoot' },
+  });
+
+  assert.doesNotMatch(JSON.stringify(emitted.css ?? ''), /ease-out/, 'must not invent an easing');
+  assert.doesNotMatch(JSON.stringify(emitted.css ?? ''), /0ms/, 'must not invent a zero duration');
+  assert.deepEqual(emitted.framerMotion.transition, {}, 'an unmeasurable property is omitted, not defaulted');
+  assert.match(emitted.note ?? '', /NOT EMITTED/, 'a dropped property must be announced, not silently absent');
+  assert.match(emitted.note ?? '', /opacity/, 'and it must name which property');
+  const [opacity] = emitted.perProperty.filter((entry) => entry.property === 'opacity');
+  assert.equal(opacity.durationMs, null);
+  assert.equal(opacity.easing, null);
+  assert.equal(opacity.measured, false);
+});
+
+test('agreement never reports "confirmed" against a measurement that never happened', async () => {
+  const { agreementVerdict } = await import('../../src/animation.mjs');
+
+  // The old band was max(2 * 16.7, declared * 0.5). A declared 30ms against a
+  // measured 0 fell inside it, so "declared timing confirmed by measurement" was
+  // printed onto the Paper evidence artboard with nothing behind it.
+  assert.match(
+    agreementVerdict({ declaredTiming: { duration: 30 }, measuredMs: null, frameIntervalMs: null }),
+    /NOT verified/,
+  );
+  assert.match(
+    agreementVerdict({ declaredTiming: null, measuredMs: null, frameIntervalMs: null }),
+    /duration unknown/,
+  );
+
+  // 50% was far too wide: a declared 300ms was "confirmed" by a measured 450ms.
+  assert.match(
+    agreementVerdict({ declaredTiming: { duration: 300 }, measuredMs: 450, frameIntervalMs: 16 }),
+    /investigate/,
+  );
+  const confirmed = agreementVerdict({ declaredTiming: { duration: 300 }, measuredMs: 305, frameIntervalMs: 16 });
+  assert.match(confirmed, /confirmed by measurement/);
+  assert.match(confirmed, /within \d+ms/, 'the band must be stated so a reader can judge it');
+  assert.match(
+    agreementVerdict({ declaredTiming: { duration: 300 }, measuredMs: 305, frameIntervalMs: null }),
+    /sample interval unknown/,
+  );
+});
+
+test('a frame interval is null when none was observed, never an invented 16.7', () => {
+  const one = analyseRecording({ declared: [], samples: [nodeSample(0)] });
+  assert.equal(one.frameIntervalMs, null, 'a single sample cannot yield an interval');
+
+  const truncated = analyseRecording({ declared: [], samples: [nodeSample(0)], truncated: true });
+  assert.equal(truncated.truncated, true, 'a clipped recording must say so');
+});

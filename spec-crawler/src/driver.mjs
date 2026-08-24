@@ -794,9 +794,15 @@ export class SpecDriver {
 
   /** Wait for the recorder to finish, then drain it. */
   async readAnimationRecorder(maxMs = 2000) {
+    // Reading a partial recording is the right call — a truncated sample is still
+    // evidence. Reading it WITHOUT saying it was truncated is not: the analyser
+    // reports frame counts and durations from a subset exactly as it would from a
+    // complete run, so a clipped recording becomes a confident short duration.
+    let truncated = false;
     await this.page.waitForFunction(() => window.__specAnimation?.done === true, null, { timeout: maxMs + 1500 })
-      .catch(() => { /* fall through and read whatever was captured */ });
-    return this.page.evaluate(agent.readAnimationRecorder);
+      .catch(() => { truncated = true; });
+    const recording = await this.page.evaluate(agent.readAnimationRecorder);
+    return truncated ? { ...recording, truncated: true, truncatedAfterMs: maxMs + 1500 } : recording;
   }
 
   async screenshot(specId) {
