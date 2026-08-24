@@ -30,6 +30,13 @@
  * nothing again.
  */
 
+import * as pageAgent from './page-agent.mjs';
+import {
+  TargetLeaseError,
+  acquireTargetLease,
+  getTargetLease,
+} from './target.mjs';
+
 /** Attributes that carry interaction state. Identity attributes are excluded on
  *  purpose: per-row uuids would make every row its own component. */
 export const STATE_ATTRIBUTES = [
@@ -55,59 +62,25 @@ const SPEC_ID = 'data-spec-id';
  * inside a 1179px row, and the row is what you want.
  */
 export async function resolveComponentAt(driver, x, y, { specId = null, expect = null } = {}) {
-  return driver.page.evaluate(
-    ({ x, y, attribute, assigned, expect }) => {
-      const leaf = document.elementFromPoint(x, y);
-      if (!leaf) return { error: `nothing at (${x}, ${y}) — the point is over a gap or outside the viewport` };
-
-      const landmark = leaf.closest('[data-list-row],[role="row"],[role="option"],[role="menuitem"],[role="dialog"],[role="listitem"],a[href],li,button');
-      let chosen = landmark ?? leaf;
-
-      if (!landmark) {
-        // Widen while the ancestor is still visually the same object.
-        let node = leaf;
-        const leafRect = leaf.getBoundingClientRect();
-        while (node.parentElement) {
-          const parentRect = node.parentElement.getBoundingClientRect();
-          const grew = parentRect.width > leafRect.width * 4 || parentRect.height > leafRect.height * 4;
-          if (grew) break;
-          node = node.parentElement;
-        }
-        chosen = node;
-      }
-
-      const label = (chosen.getAttribute('aria-label') || chosen.innerText || '').trim().replace(/\s+/g, ' ');
-
-      // The staleness guard. A coordinate captured a moment ago may now point at
-      // a different element because the page scrolled or re-rendered. Without a
-      // check, elementFromPoint resolves SOMETHING and it measures cleanly —
-      // confident, wrong output, which is the exact failure this whole tool is
-      // meant to prevent. `expect` (a substring of the label, a tag, or an
-      // attribute selector) turns that silent miss into a loud refusal.
-      if (expect) {
-        const matches = label.toLowerCase().includes(expect.toLowerCase())
-          || chosen.tagName.toLowerCase() === expect.toLowerCase()
-          || ((() => { try { return chosen.matches(expect); } catch { return false; } })());
-        if (!matches) {
-          return { error: `point (${x}, ${y}) resolved to <${chosen.tagName.toLowerCase()}> "${label.slice(0, 50)}", which does not match expect="${expect}". The layout moved — re-read coordinates and retry.`, resolvedLabel: label.slice(0, 60) };
-        }
-      }
-
-      chosen.setAttribute(attribute, assigned);
-      const rect = chosen.getBoundingClientRect();
-      const styles = getComputedStyle(chosen);
-      return {
-        specId: assigned,
-        tag: chosen.tagName.toLowerCase(),
-        via: landmark ? 'landmark' : 'width-boundary',
-        label: label.slice(0, 60),
-        rect: { x: +rect.x.toFixed(1), y: +rect.y.toFixed(1), width: +rect.width.toFixed(1), height: +rect.height.toFixed(1) },
-        display: styles.display,
-        href: chosen.getAttribute('href'),
-      };
-    },
-    { x, y, attribute: SPEC_ID, assigned: specId ?? `pt${Date.now().toString(36)}`, expect },
-  );
+  try {
+    const lease = await acquireTargetLease(driver, {
+      x,
+      y,
+      expect,
+      assignedSpecId: specId,
+    });
+    // Preserve the original plain-object return contract. The live lease is kept
+    // in target.mjs's page-local registry and is revalidated by every later step.
+    return { ...lease.snapshot, label: lease.snapshot.label.slice(0, 60) };
+  } catch (error) {
+    if (!(error instanceof TargetLeaseError)) throw error;
+    return {
+      error: error.message,
+      code: error.code,
+      reason: error.reason,
+      resolvedLabel: error.evidence?.resolved?.label?.slice?.(0, 60),
+    };
+  }
 }
 
 /**
@@ -123,24 +96,26 @@ export async function resolveComponentAt(driver, x, y, { specId = null, expect =
  * module takes them in the first place. Keeping the point lets any lost tag be
  * re-earned instead of failing.
  */
-export async function ensureTagged(driver, specId, x, y) {
-  // Check AND re-tag in one evaluate. Doing it as two calls does not close the
-  // race, it only moves it: a check that passes can be followed by a recycle
-  // before the read, and re-tagging in one call then reading in the next landed
-  // the tag on a *different row* — which measures cleanly and is simply wrong.
-  const result = await driver.page.evaluate(
-    ({ specId, attribute, x, y }) => {
-      if (document.querySelector(`[${attribute}="${specId}"]`)) return { ok: true, reResolved: false };
-      const leaf = document.elementFromPoint(x, y);
-      if (!leaf) return { ok: false };
-      const el = leaf.closest('[data-list-row],[role="row"],[role="option"],[role="menuitem"],[role="dialog"],[role="listitem"],a[href],li') ?? leaf;
-      el.setAttribute(attribute, specId);
-      return { ok: true, reResolved: true };
-    },
-    { specId, attribute: SPEC_ID, x, y },
-  );
-  if (!result.ok) throw new Error(`Component at (${x}, ${y}) was re-rendered away and nothing is there now. If the page is still settling, wait and retry; if the layout moved, point again.`);
-  return { specId, reResolved: result.reResolved };
+export async function ensureTagged(driver, specId, x, y, { expect = null } = {}) {
+  let lease = getTargetLease(driver, specId);
+  if (!lease) {
+    // Direct callers can still recover, but must now supply the expectation that
+    // prevents a stale coordinate from silently becoming a different component.
+    lease = await acquireTargetLease(driver, {
+      x,
+      y,
+      expect,
+      assignedSpecId: specId,
+    });
+    return { specId, reResolved: true, lease: lease.snapshot };
+  }
+  const before = lease.snapshot.rect;
+  const current = await lease.ensureTagged();
+  return {
+    specId,
+    reResolved: current.via !== 'spec-id' || JSON.stringify(current.rect) !== JSON.stringify(before),
+    lease: current,
+  };
 }
 
 /**
@@ -178,47 +153,24 @@ export async function serializeStable(driver, specId, x, y) {
  *
  * Returns a restore function; the live page must not be left mutated.
  */
+let subgridTransaction = 0;
+
 export async function resolveSubgrid(driver, specId) {
-  const touched = await driver.page.evaluate(
-    ({ specId, attribute }) => {
-      const root = specId ? document.querySelector(`[${attribute}="${specId}"]`) : document.body;
-      if (!root) return 0;
-      const targets = [root, ...root.querySelectorAll('*')]
-        .filter((el) => getComputedStyle(el).gridTemplateColumns.startsWith('subgrid'));
-
-      let count = 0;
-      for (const el of targets) {
-        // `display: contents` ancestors sit in this chain and must be walked
-        // through, not stopped at.
-        let ancestor = el.parentElement;
-        let source = null;
-        while (ancestor) {
-          const style = getComputedStyle(ancestor);
-          if (style.display.includes('grid')
-              && !style.gridTemplateColumns.startsWith('subgrid')
-              && style.gridTemplateColumns !== 'none') { source = style; break; }
-          ancestor = ancestor.parentElement;
-        }
-        if (!source) continue;
-        el.dataset.specSubgridPrev = el.style.cssText;
-        el.style.gridTemplateColumns = source.gridTemplateColumns;
-        if (source.columnGap && source.columnGap !== 'normal') el.style.columnGap = source.columnGap;
-        count += 1;
-      }
-      return count;
-    },
-    { specId, attribute: SPEC_ID },
-  );
-
-  if (!touched) return { resolved: 0, restore: async () => {} };
+  subgridTransaction += 1;
+  const result = await driver.page.evaluate(pageAgent.resolveSubgrids, {
+    attribute: SPEC_ID,
+    targetSpecId: specId ?? null,
+    token: `intent-${subgridTransaction}`,
+  });
+  if (!result?.resolved) return { resolved: 0, restore: async () => 0 };
+  let restored = false;
   return {
-    resolved: touched,
-    restore: () => driver.page.evaluate(() => {
-      for (const el of document.querySelectorAll('[data-spec-subgrid-prev]')) {
-        el.style.cssText = el.dataset.specSubgridPrev;
-        delete el.dataset.specSubgridPrev;
-      }
-    }),
+    resolved: result.resolved,
+    restore: async () => {
+      if (restored) return 0;
+      restored = true;
+      return driver.page.evaluate(pageAgent.restoreSubgrids, { records: result.records });
+    },
   };
 }
 
@@ -232,20 +184,14 @@ export async function resolveSubgrid(driver, specId) {
  * and this supplies everything a screenshot loses. Neither half can fake the
  * other, which is the property worth keeping.
  */
-export async function measuredAnnotation(driver, specId, { x = null, y = null } = {}) {
+export async function measuredAnnotation(driver, specId, { x = null, y = null, expect = null } = {}) {
+  await ensureTagged(driver, specId, x, y, { expect });
   return driver.page.evaluate(
-    ({ specId, attribute, stateAttrs, x, y }) => {
-      // Resolve and measure in ONE page call. Re-tagging in a previous call and
-      // reading in this one still races a live app: Linear recycled the row
-      // between the two, so the tag pointed at a different issue and the read
-      // came back null while looking like "this component has no styles".
-      // Anything that must agree with the tag has to happen inside one evaluate.
-      let el = document.querySelector(`[${attribute}="${specId}"]`);
-      if (!el && x !== null && y !== null) {
-        const leaf = document.elementFromPoint(x, y);
-        el = leaf?.closest('[data-list-row],[role="row"],[role="option"],[role="menuitem"],[role="dialog"],[role="listitem"],a[href],li') ?? leaf;
-        if (el) el.setAttribute(attribute, specId);
-      }
+    ({ specId, attribute, stateAttrs }) => {
+      // The TargetLease was revalidated immediately before this read. If the
+      // element disappears in the narrow gap, return null rather than resolving
+      // the coordinate without identity evidence and measuring the wrong row.
+      const el = document.querySelector(`[${attribute}="${specId}"]`);
       if (!el) return null;
       const rect = el.getBoundingClientRect();
       const styles = getComputedStyle(el);
@@ -276,7 +222,7 @@ export async function measuredAnnotation(driver, specId, { x = null, y = null } 
         ),
       };
     },
-    { specId, attribute: SPEC_ID, stateAttrs: STATE_ATTRIBUTES, x, y },
+    { specId, attribute: SPEC_ID, stateAttrs: STATE_ATTRIBUTES },
   );
 }
 

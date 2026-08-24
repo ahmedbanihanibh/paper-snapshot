@@ -232,6 +232,266 @@ export function pageSignature(attribute) {
 }
 
 /**
+ * A semantic baseline snapshot. Unlike pageSignature, this distinguishes two
+ * different surfaces with the same element counts and reports why reset failed.
+ */
+export function semanticSnapshot({ attribute, urlParts = ['origin', 'pathname', 'search'] } = {}) {
+  const normalize = (value) => String(value ?? '').trim().replace(/\s+/g, ' ');
+  const digest = (value) => {
+    let hash = 0x811c9dc5;
+    const text = String(value ?? '');
+    for (let index = 0; index < text.length; index += 1) {
+      hash ^= text.charCodeAt(index);
+      hash = Math.imul(hash, 0x01000193);
+    }
+    return (hash >>> 0).toString(16).padStart(8, '0');
+  };
+  const rectOf = (element) => {
+    const rect = element.getBoundingClientRect();
+    return {
+      x: +rect.x.toFixed(1), y: +rect.y.toFixed(1),
+      width: +rect.width.toFixed(1), height: +rect.height.toFixed(1),
+    };
+  };
+  const visible = (element) => {
+    const rect = element.getBoundingClientRect();
+    const style = getComputedStyle(element);
+    return rect.width >= 1 && rect.height >= 1
+      && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+  };
+  const semanticDescriptor = (element) => ({
+    tag: element.tagName.toLowerCase(),
+    role: element.getAttribute('role') || (element.tagName === 'DIALOG' ? 'dialog' : null),
+    labelDigest: digest(normalize(element.getAttribute('aria-label') || element.innerText || element.textContent || '').slice(0, 500)),
+    id: element.id || null,
+    testId: element.getAttribute('data-testid') || element.getAttribute('data-test-id') || null,
+  });
+  const stateAttributes = (element) => {
+    const state = {};
+    for (const attr of element.attributes) {
+      if (attr.name === 'open' || attr.name === 'hidden'
+        || attr.name.startsWith('aria-')
+        || attr.name === 'data-state' || attr.name === 'data-active'
+        || attr.name === 'data-selected' || attr.name === 'data-highlighted'
+        || attr.name === 'data-checked' || attr.name === 'data-disabled') {
+        state[attr.name] = attr.value;
+      }
+    }
+    return state;
+  };
+  const visualHash = (element) => {
+    const nodes = [element, ...element.querySelectorAll('*')].slice(0, 300);
+    const parts = [];
+    for (const node of nodes) {
+      if (!visible(node)) continue;
+      const style = getComputedStyle(node);
+      const rect = node.getBoundingClientRect();
+      parts.push([
+        node.tagName,
+        +rect.x.toFixed(1), +rect.y.toFixed(1), +rect.width.toFixed(1), +rect.height.toFixed(1),
+        style.display, style.visibility, style.opacity, style.transform, style.filter,
+        style.color, style.backgroundColor, style.borderTopColor, style.borderTopWidth,
+        style.borderRadius, style.boxShadow, style.fontSize, style.fontWeight, style.lineHeight,
+      ].join('|'));
+    }
+    return digest(parts.join('\n'));
+  };
+  const stateHash = (element) => {
+    const nodes = [element, ...element.querySelectorAll('*')].slice(0, 500);
+    return digest(nodes.map((node) => `${node.tagName}:${JSON.stringify(stateAttributes(node))}`).join('|'));
+  };
+
+  const parsed = new URL(location.href);
+  const url = {};
+  for (const part of urlParts) {
+    if (part in parsed) url[part] = parsed[part];
+  }
+
+  const surfaceSelector = '[role="dialog"],[role="menu"],[role="listbox"],[role="tooltip"],[role="alertdialog"],dialog[open],[data-state="open"],[aria-modal="true"],[popover]:popover-open';
+  const surfaces = [];
+  const surfaceCounts = new Map();
+  for (const element of document.querySelectorAll(surfaceSelector)) {
+    if (!visible(element)) continue;
+    const descriptor = semanticDescriptor(element);
+    const base = `${descriptor.tag}|${descriptor.role ?? ''}|${descriptor.labelDigest}`;
+    const ordinal = surfaceCounts.get(base) ?? 0;
+    surfaceCounts.set(base, ordinal + 1);
+    surfaces.push({
+      key: `${base}|${ordinal}`,
+      ...descriptor,
+      rect: rectOf(element),
+      stateHash: stateHash(element),
+      visualHash: visualHash(element),
+    });
+  }
+  surfaces.sort((left, right) => left.key.localeCompare(right.key));
+
+  const relevantState = [];
+  const stateSelector = '[open],[aria-expanded],[aria-selected],[aria-checked],[aria-pressed],[aria-current],[aria-modal],[data-state],[data-active],[data-selected],[data-highlighted],[data-checked],[data-disabled]';
+  const stateCounts = new Map();
+  for (const element of document.querySelectorAll(stateSelector)) {
+    if (!visible(element)) continue;
+    const descriptor = semanticDescriptor(element);
+    const state = stateAttributes(element);
+    const base = `${descriptor.tag}|${descriptor.role ?? ''}|${descriptor.labelDigest}`;
+    const ordinal = stateCounts.get(base) ?? 0;
+    stateCounts.set(base, ordinal + 1);
+    relevantState.push({ key: `${base}|${ordinal}`, state });
+    if (relevantState.length >= 500) break;
+  }
+  relevantState.sort((left, right) => left.key.localeCompare(right.key));
+
+  const scroll = [{ key: 'window', left: +scrollX.toFixed(1), top: +scrollY.toFixed(1) }];
+  const scrollCounts = new Map();
+  for (const element of document.querySelectorAll('*')) {
+    const style = getComputedStyle(element);
+    const scrollable = /(auto|scroll)/.test(`${style.overflowX} ${style.overflowY}`)
+      && (element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth);
+    if (!scrollable && element.scrollLeft === 0 && element.scrollTop === 0) continue;
+    const descriptor = semanticDescriptor(element);
+    const base = `${descriptor.tag}|${descriptor.role ?? ''}|${descriptor.labelDigest}`;
+    const ordinal = scrollCounts.get(base) ?? 0;
+    scrollCounts.set(base, ordinal + 1);
+    scroll.push({
+      key: `${base}|${ordinal}`,
+      left: +element.scrollLeft.toFixed(1), top: +element.scrollTop.toFixed(1),
+      width: element.scrollWidth, height: element.scrollHeight,
+    });
+    if (scroll.length >= 200) break;
+  }
+
+  const active = document.activeElement && document.activeElement !== document.body
+    ? semanticDescriptor(document.activeElement)
+    : null;
+  const residue = [];
+  if (document.getElementById('__spec_annotations__')) residue.push('annotations');
+  if (window.__specAnimation) residue.push('animation-recorder');
+  if (document.querySelector('[data-spec-subgrid-token]')) residue.push('subgrid-resolution');
+  if (document.querySelector('[data-spec-forced-state],[data-spec-force-state]')) residue.push('forced-state-attributes');
+
+  return {
+    url,
+    documentEpoch: String(performance.timeOrigin),
+    surfaces,
+    focus: active,
+    scroll,
+    relevantState,
+    crawlerResidue: residue.sort(),
+  };
+}
+
+/** Compare two semantic snapshots and retain exact field-level differences. */
+export function compareSemanticSnapshots(expected, actual) {
+  const differences = [];
+  const compare = (left, right, path) => {
+    if (Object.is(left, right)) return;
+    if (Array.isArray(left) || Array.isArray(right)) {
+      if (!Array.isArray(left) || !Array.isArray(right) || JSON.stringify(left) !== JSON.stringify(right)) {
+        differences.push({ path, expected: left, actual: right });
+      }
+      return;
+    }
+    if (left && right && typeof left === 'object' && typeof right === 'object') {
+      const keys = new Set([...Object.keys(left), ...Object.keys(right)]);
+      for (const key of [...keys].sort()) compare(left[key], right[key], path ? `${path}.${key}` : key);
+      return;
+    }
+    differences.push({ path, expected: left, actual: right });
+  };
+  compare(expected, actual, '');
+  return { equal: differences.length === 0, differences };
+}
+
+/** Resolve all column/row subgrids in a subtree and return exact restoration data. */
+export function resolveSubgrids({ attribute, targetSpecId = null, targetSelector = null, token = 'capture' } = {}) {
+  let root = null;
+  if (targetSpecId) root = document.querySelector(`[${attribute}="${String(targetSpecId).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"]`);
+  else if (targetSelector) { try { root = document.querySelector(targetSelector); } catch { root = null; } }
+  else root = document.body;
+  if (!root) return { resolved: 0, records: [] };
+
+  const elements = [root, ...root.querySelectorAll('*')];
+  const targets = elements.filter((element) => {
+    const style = getComputedStyle(element);
+    return style.gridTemplateColumns.startsWith('subgrid') || style.gridTemplateRows.startsWith('subgrid');
+  });
+  const records = [];
+  for (let index = 0; index < targets.length; index += 1) {
+    const element = targets[index];
+    const computed = getComputedStyle(element);
+    const columnsSubgrid = computed.gridTemplateColumns.startsWith('subgrid');
+    const rowsSubgrid = computed.gridTemplateRows.startsWith('subgrid');
+    let columnSource = null;
+    let rowSource = null;
+    let ancestor = element.parentElement;
+    while (ancestor && (!columnSource || !rowSource)) {
+      const style = getComputedStyle(ancestor);
+      // display:contents is intentionally traversed; it participates in the
+      // ancestry but cannot supply grid tracks itself.
+      if (style.display.includes('grid')) {
+        if (!columnSource && !style.gridTemplateColumns.startsWith('subgrid') && style.gridTemplateColumns !== 'none') columnSource = style;
+        if (!rowSource && !style.gridTemplateRows.startsWith('subgrid') && style.gridTemplateRows !== 'none') rowSource = style;
+      }
+      ancestor = ancestor.parentElement;
+    }
+    if ((columnsSubgrid && !columnSource) || (rowsSubgrid && !rowSource)) continue;
+
+    const marker = `${token}-${index}`;
+    const hadStyle = element.hasAttribute('style');
+    const cssText = element.getAttribute('style') ?? '';
+    element.setAttribute('data-spec-subgrid-token', marker);
+    if (columnsSubgrid && columnSource) {
+      // Keep named lines verbatim: descendants may place themselves by name.
+      element.style.gridTemplateColumns = columnSource.gridTemplateColumns;
+      if (columnSource.columnGap && columnSource.columnGap !== 'normal') element.style.columnGap = columnSource.columnGap;
+    }
+    if (rowsSubgrid && rowSource) {
+      element.style.gridTemplateRows = rowSource.gridTemplateRows;
+      if (rowSource.rowGap && rowSource.rowGap !== 'normal') element.style.rowGap = rowSource.rowGap;
+    }
+    records.push({ marker, hadStyle, cssText });
+  }
+  return { resolved: records.length, records };
+}
+
+/** Restore exact authored inline style text, including absence of style=. */
+export function restoreSubgrids({ records = [] } = {}) {
+  let restored = 0;
+  for (const record of records) {
+    const marker = String(record.marker).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    const element = document.querySelector(`[data-spec-subgrid-token="${marker}"]`);
+    if (!element) continue;
+    if (record.hadStyle) element.setAttribute('style', record.cssText);
+    else element.removeAttribute('style');
+    element.removeAttribute('data-spec-subgrid-token');
+    restored += 1;
+  }
+  return restored;
+}
+
+/** Remove transient crawler mutations without removing ordinary element tags. */
+export function clearCrawlerResidue({ clearTags = false, attribute = 'data-spec-id' } = {}) {
+  document.getElementById('__spec_annotations__')?.remove();
+  delete window.__specAnimation;
+  for (const element of document.querySelectorAll('[data-spec-forced-state],[data-spec-force-state]')) {
+    element.removeAttribute('data-spec-forced-state');
+    element.removeAttribute('data-spec-force-state');
+  }
+  // A normally completed subgrid transaction has no markers. If one remains we
+  // can remove its marker, but cannot invent the lost authored cssText; the
+  // semantic baseline will continue to report any resulting visual difference.
+  for (const element of document.querySelectorAll('[data-spec-subgrid-token]')) {
+    element.removeAttribute('data-spec-subgrid-token');
+  }
+  if (clearTags) {
+    for (const element of document.querySelectorAll(`[${attribute}]`)) element.removeAttribute(attribute);
+    delete document.documentElement.dataset.specCounter;
+    delete document.documentElement.dataset.specPointCounter;
+  }
+  return true;
+}
+
+/**
  * Last-resort click: dispatch the full pointer sequence by hand.
  *
  * Two reasons this exists rather than calling `element.click()`:

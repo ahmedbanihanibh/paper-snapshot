@@ -16,7 +16,7 @@ set -uo pipefail
 
 PROFILE="${SPEC_EDGE_PROFILE:-$HOME/.spec-crawler-edge}"
 PORT="${SPEC_CDP_PORT:-9222}"
-EDGE="/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"
+EDGE="${SPEC_EDGE_BIN:-${EDGE:-/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge}}"
 LINEAR_URL="${SPEC_LINEAR_URL:-https://linear.app/test-workspace-bb/team/TES/all}"
 APP_URL="${SPEC_APP_URL:-http://localhost:3000}"
 

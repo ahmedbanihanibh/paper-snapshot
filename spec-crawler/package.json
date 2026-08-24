@@ -9,8 +9,18 @@
     "spec-crawler-mcp": "./mcp.mjs"
   },
   "scripts": {
-    "edge": "open -na 'Microsoft Edge' --args --remote-debugging-port=9222 --user-data-dir=\"$HOME/.spec-crawler-edge\"",
-    "crawl": "node index.mjs"
+    "edge": "./bin/spec-up-paired.sh",
+    "crawl": "node index.mjs",
+    "scenario": "node scenario-run.mjs",
+    "validate:bundles": "node validate-bundles.mjs",
+    "test": "node --test --test-concurrency=1",
+    "test:unit": "node --test --test-concurrency=1 test/unit/*.test.mjs",
+    "test:browser": "node --test --test-concurrency=1 test/browser/*.test.mjs",
+    "test:integration": "node --test --test-concurrency=1 test/integration/*.test.mjs",
+    "test:repeatability": "node --test --test-concurrency=1 test/repeatability/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",

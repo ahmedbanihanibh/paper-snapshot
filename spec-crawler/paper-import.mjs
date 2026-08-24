@@ -18,6 +18,8 @@ const { values } = parseArgs({
     limit: { type: 'string' },
     'dry-run': { type: 'boolean', default: false },
     evidence: { type: 'boolean', default: false },
+    'file-id': { type: 'string' },
+    update: { type: 'boolean', default: false },
     help: { type: 'boolean', default: false },
   },
 });
@@ -31,14 +33,17 @@ if (values.help) {
   --dry-run        list what would be imported, write nothing
   --evidence       also create an evidence artboard per state (annotated
                    screenshot + anchor + role evidence + css state summary)
+  --file-id <id>   target a specific open Paper file
+  --update          update a changed ledger entry instead of reporting conflict
 `);
   process.exit(0);
 }
 
 // Fail loudly and early if the app isn't up — otherwise the first artboard call
 // produces a confusing fetch error.
+let client;
 try {
-  await new PaperClient().connect();
+  client = await new PaperClient().connect();
 } catch (cause) {
   console.error('Could not reach the Paper MCP app at http://127.0.0.1:29979/mcp');
   console.error('Open the Paper MCP app and load a file, then retry.');
@@ -51,8 +56,12 @@ const result = await importBundle(values.bundle, {
   limit: values.limit ? Number(values.limit) : Infinity,
   dryRun: values['dry-run'],
   evidence: values.evidence,
-  onProgress: ({ state }) => process.stderr.write(`  ${state.id} (${state.kind})\n`),
+  fileId: values['file-id'],
+  onConflict: values.update ? 'update' : 'conflict',
+  client,
+  onProgress: ({ state, action }) => process.stderr.write(`  ${state.id} (${state.kind})${action ? ` [${action}]` : ''}\n`),
 });
 
-console.error(`\n${values['dry-run'] ? 'would import' : 'imported'} ${result.imported.length} → ${result.file} / ${result.page}`);
-for (const item of result.imported) console.log(`${item.id}\t${item.nodeId ?? '(dry-run)'}${item.evidenceNodeId ? `\t+evidence ${item.evidenceNodeId}` : ''}`);
+console.error(`\n${values['dry-run'] ? 'would process' : 'processed'} ${result.imported.length} → ${result.file} / ${result.page}`);
+for (const item of result.imported) console.log(`${item.id}\t${item.nodeId ?? '(dry-run)'}\t${item.action ?? 'create'}${item.evidenceNodeId ? `\t+evidence ${item.evidenceNodeId}` : ''}`);
+if (result.conflicts.length) process.exitCode = 1;

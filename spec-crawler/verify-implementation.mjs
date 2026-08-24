@@ -12,16 +12,17 @@
  * through — the code reads fine, the contract was followed, and the result is
  * still visibly not the reference.
  *
- * The comparison runs in the browser on a canvas, so there is no image
- * dependency: both PNGs are drawn to the same size and their pixels differenced.
- * Output is a percentage, a per-region breakdown, and a diff image where changed
- * pixels are highlighted.
+ * The comparison uses the built-in-only PNG decoder shared by standalone and
+ * Paper verification. Images stay at their intrinsic sizes: geometry mismatches
+ * fail instead of being hidden by rescaling. Output remains CLI-compatible while
+ * adding alpha-aware, perceptual, region, and deterministic hash evidence.
  */
 
 import { parseArgs } from 'node:util';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { SpecDriver } from './src/driver.mjs';
+import { comparePngs } from './src/visual-diff.mjs';
 
 const { values } = parseArgs({
   options: {
@@ -60,71 +61,15 @@ try {
   const candidate = await handle.screenshot({ type: 'png' });
   writeFileSync(path.join(outDir, `${state.id}-candidate.png`), candidate);
 
-  // Canvas diff, in-page: no image library, and the browser is already here.
-  const result = await driver.page.evaluate(async ({ a, b }) => {
-    const load = (dataUri) => new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = reject;
-      img.src = dataUri;
-    });
-    const [ref, cand] = await Promise.all([load(a), load(b)]);
-
-    // Compare at the reference's size; a size mismatch is itself a finding, so
-    // it is reported rather than silently normalised away.
-    const w = ref.width; const h = ref.height;
-    const draw = (img) => {
-      const c = document.createElement('canvas');
-      c.width = w; c.height = h;
-      const ctx = c.getContext('2d', { willReadFrequently: true });
-      ctx.drawImage(img, 0, 0, w, h);
-      return ctx.getImageData(0, 0, w, h);
-    };
-    const refData = draw(ref); const candData = draw(cand);
-
-    const diff = document.createElement('canvas');
-    diff.width = w; diff.height = h;
-    const dctx = diff.getContext('2d');
-    const out = dctx.createImageData(w, h);
-
-    // Thirds, so the report says *where* it differs rather than only how much.
-    const bands = [0, 0, 0]; const bandCounts = [0, 0, 0];
-    let changed = 0;
-
-    for (let i = 0; i < refData.data.length; i += 4) {
-      const dr = Math.abs(refData.data[i] - candData.data[i]);
-      const dg = Math.abs(refData.data[i + 1] - candData.data[i + 1]);
-      const db = Math.abs(refData.data[i + 2] - candData.data[i + 2]);
-      const delta = (dr + dg + db) / 3;
-      const pixel = i / 4;
-      const band = Math.min(2, Math.floor((Math.floor(pixel / w) / h) * 3));
-      bandCounts[band] += 1;
-
-      if (delta > 12) {
-        changed += 1; bands[band] += 1;
-        out.data[i] = 255; out.data[i + 1] = 0; out.data[i + 2] = 96; out.data[i + 3] = 255;
-      } else {
-        const grey = refData.data[i] * 0.3 + refData.data[i + 1] * 0.5 + refData.data[i + 2] * 0.2;
-        out.data[i] = out.data[i + 1] = out.data[i + 2] = grey * 0.35;
-        out.data[i + 3] = 255;
-      }
-    }
-    dctx.putImageData(out, 0, 0);
-
-    return {
-      referenceSize: { w: ref.width, h: ref.height },
-      candidateSize: { w: cand.width, h: cand.height },
-      changedPct: +((changed / (w * h)) * 100).toFixed(2),
-      bands: bands.map((n, i) => +((n / Math.max(1, bandCounts[i])) * 100).toFixed(2)),
-      diffPng: diff.toDataURL('image/png'),
-    };
-  }, { a: `data:image/png;base64,${reference.toString('base64')}`, b: `data:image/png;base64,${candidate.toString('base64')}` });
-
-  writeFileSync(path.join(outDir, `${state.id}-diff.png`), Buffer.from(result.diffPng.split(',')[1], 'base64'));
-
-  const sizeMatch = result.referenceSize.w === result.candidateSize.w && result.referenceSize.h === result.candidateSize.h;
+  // The reusable Node-side comparator decodes each PNG at its intrinsic size.
+  // A mismatch is compared on a same-coordinate union canvas and always fails;
+  // the candidate is never stretched to make unlike geometry appear equal.
   const threshold = Number(values.threshold);
-  const pass = sizeMatch && result.changedPct <= threshold;
+  const result = comparePngs(reference, candidate, { threshold });
+  writeFileSync(path.join(outDir, `${state.id}-diff.png`), result.diffPng);
+
+  const sizeMatch = result.sizeMatch;
+  const pass = result.pass;
 
   console.error(`state       ${state.id}`);
   console.error(`reference   ${result.referenceSize.w}×${result.referenceSize.h}`);

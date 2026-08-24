@@ -11,6 +11,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
 import * as agent from './page-agent.mjs';
+import { waitForStable } from './stability.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, '..', '..');
@@ -37,6 +38,7 @@ function loadSerializerSource() {
 
 export class SpecDriver {
   #serializerSource = null;
+  #subgridTransaction = 0;
 
   /**
    * Attributes that carry interaction state, and so must separate two captures of
@@ -69,17 +71,21 @@ export class SpecDriver {
     'open',
   ];
 
-  constructor(browser, page) {
+  constructor(browser, page, { baselineUrlParts = ['origin', 'pathname', 'search'] } = {}) {
     this.browser = browser;
     this.page = page;
     this.baselineUrl = page.url();
+    this.baselineUrlParts = [...baselineUrlParts];
+    this.lastStabilityEvidence = null;
+    this.lastResetReport = null;
   }
 
   /**
    * @param {string} endpoint CDP endpoint, e.g. http://localhost:9222
    * @param {string} [urlPattern] substring/regex matched against open tabs
+   * @param {{baselineUrlParts?: string[]}} [options] semantic URL fields to compare during reset
    */
-  static async attach(endpoint, urlPattern) {
+  static async attach(endpoint, urlPattern, options = {}) {
     const browser = await chromium.connectOverCDP(endpoint);
     const contexts = browser.contexts();
     const pages = contexts.flatMap((context) => context.pages());
@@ -95,7 +101,7 @@ export class SpecDriver {
       page = match;
     }
     await page.bringToFront();
-    return new SpecDriver(browser, page);
+    return new SpecDriver(browser, page, options);
   }
 
   /**
@@ -120,6 +126,7 @@ export class SpecDriver {
   /** Tag the DOM and record the resting signature. Call before any interaction. */
   async establishBaseline() {
     this.pendingFresh = new Set();
+    await this.clearCrawlerResidue();
     // Settle first. Tagging a half-hydrated app assigns ids to a skeleton, and
     // the real controls then arrive untagged — page_describe returns a full,
     // plausible-looking map in which every id is null, and frontier reports
@@ -129,6 +136,7 @@ export class SpecDriver {
     await this.page.evaluate(agent.tagElements, agent.ID_ATTRIBUTE);
     this.baselineUrl = this.page.url();
     this.baselineSignature = await this.signature();
+    this.baselineSnapshot = await this.semanticSnapshot();
     this.baselineOverlays = new Set(await this.visibleOverlays());
     return this.baselineSignature;
   }
@@ -150,18 +158,45 @@ export class SpecDriver {
     return this.page.evaluate(agent.pageSignature, agent.ID_ATTRIBUTE);
   }
 
-  settle(quietMs = SETTLE_QUIET_MS, timeoutMs = SETTLE_TIMEOUT_MS) {
-    return this.page.evaluate(
-      ([quiet, limit]) => new Promise((resolve) => {
-        let timer;
-        const deadline = setTimeout(() => { observer.disconnect(); clearTimeout(timer); resolve('timeout'); }, limit);
-        const done = () => { observer.disconnect(); clearTimeout(deadline); resolve('quiet'); };
-        const observer = new MutationObserver(() => { clearTimeout(timer); timer = setTimeout(done, quiet); });
-        observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true });
-        timer = setTimeout(done, quiet);
-      }),
-      [quietMs, timeoutMs],
-    );
+  semanticSnapshot() {
+    return this.page.evaluate(agent.semanticSnapshot, {
+      attribute: agent.ID_ATTRIBUTE,
+      urlParts: this.baselineUrlParts,
+    });
+  }
+
+  async compareToBaseline() {
+    const actual = await this.semanticSnapshot();
+    const comparison = agent.compareSemanticSnapshots(this.baselineSnapshot, actual);
+    return { ...comparison, expected: this.baselineSnapshot, actual };
+  }
+
+  async settle(quietMs = SETTLE_QUIET_MS, timeoutMs = SETTLE_TIMEOUT_MS, options = {}) {
+    // Preserve the positional timing arguments while widening the result from the
+    // old 'quiet'/'timeout' string to evidence with an explicit status field.
+    if (quietMs && typeof quietMs === 'object') {
+      options = quietMs;
+      quietMs = options.quietWindowMs ?? SETTLE_QUIET_MS;
+      timeoutMs = options.timeoutMs ?? SETTLE_TIMEOUT_MS;
+    }
+    const evidence = await waitForStable(this.page, {
+      quietWindowMs: quietMs,
+      timeoutMs,
+      pollIntervalMs: options.pollIntervalMs,
+      consecutiveSamples: options.consecutiveSamples,
+      maxSampledElements: options.maxSampledElements,
+      includeSubtree: options.includeSubtree,
+      scope: options.scope ?? null,
+      throwOnTimeout: options.throwOnTimeout,
+    });
+    evidence.status = evidence.stable ? 'quiet' : (evidence.timedOut ? 'timeout' : 'failed');
+    this.lastStabilityEvidence = evidence;
+    return evidence;
+  }
+
+  /** Exact old return contract for integrations that still compare strings. */
+  async settleLegacy(quietMs = SETTLE_QUIET_MS, timeoutMs = SETTLE_TIMEOUT_MS, options = {}) {
+    return (await this.settle(quietMs, timeoutMs, options)).status;
   }
 
   /**
@@ -526,19 +561,48 @@ export class SpecDriver {
    * signature — an unverified dismiss is how these crawlers silently corrupt
    * themselves and attribute one menu's styles to the next trigger.
    */
-  async reset() {
+  async clearCrawlerResidue({ clearTags = false } = {}) {
+    await this.page.evaluate(agent.clearCrawlerResidue, {
+      clearTags,
+      attribute: agent.ID_ATTRIBUTE,
+    }).catch(() => {});
+    // Forced :hover is often JS-driven too. Parking real input and blurring clears
+    // what the page itself can clear; DevTools-only forced pseudo state belongs to
+    // the CDP session that created it and cannot be cleared from another session.
+    await this.page.mouse?.move?.(1, 1).catch(() => {});
+  }
+
+  async reset({ structured = false } = {}) {
     this.pendingFresh = new Set();
+    const attempts = [];
     for (const attempt of ['escape', 'escape', 'corner']) {
+      await this.clearCrawlerResidue();
       if (attempt === 'escape') await this.page.keyboard.press('Escape').catch(() => {});
       else await this.page.mouse.click(2, 2).catch(() => {});
-      await this.settle(120, 1200);
-      if (await this.signature() === this.baselineSignature) return attempt;
+      const stability = await this.settle(120, 1200);
+      const comparison = await this.compareToBaseline();
+      attempts.push({ method: attempt, stability, differences: comparison.differences });
+      if (comparison.equal) {
+        this.lastResetReport = { method: attempt, clean: true, attempts, differences: [] };
+        return structured ? this.lastResetReport : attempt;
+      }
     }
 
     await this.page.goto(this.baselineUrl, { waitUntil: 'domcontentloaded' }).catch(() => {});
-    await this.settle(300, 5000);
+    const stability = await this.settle(300, 5000);
+    await this.clearCrawlerResidue();
+    // Reload creates a new document epoch. Take the clean reloaded state as the
+    // next baseline, but preserve the pre-reload differences in the report.
+    const beforeRebaseline = this.baselineSnapshot ? await this.compareToBaseline().catch(() => null) : null;
     await this.establishBaseline();
-    return 'reload';
+    attempts.push({ method: 'reload', stability, differences: beforeRebaseline?.differences ?? [] });
+    this.lastResetReport = {
+      method: 'reload',
+      clean: true,
+      attempts,
+      differences: beforeRebaseline?.differences ?? [],
+    };
+    return structured ? this.lastResetReport : 'reload';
   }
 
   /**
@@ -551,20 +615,34 @@ export class SpecDriver {
    * way back. Required before capturing an *opening* transition, since the
    * closed state is half of what is being measured.
    */
-  async ensureClean({ maxAttempts = 3 } = {}) {
+  async ensureClean({ maxAttempts = 3, structured = false } = {}) {
+    const attempts = [];
     for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
-      if ((await this.visibleOverlays()).length === 0) {
+      await this.clearCrawlerResidue();
+      const overlays = await this.visibleOverlays();
+      if (overlays.length === 0) {
         await this.establishBaseline();
-        return attempt === 0 ? 'already-clean' : 'dismissed';
+        const method = attempt === 0 ? 'already-clean' : 'dismissed';
+        this.lastResetReport = { method, clean: true, attempts, differences: [] };
+        return structured ? this.lastResetReport : method;
       }
       await this.page.keyboard.press('Escape').catch(() => {});
-      await this.settle(120, 1200);
+      const stability = await this.settle(120, 1200);
+      attempts.push({ method: 'escape', overlays, stability });
     }
 
     await this.page.goto(this.baselineUrl, { waitUntil: 'domcontentloaded' }).catch(() => {});
-    await this.settle(300, 6000);
+    const stability = await this.settle(300, 6000);
+    await this.clearCrawlerResidue();
+    const remaining = await this.visibleOverlays();
     await this.establishBaseline();
-    return 'reloaded';
+    this.lastResetReport = {
+      method: 'reloaded',
+      clean: remaining.length === 0,
+      attempts: [...attempts, { method: 'reload', overlays: remaining, stability }],
+      differences: remaining.length ? [{ path: 'surfaces', expected: [], actual: remaining }] : [],
+    };
+    return structured ? this.lastResetReport : 'reloaded';
   }
 
   /**
@@ -587,48 +665,22 @@ export class SpecDriver {
    * subtree as an inline style, so the fragment lays itself out standalone.
    * Returns a restore function; the page must not be left mutated.
    */
-  async #resolveSubgrid(selector) {
-    const touched = await this.page.evaluate((target) => {
-      const root = document.querySelector(target);
-      if (!root) return 0;
-      const subgrids = [root, ...root.querySelectorAll('*')].filter(
-        (el) => getComputedStyle(el).gridTemplateColumns.startsWith('subgrid'),
-      );
-      let count = 0;
-      for (const el of subgrids) {
-        // Walk up for the grid that actually declares tracks. `display: contents`
-        // ancestors sit in this chain and must be walked through, not stopped at.
-        let ancestor = el.parentElement;
-        let tracks = null;
-        while (ancestor) {
-          const style = getComputedStyle(ancestor);
-          if (style.display.includes('grid') && !style.gridTemplateColumns.startsWith('subgrid')
-              && style.gridTemplateColumns !== 'none') {
-            tracks = style.gridTemplateColumns;
-            break;
-          }
-          ancestor = ancestor.parentElement;
-        }
-        if (!tracks) continue;
-        el.dataset.specSubgridPrev = el.style.gridTemplateColumns || ' ';
-        // Line names are decorative here and Paper does not consume them; the
-        // track sizes are what make the fragment lay out.
-        el.style.gridTemplateColumns = tracks.replace(/\[[^\]]*\]/g, ' ').trim().replace(/\s+/g, ' ');
-        count += 1;
-      }
-      return count;
-    }, selector);
-
-    if (!touched) return async () => {};
-    return async () => {
-      await this.page.evaluate(() => {
-        for (const el of document.querySelectorAll('[data-spec-subgrid-prev]')) {
-          const prev = el.dataset.specSubgridPrev;
-          if (prev === ' ') el.style.removeProperty('grid-template-columns');
-          else el.style.gridTemplateColumns = prev;
-          delete el.dataset.specSubgridPrev;
-        }
-      });
+  async #resolveSubgrid(specId, selector) {
+    this.#subgridTransaction += 1;
+    const result = await this.page.evaluate(agent.resolveSubgrids, {
+      attribute: agent.ID_ATTRIBUTE,
+      targetSpecId: specId ?? null,
+      targetSelector: specId ? null : selector,
+      token: `driver-${this.#subgridTransaction}`,
+    });
+    let restored = false;
+    return {
+      resolved: result?.resolved ?? 0,
+      restore: async () => {
+        if (restored || !result?.resolved) return 0;
+        restored = true;
+        return this.page.evaluate(agent.restoreSubgrids, { records: result.records });
+      },
     };
   }
 
@@ -645,15 +697,27 @@ export class SpecDriver {
   async serialize(specId) {
     this.#serializerSource ??= loadSerializerSource();
     const selector = specId ? `[${agent.ID_ATTRIBUTE}="${specId}"]` : 'body';
-    const restoreSubgrid = await this.#resolveSubgrid(selector);
-    const result = await this.page.evaluate(
-      async ([source, target]) => {
-        const factory = new Function(`${source}; return elementSerializer;`);
-        return factory()(target);
-      },
-      [this.#serializerSource, selector],
-    );
-    await restoreSubgrid();
+    const subgrid = await this.#resolveSubgrid(specId, selector);
+    let result;
+    let serializationError = null;
+    try {
+      result = await this.page.evaluate(
+        async ([source, target]) => {
+          const factory = new Function(`${source}; return elementSerializer;`);
+          return factory()(target);
+        },
+        [this.#serializerSource, selector],
+      );
+    } catch (error) {
+      serializationError = error;
+    } finally {
+      try {
+        await subgrid.restore();
+      } catch (restoreError) {
+        if (!serializationError) serializationError = restoreError;
+      }
+    }
+    if (serializationError) throw serializationError;
 
     if (result?.status !== 'success') {
       throw new Error(`Serializer failed for ${selector}: ${result?.error ?? result?.status ?? 'unknown'}`);

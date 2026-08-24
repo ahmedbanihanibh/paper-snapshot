@@ -32,7 +32,7 @@ set -uo pipefail
 
 PORT="${SPEC_CDP_PORT:-9222}"
 PROFILE="${SPEC_EDGE_PROFILE:-$HOME/.spec-crawler-edge}"
-EDGE="/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"
+EDGE="${SPEC_EDGE_BIN:-${EDGE:-/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge}}"
 CLAUDE_EXT_ID="fcoeoabgfenejglbffodgkkbkcdhcgfn"
 EXT_DIR="$PROFILE/Default/Extensions/$CLAUDE_EXT_ID"
 NATIVE_HOST="$HOME/Library/Application Support/Microsoft Edge/NativeMessagingHosts/com.anthropic.claude_code_browser_extension.json"

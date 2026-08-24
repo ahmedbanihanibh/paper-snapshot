@@ -12,6 +12,8 @@
  * over and redo N clicks" is. It costs clicks and buys determinism.
  */
 
+import { SurfaceResolver } from './surface.mjs';
+
 /**
  * Triggers whose labels indicate they destroy the thing being crawled.
  *
@@ -79,7 +81,7 @@ export function classify(surface, trigger) {
  * gap are exactly the props a Popper/Floating-UI call takes. Two rects in a JSON
  * file leave that to be re-derived by hand every time.
  */
-function anchorOf(triggerRect, surfaceRect) {
+export function anchorOf(triggerRect, surfaceRect) {
   if (!triggerRect || !surfaceRect) return null;
   const below = surfaceRect.y >= triggerRect.y + triggerRect.height - 4;
   const above = surfaceRect.y + surfaceRect.height <= triggerRect.y + 4;
@@ -99,11 +101,6 @@ function anchorOf(triggerRect, surfaceRect) {
   return { side, align, gap: Math.round(gap), triggerRect, surfaceRect };
 }
 
-/** The overlay among the harvested roots; siblings are usually backdrops and focus guards. */
-const pickSurface = (roots) => roots
-  .filter((root) => root.portalled || root.role)
-  .sort((left, right) => (right.rect.width * right.rect.height) - (left.rect.width * left.rect.height))[0] ?? roots[0];
-
 export async function crawlOverlays(driver, bundle, options = {}) {
   const {
     deny = DEFAULT_DENY,
@@ -115,6 +112,7 @@ export async function crawlOverlays(driver, bundle, options = {}) {
     shots = 'context',
     onProgress = () => {},
   } = options;
+  const surfaceResolver = new SurfaceResolver(driver, { classify, anchorOf });
 
   // Sticky for the whole run, so every re-enumeration after a navigation stays
   // inside the requested area rather than quietly reverting to the full page.
@@ -132,6 +130,7 @@ export async function crawlOverlays(driver, bundle, options = {}) {
     inert: 0,
     inertDetail: [],
     failures: [],
+    surfaceResolutions: [],
     byLevel: {},
   };
 
@@ -148,8 +147,9 @@ export async function crawlOverlays(driver, bundle, options = {}) {
       if (!trigger) return { ok: false };
       if (!await driver.clickById(trigger.id)) return { ok: false };
       await driver.settle();
-      const surface = pickSurface(await driver.harvestSurfaces());
-      if (!surface) return { ok: false };
+      const roots = await driver.harvestSurfaces();
+      if (!roots.length) return { ok: false };
+      const { surface } = await surfaceResolver.resolve(roots, { trigger });
       scopeId = surface.id;
     }
     return { ok: true, scopeId };
@@ -227,7 +227,16 @@ export async function crawlOverlays(driver, bundle, options = {}) {
           continue;
         }
 
-        const surface = pickSurface(roots);
+        const resolution = await surfaceResolver.resolve(roots, { trigger: live });
+        const surface = resolution.surface;
+        report.surfaceResolutions.push({
+          level,
+          path,
+          trigger: live.label,
+          confidence: resolution.confidence,
+          candidates: resolution.candidates,
+          evidence: resolution.evidence,
+        });
 
         // An in-flow element with no overlay role and a tiny box is a
         // re-rendered icon, not a surface worth a frame. Anything carrying a
@@ -275,6 +284,11 @@ export async function crawlOverlays(driver, bundle, options = {}) {
           path,
           kind: classified.kind,
           roleEvidence: classified.roleEvidence,
+          surfaceResolution: {
+            confidence: resolution.confidence,
+            candidates: resolution.candidates,
+            evidence: resolution.evidence,
+          },
           detectedBy: surface.revealed ? 'revealed' : 'mounted',
           trigger: { label: live.label, role: live.role, hasPopup: live.hasPopup },
           rect: surface.rect,

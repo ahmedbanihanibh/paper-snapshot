@@ -1,3 +1,12 @@
 test.txt
+.DS_Store
 spec-crawler/node_modules/
 spec-bundle/
+spec-crawler/spec-bundle/
+spec-crawler/spec-*/
+spec-crawler/verify/
+spec-crawler/test-results/
+spec-crawler/playwright-report/
+.spec-crawler-staging/
+.spec-crawler-locks/
+*.log

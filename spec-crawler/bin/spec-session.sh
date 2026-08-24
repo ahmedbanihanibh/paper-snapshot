@@ -65,7 +65,7 @@ OSA
   exit 0
 fi
 
-"${HERE}/spec-up.sh" || exit 1
+"${HERE}/spec-up-paired.sh" || exit 1
 
 cd "$REPO" || exit 1
 echo "  repo                   $REPO"
