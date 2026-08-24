@@ -106,6 +106,26 @@ test('manifest replacement is atomic under an injected failure and abandoned sta
   assert.equal(readFileSync(path.join(dir, 'spec.json'), 'utf8'), before);
 }));
 
+test('a fault after the manifest rename is recorded, not thrown — the commit already happened', () => withTemp((dir) => {
+  // The manifest rename is the commit point. A housekeeping failure after it used
+  // to propagate out of commit(), so the caller saw a throw for a state that was
+  // already durably written, retried it, and minted a second id for one state.
+  const store = new ArtifactStore(dir, {
+    seams: { afterManifestRename() { throw new Error('injected post-commit fault'); } },
+  });
+
+  const manifestPath = store.commit(transaction(1));
+  assert.equal(manifestPath, path.join(dir, 'spec.json'));
+
+  const written = JSON.parse(readFileSync(manifestPath, 'utf8'));
+  assert.equal(written.states.length, 1, 'the state must be present in the published manifest');
+  assert.equal(existsSync(path.join(dir, 'frames/001-card.html')), true);
+
+  assert.equal(store.lastCommitFaults.length, 1);
+  assert.equal(store.lastCommitFaults[0].step, 'afterManifestRename');
+  assert.match(store.lastCommitFaults[0].message, /injected post-commit fault/);
+}));
+
 test('rollback preserves identical files that predated the failed transaction', () => withTemp((dir) => {
   const initial = normalizeManifest({ manifestRevision: 1, states: [], cssSpec: { preserved: true } });
   new ArtifactStore(dir).commit({ manifest: initial, artifacts: [] });

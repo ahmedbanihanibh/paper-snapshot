@@ -479,7 +479,14 @@ function assertUniqueArtifacts(states) {
  * Put a captured frame on the macOS clipboard in Paper's paste format.
  */
 export function copyFrameToPaper(bundleDir, stateId) {
-  const spec = JSON.parse(readFileSync(path.join(bundleDir, 'spec.json'), 'utf8'));
+  // Every other manifest read goes through the same guard; this one did not, and
+  // it is the path that ends in `osascript` writing to the system clipboard.
+  const manifestPath = path.join(bundleDir, 'spec.json');
+  const manifestStat = lstatSync(manifestPath);
+  if (!manifestStat.isFile() || manifestStat.isSymbolicLink()) {
+    throw new Error(`Unsafe manifest path: ${manifestPath}`);
+  }
+  const spec = JSON.parse(readFileSync(manifestPath, 'utf8'));
   const needle = String(stateId);
   const state = spec.states.find((candidate) => candidate.id === needle)
     ?? spec.states.find((candidate) => candidate.id.startsWith(needle))

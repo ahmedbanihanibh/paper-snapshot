@@ -280,8 +280,24 @@ export class ArtifactStore {
       this.seams.beforeManifestRename?.({ from: stagedManifest, to: this.manifestPath, manifest });
       this.fs.renameSync(stagedManifest, this.manifestPath);
       this.#syncDirectory(this.outDir);
-      this.seams.afterManifestRename?.({ path: this.manifestPath, manifest });
-      this.fs.rmSync(stageDir, { recursive: true, force: true });
+
+      // The rename above is the commit point: the manifest is durable and the
+      // state IS written. Everything after it is housekeeping, and housekeeping
+      // must never be able to report the commit as failed — a caller that sees a
+      // throw here retries a capture that already landed, minting a second id for
+      // one state. Faults are recorded, not raised.
+      const cleanupFaults = [];
+      try {
+        this.seams.afterManifestRename?.({ path: this.manifestPath, manifest });
+      } catch (error) {
+        cleanupFaults.push({ step: 'afterManifestRename', message: String(error?.message ?? error) });
+      }
+      try {
+        this.fs.rmSync(stageDir, { recursive: true, force: true });
+      } catch (error) {
+        cleanupFaults.push({ step: 'removeStagingDirectory', path: stageDir, message: String(error?.message ?? error) });
+      }
+      this.lastCommitFaults = cleanupFaults;
       return this.manifestPath;
     } catch (error) {
       // Leave the transaction journal in place. The next store instance can
