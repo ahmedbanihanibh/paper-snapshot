@@ -86,6 +86,7 @@ export async function captureState(options = {}) {
     recorder = false,
     forcedState = null,
     subgrid = true,
+    volatile: volatileRegions = [],
     stability = {},
     oracle = null,
     preconditions = [],
@@ -118,6 +119,7 @@ export async function captureState(options = {}) {
     annotations: Boolean(annotate),
     recorder,
     forcedState,
+    volatile: volatileRegions,
   }, async (tx) => {
     // Measure before serializing. Measuring after subgrid resolution is what makes
     // the annotation report real pixel tracks rather than the literal "subgrid".
@@ -177,13 +179,17 @@ export async function captureState(options = {}) {
         ...(annotation ? { notes: annotation } : {}),
         ...(hash ? { hash } : {}),
         ...(cssStates ? { cssStates: { components: cssStates.components.length, stateNames: cssStates.stateNames } } : {}),
+        // Recorded on the state, not just returned: a later verification run has
+        // to mask the same pixels this capture agreed to ignore, and it has only
+        // the manifest to learn that from.
+        ...(tx.volatile.length ? { volatile: tx.volatile } : {}),
         ...extraState,
         rect: extraState.rect ?? rect,
       },
       frame,
       shots,
       cssStates,
-      extra: { measured, rect },
+      extra: { measured, rect, ...(tx.volatile.length ? { volatile: tx.volatile } : {}) },
     };
   });
 }

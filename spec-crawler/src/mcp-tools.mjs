@@ -212,6 +212,19 @@ export function createTools({ defaultEndpoint = DEFAULT_ENDPOINT, defaultOut = D
           specId: { type: 'string', description: 'Trigger that opens the component (from page_describe or frontier).' },
           name: { type: 'string', description: 'Name for the captured state. Defaults to the trigger label.' },
           withAnimation: { type: 'boolean', description: 'Also record the opening motion. Default true.' },
+          volatile: {
+            type: 'array',
+            description: 'Regions that are EXPECTED to vary — a clock, a relative timestamp, a live count. Without this, a subject containing any live region cannot be captured at all: the value changes between the pre- and post-capture check and the capture is rejected as drift. Each entry needs a reason, because declaring a region volatile removes it from drift detection and from state identity.',
+            items: {
+              type: 'object',
+              properties: {
+                selector: { type: 'string', description: 'CSS selector for the varying region, resolved inside the captured subject.' },
+                reason: { type: 'string', description: 'Why this region legitimately varies, e.g. "unread count polls every 5s".' },
+              },
+              required: ['selector', 'reason'],
+              additionalProperties: false,
+            },
+          },
         },
         required: ['specId'],
         additionalProperties: false,
@@ -256,6 +269,19 @@ export function createTools({ defaultEndpoint = DEFAULT_ENDPOINT, defaultOut = D
           dwellMs: { type: 'number', description: 'How long to rest the pointer. Default 900 — tooltips typically need 300-700ms, submenus similar.' },
           name: { type: 'string', description: 'Name for the captured state; omit to only report what appeared.' },
           capture: { type: 'boolean', description: 'Also add the revealed surface to the bundle as a state. Default false (report only).' },
+          volatile: {
+            type: 'array',
+            description: 'Regions that are EXPECTED to vary — a clock, a relative timestamp, a live count. Without this, a subject containing any live region cannot be captured at all: the value changes between the pre- and post-capture check and the capture is rejected as drift. Each entry needs a reason, because declaring a region volatile removes it from drift detection and from state identity.',
+            items: {
+              type: 'object',
+              properties: {
+                selector: { type: 'string', description: 'CSS selector for the varying region, resolved inside the captured subject.' },
+                reason: { type: 'string', description: 'Why this region legitimately varies, e.g. "unread count polls every 5s".' },
+              },
+              required: ['selector', 'reason'],
+              additionalProperties: false,
+            },
+          },
         },
         required: ['specId'],
         additionalProperties: false,
@@ -285,6 +311,19 @@ export function createTools({ defaultEndpoint = DEFAULT_ENDPOINT, defaultOut = D
           name: { type: 'string', description: 'e.g. "bulk-selection-actions-bar"' },
           specId: { type: 'string', description: 'Subtree to capture. Omit to capture the whole page.' },
           notes: { type: 'string', description: 'How this state is reached, so it can be reproduced.' },
+          volatile: {
+            type: 'array',
+            description: 'Regions that are EXPECTED to vary — a clock, a relative timestamp, a live count. Without this, a subject containing any live region cannot be captured at all: the value changes between the pre- and post-capture check and the capture is rejected as drift. Each entry needs a reason, because declaring a region volatile removes it from drift detection and from state identity.',
+            items: {
+              type: 'object',
+              properties: {
+                selector: { type: 'string', description: 'CSS selector for the varying region, resolved inside the captured subject.' },
+                reason: { type: 'string', description: 'Why this region legitimately varies, e.g. "unread count polls every 5s".' },
+              },
+              required: ['selector', 'reason'],
+              additionalProperties: false,
+            },
+          },
         },
         required: ['name'],
         additionalProperties: false,
@@ -303,6 +342,19 @@ export function createTools({ defaultEndpoint = DEFAULT_ENDPOINT, defaultOut = D
           path: { type: 'string', description: 'How you reached this state, in your own words — the route, the clicks, the preconditions. You are the only one who knows this; it cannot be measured.' },
           expect: { type: 'string', description: "REQUIRED. A substring of the target's label, its tag name, or a CSS selector it must match. The capture REFUSES if the point resolves to something else — this is what stops a stale coordinate from producing confident wrong output." },
           push: { type: 'boolean', description: 'Import into the open Paper file immediately. Default false.' },
+          volatile: {
+            type: 'array',
+            description: 'Regions that are EXPECTED to vary — a clock, a relative timestamp, a live count. Without this, a subject containing any live region cannot be captured at all: the value changes between the pre- and post-capture check and the capture is rejected as drift. Each entry needs a reason, because declaring a region volatile removes it from drift detection and from state identity.',
+            items: {
+              type: 'object',
+              properties: {
+                selector: { type: 'string', description: 'CSS selector for the varying region, resolved inside the captured subject.' },
+                reason: { type: 'string', description: 'Why this region legitimately varies, e.g. "unread count polls every 5s".' },
+              },
+              required: ['selector', 'reason'],
+              additionalProperties: false,
+            },
+          },
         },
         required: ['x', 'y', 'name', 'expect'],
         additionalProperties: false,
@@ -321,6 +373,19 @@ export function createTools({ defaultEndpoint = DEFAULT_ENDPOINT, defaultOut = D
           path: { type: 'string', description: 'How you reached the page/state this component is in.' },
           expect: { type: 'string', description: "REQUIRED. A substring of the target's label, its tag name, or a CSS selector it must match. Refuses if the point resolves elsewhere." },
           push: { type: 'boolean', description: 'Import all captured states into Paper immediately. Default false.' },
+          volatile: {
+            type: 'array',
+            description: 'Regions that are EXPECTED to vary — a clock, a relative timestamp, a live count. Without this, a subject containing any live region cannot be captured at all: the value changes between the pre- and post-capture check and the capture is rejected as drift. Each entry needs a reason, because declaring a region volatile removes it from drift detection and from state identity.',
+            items: {
+              type: 'object',
+              properties: {
+                selector: { type: 'string', description: 'CSS selector for the varying region, resolved inside the captured subject.' },
+                reason: { type: 'string', description: 'Why this region legitimately varies, e.g. "unread count polls every 5s".' },
+              },
+              required: ['selector', 'reason'],
+              additionalProperties: false,
+            },
+          },
         },
         required: ['x', 'y', 'name', 'expect'],
         additionalProperties: false,

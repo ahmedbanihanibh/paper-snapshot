@@ -43,6 +43,31 @@ function readBundleState(bundleDir, selector) {
   };
 }
 
+/**
+ * Masks for the regions this state's capture declared volatile.
+ *
+ * The capture agreed to ignore these pixels; a verification that compares them
+ * anyway rejects a state for varying in exactly the way it was told it would. The
+ * recorded rects are CSS pixels in the subject's own frame — which is the frame an
+ * element screenshot is in — so they only need scaling by the device pixel ratio
+ * to land on the right pixels of the PNG.
+ */
+export function volatileMasks(state, deviceScaleFactor = 1) {
+  const scale = Number.isFinite(deviceScaleFactor) && deviceScaleFactor > 0 ? deviceScaleFactor : 1;
+  const masks = [];
+  for (const region of state?.volatile ?? []) {
+    for (const rect of region.rects ?? []) {
+      masks.push({
+        x: Math.floor(rect.x * scale),
+        y: Math.floor(rect.y * scale),
+        width: Math.ceil(rect.width * scale),
+        height: Math.ceil(rect.height * scale),
+      });
+    }
+  }
+  return masks;
+}
+
 function renderEnvironment(spec, state, referencePng) {
   const provenance = { ...(spec?.provenance ?? {}), ...(state?.provenance ?? {}) };
   const recordedViewport = state.viewport ?? provenance.viewport ?? provenance.environment?.viewport ?? {};
@@ -256,10 +281,11 @@ export async function verifyStandaloneState(bundleDir, stateSelector, options = 
       return { kind: 'standalone', state: stateId, status: STATUS.PENDING, reason: 'renderer returned no screenshot', environment, artifacts: {} };
     }
 
+    const declaredMasks = volatileMasks(input.state, environment.deviceScaleFactor);
     const comparison = comparePngs(input.referencePng, candidatePng, {
       threshold: options.threshold ?? 2,
       pixelThreshold: options.pixelThreshold,
-      masks: options.masks,
+      masks: [...(options.masks ?? []), ...declaredMasks],
       regions: options.regions,
     });
     const checks = structuralChecks(input.state, rendered, options.geometryTolerance ?? 0.5);
@@ -274,6 +300,11 @@ export async function verifyStandaloneState(bundleDir, stateSelector, options = 
     const report = {
       kind: 'standalone', state: stateId, status, environment,
       comparison: { ...comparison, diffPng: undefined },
+      // An accepted verdict that quietly skipped pixels is the same false success
+      // this pipeline exists to remove. Say which regions were excluded and why.
+      volatile: (input.state.volatile ?? []).map((region) => ({
+        selector: region.selector, reason: region.reason, maskedRects: (region.rects ?? []).length,
+      })),
       checks,
       fonts: rendered.fonts ?? null,
       artifacts,

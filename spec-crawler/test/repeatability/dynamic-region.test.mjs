@@ -2,26 +2,29 @@
  * The other half of repeatability: can the pipeline express "this region is
  * *expected* to vary"?
  *
- * Today it cannot — not at capture time. Masking exists in the repo, but it
- * lives in `src/visual-diff.mjs` / `src/verification.mjs`, where it is applied
- * when two images are *compared*. `captureState` has no mask, exclusion, or
- * volatile-region option: an option named `mask` is simply not destructured, so
- * it is silently ignored and the volatile pixels land in the frame, the
- * screenshot, and every hash derived from them.
+ * It can, in two distinct places, and conflating them is the mistake this file
+ * exists to prevent.
  *
- * Rather than invent an API, this file pins the behaviour that actually exists,
- * so the gap is a failing expectation the day someone closes it rather than a
- * line in a report nobody re-reads:
+ * At COMPARISON time, `src/visual-diff.mjs` and `src/verification.mjs` mask
+ * pixels when two images are diffed. At CAPTURE time, `captureState` takes a
+ * `volatile: [{ selector, reason }]` declaration, which is a different and
+ * stronger thing: it excludes the region from drift detection and from state
+ * identity. Without it a subject containing any live region — a clock, a relative
+ * timestamp, a live count — cannot be captured at all, because the value ticks
+ * between the pre- and post-capture fingerprint and every attempt is rejected as
+ * drift.
+ *
+ * What a declaration deliberately does NOT do is rewrite the artifact. The frame
+ * and the screenshot keep what was actually on screen, so a volatile state still
+ * diverges run to run. That is correct: the stored evidence is what was there,
+ * and the declaration says how to READ it, not what to record.
  *
  *   1. a state with no volatile content reproduces exactly (the control), so a
  *      divergence below cannot be blamed on the fixture or the browser;
  *   2. a state whose content is drawn from the RNG and the clock is correctly
  *      *detected* as differing — the hashes are sensitive enough to catch it;
- *   3. asking for a mask does not change (1) or (2), which is the evidence that
- *      the capture layer cannot yet express the intent.
- *
- * If a real capture-time mask ever lands, assertion 3 flips and this file is
- * where the new contract gets written.
+ *   3. declaring the region volatile makes the subject capturable and records the
+ *      mask, while leaving (1) and (2) exactly as they were.
  */
 
 import assert from 'node:assert/strict';
@@ -108,7 +111,7 @@ gate('one volatile state is enough to diverge the whole bundle digest', () => {
   assert.equal(second.spec.hashes.topology, first.spec.hashes.topology);
 });
 
-gate('captureState has no capture-time mask: the option is accepted and ignored', async (t) => {
+gate('a declared volatile region makes a live subject capturable and records the mask', async (t) => {
   const capture = async (dir) => {
     const page = await browser.newPage({ viewport: { ...VIEWPORT } });
     try {
@@ -119,9 +122,7 @@ gate('captureState has no capture-time mask: the option is accepted and ignored'
       const specId = await page.$eval('#volatile', (element, attribute) => element.getAttribute(attribute), pageAgent.ID_ATTRIBUTE);
       const result = await captureState({
         driver, bundle, specId, name: 'volatile panel', stability: STABILITY,
-        // Not part of captureState's option surface. If a capture-time mask ever
-        // lands, this is the call that should start producing stable evidence.
-        mask: [{ x: 0, y: 0, width: 320, height: 72 }],
+        volatile: [{ selector: '#volatile-value', reason: 'random token and load timestamp; not part of the spec' }],
       });
       assert.equal(result.ok, true, JSON.stringify(result));
       bundle.write();
@@ -133,9 +134,24 @@ gate('captureState has no capture-time mask: the option is accepted and ignored'
 
   const a = await capture(makeRunDir(t, 'spec-mask-a-'));
   const b = await capture(makeRunDir(t, 'spec-mask-b-'));
-  assert.notEqual(
-    b.hashes.content,
-    a.hashes.content,
-    'a `mask` option now changes capture output — the capture layer can express volatile regions, so update this suite',
-  );
+
+  // What a declaration buys, and what it does not.
+  //
+  // It buys capturability and a recorded mask: the region is excluded from drift
+  // detection, so the state commits, and its rects are written to the manifest so
+  // a later verification excludes the same pixels.
+  //
+  // It does NOT rewrite the artifact. The frame and the PNG keep the value that
+  // was actually on screen, so the content hash still diverges between runs —
+  // which is correct. The stored evidence is what was there; declaring a region
+  // volatile says how to READ that evidence, not what to record.
+  for (const record of [a, b]) {
+    const [region] = record.volatile;
+    assert.equal(region.selector, '#volatile-value');
+    assert.match(region.reason, /random token/);
+    assert.equal(region.matched, 1);
+    assert.ok(region.rects.length === 1 && region.rects[0].width > 0);
+  }
+  assert.notEqual(b.hashes.content, a.hashes.content, 'the stored artifact must keep what was actually rendered');
+  assert.equal(b.hashes.topology, a.hashes.topology, 'structure is identical between runs');
 });

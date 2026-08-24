@@ -48,6 +48,16 @@
     background: #eef1f8; border-radius: 8px; padding: 8px;
   }
   #css-hover:hover { background: #c9d4f2; }
+
+  #live-card {
+    position: fixed; left: 340px; top: 280px; width: 180px;
+    background: #f4f5f8; border-radius: 8px; padding: 8px;
+    display: flex; justify-content: space-between;
+  }
+  /* Fixed width so the ticking value cannot reflow the card. A volatile region
+     that changes its parent's geometry is a layout change, and the capture is
+     right to reject that — declaring content volatile must not excuse it. */
+  #live-count { width: 40px; text-align: right; font-variant-numeric: tabular-nums; }
 </style>
 
 <div id="list">
@@ -64,6 +74,14 @@
 
 <div id="css-hover">CSS-only hover</div>
 
+<!-- A live region. Real apps are full of these — relative timestamps, unread
+     counts, presence dots — and every one of them makes its whole component
+     uncapturable unless the caller can declare it as expected to vary. -->
+<div id="live-card">
+  <span class="label">Issue ABC-123</span>
+  <span id="live-count">0</span>
+</div>
+
 <script>
   window.__pointer = { downs: 0, ups: 0 };
   addEventListener('mousedown', () => { window.__pointer.downs += 1; }, true);
@@ -74,4 +92,28 @@
   document.getElementById('row').addEventListener('mouseleave', (event) => {
     event.currentTarget.removeAttribute('data-active');
   });
+
+  // Opt-in, not automatic. A live region anywhere on the page also makes every
+  // WHOLE-PAGE capture drift — true, and worth knowing, but it would poison every
+  // other test in this file rather than testing anything.
+  //
+  // Wrapped in an IIFE, and every binding hung off `window`, because the tests
+  // share one page: `setContent` re-runs this script in the SAME global, and a
+  // top-level `let` redeclaration is a parse-time error that silently voids the
+  // whole script — including the pointer listeners above, which are what the
+  // unrelated tests depend on.
+  (function () {
+    // The global outlives setContent too, so a ticker started by one test would
+    // keep firing through every test after it.
+    if (window.__liveTicker) clearInterval(window.__liveTicker);
+    window.__liveTicker = null;
+    window.__liveTicks = 0;
+    window.__startLiveTicker = function () {
+      if (window.__liveTicker) return;
+      window.__liveTicker = setInterval(function () {
+        window.__liveTicks += 1;
+        document.getElementById('live-count').textContent = String(window.__liveTicks);
+      }, 30);
+    };
+  }());
 </script>

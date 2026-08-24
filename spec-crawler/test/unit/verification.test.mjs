@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 
 import { encodePng } from '../../src/visual-diff.mjs';
-import { verifyPaperRoundTrip, verifyStandaloneState } from '../../src/verification.mjs';
+import { verifyPaperRoundTrip, verifyStandaloneState, volatileMasks } from '../../src/verification.mjs';
 
 const pixels = Buffer.from([255, 0, 0, 255, 0, 0, 255, 255]);
 const shot = () => encodePng({ width: 2, height: 1, data: pixels });
@@ -123,3 +123,34 @@ test('Paper round trip compares source and standalone with exact IDs and dimensi
   const screenshotCall = client.calls.find((call) => call.name === 'get_screenshot');
   assert.equal(screenshotCall.args.fileId, 'explicit-file');
 }));
+
+test('volatileMasks scales recorded CSS-pixel rects into device pixels', () => {
+  // The rects are recorded in CSS pixels relative to the subject; the PNG is in
+  // device pixels. Skipping this conversion masks the wrong quarter of the image
+  // on any retina capture, and the verdict still reads as a clean pass.
+  const state = {
+    volatile: [
+      { selector: '#clock', reason: 'ticks', rects: [{ x: 10, y: 4, width: 30.4, height: 12.2 }] },
+      { selector: '.badge', reason: 'unread count', rects: [{ x: 0, y: 0, width: 8, height: 8 }] },
+    ],
+  };
+
+  assert.deepEqual(volatileMasks(state, 1), [
+    { x: 10, y: 4, width: 31, height: 13 },
+    { x: 0, y: 0, width: 8, height: 8 },
+  ]);
+  assert.deepEqual(volatileMasks(state, 2), [
+    { x: 20, y: 8, width: 61, height: 25 },
+    { x: 0, y: 0, width: 16, height: 16 },
+  ]);
+
+  // Masks round outward — a mask one pixel short of the volatile region leaves a
+  // fringe of ticking pixels in the comparison, which is the failure it exists to
+  // prevent.
+  const [scaled] = volatileMasks({ volatile: [{ rects: [{ x: 1.6, y: 1.6, width: 1.1, height: 1.1 }] }] }, 1);
+  assert.deepEqual(scaled, { x: 1, y: 1, width: 2, height: 2 });
+
+  assert.deepEqual(volatileMasks({}, 2), []);
+  assert.deepEqual(volatileMasks(null, 2), []);
+  assert.deepEqual(volatileMasks(state, 0), volatileMasks(state, 1), 'a nonsense ratio falls back to 1, never to zero-size masks');
+});

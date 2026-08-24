@@ -6,6 +6,7 @@ import {
   CleanupStack,
   assertCommittable,
   diffSignatures,
+  normalizeVolatile,
   withCaptureTransaction,
 } from '../../src/capture-transaction.mjs';
 import { captureState } from '../../src/capture.mjs';
@@ -322,6 +323,38 @@ test('diffSignatures names the field that moved', () => {
     [{ field: 'size', before: '10x10', after: '10x20' }],
   );
   assert.equal(diffSignatures('a', null), null);
+});
+
+test('normalizeVolatile requires a selector and a stated reason', () => {
+  assert.deepEqual(normalizeVolatile(null), []);
+  assert.deepEqual(
+    normalizeVolatile([{ selector: '  #clock  ', reason: '  ticks  ' }]),
+    [{ selector: '#clock', reason: 'ticks' }],
+  );
+
+  // A reason is required because declaring a region volatile is the power to make
+  // a capture stop noticing that something changed.
+  assert.throws(() => normalizeVolatile([{ selector: '#clock' }]), (error) => {
+    assert.equal(error.code, 'ERR_CAPTURE_VOLATILE_USAGE');
+    assert.match(error.message, /reason/);
+    return true;
+  });
+  assert.throws(() => normalizeVolatile(['#clock']), { code: 'ERR_CAPTURE_VOLATILE_USAGE' });
+  assert.throws(() => normalizeVolatile([{ reason: 'no selector' }]), { code: 'ERR_CAPTURE_VOLATILE_USAGE' });
+});
+
+test('a malformed volatile declaration returns a structured failure and never throws', async () => {
+  const harness = makeHarness();
+  const result = await withCaptureTransaction(
+    { driver: harness.driver, bundle: harness.bundle, oracle: harness.oracle, target: { specId: 'row-1' }, volatile: [{ selector: '#clock' }] },
+    async () => goodPayload(),
+  );
+
+  assert.equal(result.ok, false);
+  assert.equal(result.code, 'ERR_CAPTURE_VOLATILE_USAGE');
+  assert.equal(result.stage, 'precondition');
+  assert.equal(harness.added.length, 0);
+  assert.deepEqual(result.cleanup, [], 'nothing was acquired, so nothing needed unwinding');
 });
 
 test('CaptureError serializes to the structured failure shape', () => {

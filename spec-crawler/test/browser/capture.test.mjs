@@ -233,6 +233,57 @@ browserTest('a CSS-only hover commits rather than deduping against rest', async 
   assert.match(html, /rgb\(201, 212, 242\)/, 'the committed frame must carry the hovered background');
 });
 
+browserTest('a live region makes its component uncapturable until it is declared volatile', async () => {
+  await page.evaluate(() => window.__startLiveTicker());
+  const specId = await specIdOf('#live-card');
+
+  const undeclared = await captureState({ driver, bundle, specId, name: 'live card', stability: STABILITY });
+  assert.equal(undeclared.ok, false, 'a ticking value must be caught by the drift guard when undeclared');
+  assert.equal(undeclared.code, 'ERR_CAPTURE_DRIFT');
+  assertNothingWritten();
+
+  const declared = await captureState({
+    driver, bundle, specId, name: 'live card', stability: STABILITY,
+    volatile: [{ selector: '#live-count', reason: 'unread count ticks continuously; not part of the spec' }],
+  });
+  assert.equal(declared.ok, true, JSON.stringify(declared));
+  assert.equal(declared.committed, true);
+
+  const [region] = declared.record.volatile;
+  assert.equal(region.selector, '#live-count');
+  assert.match(region.reason, /ticks continuously/);
+  assert.equal(region.matched, 1);
+  // Rects are relative to the subject, which is the frame an element screenshot
+  // is in — a viewport-relative rect would mask the wrong pixels below the fold.
+  assert.ok(region.rects[0].width > 0 && region.rects[0].height > 0);
+  assert.ok(region.rects[0].x < declared.record.rect.width, 'rect must be subject-relative, not viewport-relative');
+});
+
+browserTest('a volatile declaration must name a reason and must match something', async () => {
+  await page.evaluate(() => window.__startLiveTicker());
+  const specId = await specIdOf('#live-card');
+
+  const noReason = await captureState({
+    driver, bundle, specId, name: 'live card', stability: STABILITY,
+    volatile: [{ selector: '#live-count' }],
+  });
+  assert.equal(noReason.ok, false);
+  assert.equal(noReason.code, 'ERR_CAPTURE_VOLATILE_USAGE');
+  assert.match(noReason.message, /reason/);
+
+  // A stale selector is the dangerous case: the author believes the clock is
+  // excluded, nothing matches, and the capture fails as drift with no hint that
+  // the declaration was the problem.
+  const stale = await captureState({
+    driver, bundle, specId, name: 'live card', stability: STABILITY,
+    volatile: [{ selector: '#renamed-last-week', reason: 'unread count' }],
+  });
+  assert.equal(stale.ok, false);
+  assert.equal(stale.code, 'ERR_CAPTURE_VOLATILE_UNMATCHED');
+  assert.match(stale.message, /#renamed-last-week/);
+  assertNothingWritten();
+});
+
 browserTest('a second identical capture is deduped instead of written twice', async () => {
   const specId = await specIdOf('#panel');
   const first = await captureState({ driver, bundle, specId, name: 'details panel', stability: STABILITY });

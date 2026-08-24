@@ -263,7 +263,7 @@ export function createHandlers({
       return text({ forced: states, specId, note: 'State is applied in the real style engine. capture_state now, then reset to clear.' });
     },
 
-    async capture_component({ specId: requestedId, name, withAnimation = true }) {
+    async capture_component({ specId: requestedId, name, withAnimation = true, volatile: volatileRegions = [] }) {
       let specId = requestedId;
       const active = requireDriver();
       const store = requireBundle();
@@ -321,6 +321,7 @@ export function createHandlers({
 
       const classified = classify(surface, trigger);
       const result = await captureState({
+        volatile: volatileRegions,
         driver: active,
         bundle: store,
         name: name ?? trigger.label ?? surface.role ?? 'component',
@@ -406,7 +407,7 @@ export function createHandlers({
     capture_animation: async ({ specId, keys, maxMs }) =>
       text(await captureAnimation(requireDriver(), { triggerId: specId, keys, maxMs: maxMs ?? 2000 })),
 
-    async capture_hover_reveal({ specId, dwellMs, name, capture = false }) {
+    async capture_hover_reveal({ specId, dwellMs, name, capture = false, volatile: volatileRegions = [] }) {
       const active = requireDriver();
       const reveal = await captureReveal(active, { targetId: specId, dwellMs: dwellMs ?? 900 });
 
@@ -415,6 +416,7 @@ export function createHandlers({
         const subject = reveal.menu ?? reveal.tooltip ?? reveal.affordance ?? reveal.surfaces[0];
         if (subject) {
           const result = await captureState({
+            volatile: volatileRegions,
             driver: active,
             bundle: requireBundle(),
             name: name ?? subject.label ?? 'hover-reveal',
@@ -462,10 +464,11 @@ export function createHandlers({
       });
     },
 
-    async capture_state({ name, specId, notes }) {
+    async capture_state({ name, specId, notes, volatile: volatileRegions = [] }) {
       const active = requireDriver();
       const store = requireBundle();
       const result = await captureState({
+        volatile: volatileRegions,
         driver: active,
         bundle: store,
         name,
@@ -483,7 +486,7 @@ export function createHandlers({
       return text({ ...result.record, bundleDir: store.outDir });
     },
 
-    async capture_at({ x, y, name, why, path: reachedBy, expect = null, push = false }) {
+    async capture_at({ x, y, name, why, path: reachedBy, expect = null, push = false, volatile: volatileRegions = [] }) {
       const missing = requireExpect('capture_at', expect);
       if (missing) return missing;
 
@@ -500,6 +503,7 @@ export function createHandlers({
       }
 
       const result = await captureState({
+        volatile: volatileRegions,
         driver: active,
         bundle: store,
         name,
@@ -538,7 +542,7 @@ export function createHandlers({
       });
     },
 
-    async capture_state_matrix({ x, y, name, why, path: reachedBy, expect = null, push = false }) {
+    async capture_state_matrix({ x, y, name, why, path: reachedBy, expect = null, push = false, volatile: volatileRegions = [] }) {
       const missing = requireExpect('capture_state_matrix', expect);
       if (missing) return missing;
 
@@ -564,6 +568,7 @@ export function createHandlers({
         // finished. The action runs inside the transaction, so the held button of
         // an `active` frame is released by the cleanup stack even on a throw.
         const result = await captureState({
+          volatile: volatileRegions,
           driver: active,
           bundle: store,
           name: `${name}-${state.state}`,
