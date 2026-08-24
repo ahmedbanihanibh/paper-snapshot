@@ -588,17 +588,27 @@ export class SpecDriver {
       }
     }
 
-    await this.page.goto(this.baselineUrl, { waitUntil: 'domcontentloaded' }).catch(() => {});
+    let navigationError = null;
+    await this.page.goto(this.baselineUrl, { waitUntil: 'domcontentloaded' })
+      .catch((error) => { navigationError = String(error?.message ?? error); });
     const stability = await this.settle(300, 5000);
     await this.clearCrawlerResidue();
     // Reload creates a new document epoch. Take the clean reloaded state as the
     // next baseline, but preserve the pre-reload differences in the report.
     const beforeRebaseline = this.baselineSnapshot ? await this.compareToBaseline().catch(() => null) : null;
+    // Re-baselining makes any post-reload state compare equal to itself, so the
+    // comparison cannot answer whether the reset worked. A swallowed navigation
+    // failure leaves the page exactly as dirty as it was and the old code still
+    // reported clean:true. Overlay count is the only absolute criterion here, and
+    // it is what `ensureClean` already uses.
+    const remaining = await this.visibleOverlays().catch(() => []);
     await this.establishBaseline();
-    attempts.push({ method: 'reload', stability, differences: beforeRebaseline?.differences ?? [] });
+    attempts.push({ method: 'reload', stability, overlays: remaining, differences: beforeRebaseline?.differences ?? [] });
     this.lastResetReport = {
       method: 'reload',
-      clean: true,
+      clean: !navigationError && remaining.length === 0,
+      ...(navigationError ? { navigationError } : {}),
+      ...(remaining.length ? { residualOverlays: remaining.slice(0, 8) } : {}),
       attempts,
       differences: beforeRebaseline?.differences ?? [],
     };

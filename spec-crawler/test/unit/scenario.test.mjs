@@ -341,6 +341,88 @@ test('a scenario runs against a driver, resolves refs, and captures through the 
   assert.equal(existsSync(path.resolve('specs/menu')), false, 'no bundle directory may be created behind an injected seam');
 });
 
+test('a "moved" postcondition fails when the element vanished rather than moved', async () => {
+  // Dropping a row into a folder removes it from the list. Calling that "moved"
+  // let a drag pass its own postcondition without ever evidencing the nesting it
+  // was written to prove.
+  const driver = fakeDriver();
+  const inner = driver.page.evaluate.bind(driver.page);
+  let clicked = false;
+  driver.page.evaluate = async (fn, arg) => {
+    if (fn.name === 'pageDescribeSpecId' && clicked) return null;
+    return inner(fn, arg);
+  };
+  const clickById = driver.clickById.bind(driver);
+  driver.clickById = async (id) => { const result = await clickById(id); clicked = true; return result; };
+
+  const report = await runScenario(scenarioWith([{
+    id: 'drop',
+    action: 'click',
+    target: { role: 'button', labelIncludes: 'Open menu' },
+    expect: { name: 'the row moved', kind: 'moved', target: { role: 'button', labelIncludes: 'Open menu' } },
+  }]), { driver, now: () => '2026-01-01T00:00:00.000Z' });
+
+  assert.equal(report.ok, false);
+  const [step] = report.steps;
+  assert.equal(step.status, 'failed');
+  assert.match(JSON.stringify(step.evidence ?? step.error), /left the document/);
+  assert.match(JSON.stringify(step.evidence ?? step.error), /surfaceDisappears/);
+});
+
+test('declared verification that never ran is not reported as a clean verdict', async () => {
+  // `[].every()` is true. A scenario that declares verification and then never
+  // reaches the step that performs it must not read as verified — that is the
+  // "optional verification counted as success" the whole effort is about.
+  const report = await runScenario(scenarioWith([openMenu], {
+    captures: { outDir: 'specs/menu' },
+    verification: { standalone: { states: ['001-menu-open'] } },
+  }), {
+    driver: fakeDriver(),
+    capture: async () => ({ stateId: '001-menu-open' }),
+    now: () => '2026-01-01T00:00:00.000Z',
+  });
+
+  assert.deepEqual(report.steps.map((step) => step.status), ['ok']);
+  assert.equal(report.verification.declared, true);
+  assert.equal(report.verification.ran, false);
+  assert.equal(report.verification.ok, false);
+  assert.match(report.verification.reason, /nothing was verified/);
+  assert.equal(report.ok, false, 'a run cannot be ok while its declared verification never happened');
+});
+
+test('an undeclared verification leaves the run ok', async () => {
+  const report = await runScenario(scenarioWith([openMenu]), {
+    driver: fakeDriver(),
+    now: () => '2026-01-01T00:00:00.000Z',
+  });
+  assert.equal(report.verification.declared, false);
+  assert.equal(report.verification.ok, true);
+  assert.equal(report.ok, true, JSON.stringify(report.steps));
+});
+
+test('a between-steps reset that does not come clean fails the run instead of poisoning the next step', async () => {
+  // The old code was `driver.reset(...).catch(() => {})`. A reset that silently
+  // did nothing left the next step measuring the previous step's leftovers, and
+  // the report said every step passed.
+  const driver = fakeDriver();
+  driver.reset = async () => ({ method: 'reload', clean: false, residualOverlays: ['menu'], attempts: [], differences: [] });
+
+  const report = await runScenario(scenarioWith([
+    openMenu,
+    { id: 'second', action: 'press', keys: 'Escape', expect: { name: 'nothing open', kind: 'noOverlays' } },
+  ], { resetPolicy: 'between-steps' }), {
+    driver,
+    now: () => '2026-01-01T00:00:00.000Z',
+  });
+
+  assert.equal(report.ok, false);
+  const reset = report.steps.find((step) => step.id === 'open-menu:reset');
+  assert.ok(reset, `expected a recorded reset failure, got ${JSON.stringify(report.steps.map((step) => step.id))}`);
+  assert.equal(reset.status, 'failed');
+  assert.equal(reset.error.code, 'ERR_SCENARIO_RESET');
+  assert.equal(report.steps.find((step) => step.id === 'second').status, 'skipped');
+});
+
 test('a failed postcondition fails the step, stops its dependents, and still runs teardown and reset', async () => {
   // The click lands but the menu never opens — exactly the silent no-op the
   // postcondition rule exists to catch.

@@ -405,8 +405,13 @@ async function checkExpectation(ctx, expectation, before) {
         return result;
       }
       if (!descriptor) {
-        result.observed = { rect: null, note: 'element left the document' };
-        result.ok = true;
+        // An element that vanished did not move. A drag that drops a row into a
+        // folder removes it from the list, and calling that "moved" lets the
+        // postcondition pass without ever evidencing the nesting it was written
+        // to prove. Say so, and name the expectation that does mean this.
+        result.observed = { rect: null, note: 'the element left the document, so no movement could be measured' };
+        result.expected = { ...result.expected, insteadUse: 'surfaceDisappears' };
+        result.ok = false;
         return result;
       }
       const dx = Math.abs(descriptor.rect.x - before.rect.x);
@@ -917,7 +922,25 @@ export async function runScenario(input, options = {}) {
         onProgress(record);
 
         if (!failure && phase === 'steps' && scenario.resetPolicy === 'between-steps' && index < planned.length - 1) {
-          await driver.reset({ structured: true }).catch(() => {});
+          // A reset that did not take leaves the next step running against the
+          // previous step's leftovers. Swallowing it produced captures that were
+          // measured in a state nobody declared, so it fails the run instead.
+          try {
+            const report = await driver.reset({ structured: true });
+            if (report && report.clean === false) {
+              throw new ScenarioStepError('reset between steps did not reach a clean baseline', {
+                code: 'ERR_SCENARIO_RESET', path: `steps[${index}]`, evidence: report,
+              });
+            }
+          } catch (error) {
+            failure = { id: plannedStep.id, error: serializeError(error) };
+            const record = {
+              index: plannedStep.index, id: `${plannedStep.id}:reset`, phase: 'steps', action: 'reset',
+              status: STATUS.FAILED, dependsOn: [plannedStep.id], evidence: null, error: failure.error,
+            };
+            records.push(record);
+            onProgress(record);
+          }
         }
       }
     }
@@ -962,15 +985,33 @@ export async function runScenario(input, options = {}) {
 
   const finishedAt = now();
   const failed = records.filter((record) => record.status === STATUS.FAILED);
+
+  // `[].every()` is true, so a scenario that declares verification and then never
+  // reaches the step that runs it would report a clean verdict on no evidence at
+  // all. Declared-and-absent is the one case that must not read as passing.
+  const reports = [...ctx.verification.standalone, ...ctx.verification.paper];
+  const verificationDeclared = Boolean(scenario.verification);
+  const verificationOk = reports.length
+    ? reports.every((report) => report.status !== 'rejected' && report.status !== 'error')
+    : !verificationDeclared;
+
   return {
-    ok: failed.length === 0,
+    ok: failed.length === 0 && verificationOk,
     mode: 'run',
     schemaVersion: scenario.schemaVersion,
     scenario: { name: scenario.name, description: scenario.description },
     plan,
     steps: records,
     captures: { outDir: plan.bundle, entries: ctx.captures },
-    verification: { ...ctx.verification, ok: [...ctx.verification.standalone, ...ctx.verification.paper].every((report) => report.status !== 'rejected' && report.status !== 'error') },
+    verification: {
+      ...ctx.verification,
+      declared: verificationDeclared,
+      ran: reports.length > 0,
+      ok: verificationOk,
+      ...(verificationDeclared && reports.length === 0
+        ? { reason: 'verification was declared but no verification step ran, so nothing was verified' }
+        : {}),
+    },
     reset: resetReport,
     teardown: { ran: teardownRan, steps: plan.phases.teardown.length },
     startedAt,
