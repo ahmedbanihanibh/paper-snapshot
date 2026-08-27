@@ -20,3 +20,23 @@ implementing the rule.
 Reference document restored to 37 blocks, verified. (The odd
 `'rsioHeading two'` text at index 22 is pre-existing, present in the
 before-capture too.)
+
+### 2026-08-28 — the collapsible range ends at the next EQUAL-or-higher heading
+
+The reference document has no two same-level headings in sequence, so the
+shape was built: `## ZebraAAA` / body / `## ZebraBBB` / body. Making
+`ZebraAAA` collapsible absorbed **only** its own heading and body —
+`containsBBB: false`, `headingsInside: [H2 'ZebraAAA']`, 46 → 45 blocks.
+
+**A section runs from its heading to the next heading of EQUAL-OR-HIGHER
+level, else the end of the document.** Both samples now agree: the `h1`
+swallowed a lower-level `h2` and continued to the end, which is what this
+rule predicts.
+
+Status: **measured** — `scratchpad/range2.mjs`.
+
+Method note worth keeping: `Input.insertText` does NOT fire ProseMirror
+input rules, so `"## "` stays literal text. Per-character
+`Input.dispatchKeyEvent` with `text` does fire them. That one difference
+is why the first attempt produced five junk paragraphs instead of two
+headings.
