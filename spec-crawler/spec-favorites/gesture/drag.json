@@ -1,0 +1,140 @@
+{
+  "from": "s3222",
+  "to": "s3247",
+  "phases": [
+    {
+      "label": "hover",
+      "phase": 0,
+      "surfaces": [
+        {
+          "id": "s3197",
+          "role": null,
+          "rect": {
+            "x": 12,
+            "y": 285,
+            "width": 220,
+            "height": 637
+          },
+          "portalled": false,
+          "label": "Write SNMP Development Surface project u"
+        }
+      ],
+      "transient": []
+    },
+    {
+      "label": "grab",
+      "phase": 0.05,
+      "surfaces": [
+        {
+          "id": "s3197",
+          "role": null,
+          "rect": {
+            "x": 12,
+            "y": 285,
+            "width": 220,
+            "height": 637
+          },
+          "portalled": false,
+          "label": "Write SNMP Development Surface project u"
+        }
+      ],
+      "transient": []
+    },
+    {
+      "label": "drag-10%",
+      "phase": 0.1,
+      "surfaces": [
+        {
+          "id": "s3197",
+          "role": null,
+          "rect": {
+            "x": 12,
+            "y": 285,
+            "width": 220,
+            "height": 637
+          },
+          "portalled": false,
+          "label": "Write SNMP Development Surface project u"
+        }
+      ],
+      "transient": []
+    },
+    {
+      "label": "drag-50%",
+      "phase": 0.5,
+      "surfaces": [
+        {
+          "id": "s3197",
+          "role": null,
+          "rect": {
+            "x": 12,
+            "y": 285,
+            "width": 220,
+            "height": 637
+          },
+          "portalled": false,
+          "label": "Write SNMP Development Surface project u"
+        }
+      ],
+      "transient": []
+    },
+    {
+      "label": "drag-100%",
+      "phase": 1,
+      "surfaces": [
+        {
+          "id": "s3197",
+          "role": null,
+          "rect": {
+            "x": 12,
+            "y": 285,
+            "width": 220,
+            "height": 637
+          },
+          "portalled": false,
+          "label": "Write SNMP Development Surface project u"
+        }
+      ],
+      "transient": []
+    },
+    {
+      "label": "drop",
+      "phase": 1,
+      "surfaces": [
+        {
+          "id": "s3197",
+          "role": null,
+          "rect": {
+            "x": 12,
+            "y": 285,
+            "width": 220,
+            "height": 637
+          },
+          "portalled": false,
+          "label": "Write SNMP Development Surface project u"
+        }
+      ],
+      "transient": []
+    },
+    {
+      "label": "settled",
+      "phase": 1,
+      "surfaces": [
+        {
+          "id": "s3197",
+          "role": null,
+          "rect": {
+            "x": 12,
+            "y": 285,
+            "width": 220,
+            "height": 637
+          },
+          "portalled": false,
+          "label": "Write SNMP Development Surface project u"
+        }
+      ],
+      "transient": []
+    }
+  ],
+  "dragOverlay": null
+}

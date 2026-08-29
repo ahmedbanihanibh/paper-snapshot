@@ -1,0 +1,23 @@
+{
+  "capturedAt": "2026-08-10T23:22:41.146Z",
+  "stateCount": 1,
+  "states": [
+    {
+      "id": "001-issues-list",
+      "name": "Issues list",
+      "tier": 1,
+      "level": 0,
+      "path": [],
+      "kind": "region",
+      "url": "https://linear.app/test-workspace-bb/team/TES/all",
+      "frame": "frames/001-issues-list.html",
+      "jsx": "jsx/001-issues-list.jsx",
+      "shot": "shots/001-issues-list.png",
+      "shots": {
+        "surface": "shots/001-issues-list.png"
+      },
+      "states": "states/001-issues-list.json",
+      "bytes": 1384195
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "selectors": [
+    {
+      "selector": ".menu",
+      "hover": {}
+    }
+  ]
+}

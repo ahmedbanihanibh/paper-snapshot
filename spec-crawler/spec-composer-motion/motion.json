@@ -1,0 +1,1129 @@
+{
+  "open": {
+    "trigger": "c",
+    "via": "press",
+    "nodeCount": 2,
+    "frames": 145,
+    "frameIntervalMs": 17.6,
+    "nodes": [
+      {
+        "id": "s1967",
+        "properties": {},
+        "declared": [
+          {
+            "type": "CSSAnimation",
+            "property": null,
+            "animationName": "sx-18re5ia-B",
+            "timing": {
+              "duration": null,
+              "delay": 0,
+              "endTime": null,
+              "activeDuration": null,
+              "easing": "linear",
+              "iterations": 1,
+              "fill": "both"
+            },
+            "keyframes": [
+              {
+                "offset": 0,
+                "easing": "ease",
+                "composite": "auto",
+                "opacity": "0",
+                "computedOffset": 0
+              },
+              {
+                "offset": 1,
+                "easing": "ease",
+                "composite": "auto",
+                "opacity": "1",
+                "computedOffset": 1
+              }
+            ]
+          }
+        ],
+        "measured": {
+          "durationMs": 0,
+          "overshoot": 0,
+          "frames": 145
+        },
+        "fit": {
+          "type": "tween",
+          "duration": 0,
+          "easing": "unknown — no declared timing, curve did not overshoot"
+        },
+        "agreement": "nothing declared; measured only — treat duration as approximate"
+      },
+      {
+        "id": "s2686",
+        "properties": {},
+        "declared": [
+          {
+            "type": "CSSAnimation",
+            "property": null,
+            "animationName": "sx-18re5ia-B",
+            "timing": {
+              "duration": 100,
+              "delay": 0,
+              "endTime": 100,
+              "activeDuration": 100,
+              "easing": "linear",
+              "iterations": 1,
+              "fill": "forwards"
+            },
+            "keyframes": [
+              {
+                "offset": 0,
+                "easing": "ease-out",
+                "composite": "auto",
+                "opacity": "0",
+                "computedOffset": 0
+              },
+              {
+                "offset": 1,
+                "easing": "ease-out",
+                "composite": "auto",
+                "opacity": "1",
+                "computedOffset": 1
+              }
+            ]
+          }
+        ],
+        "measured": {
+          "durationMs": 0,
+          "overshoot": 0,
+          "frames": 145
+        },
+        "fit": {
+          "type": "tween",
+          "duration": 100,
+          "easing": "linear"
+        },
+        "agreement": "declared 100ms vs measured 0ms — investigate; measurement is sampled at ~18ms/frame"
+      }
+    ],
+    "emit": [
+      {
+        "id": "s1967",
+        "css": ".surface {\n  transition: transform 0ms unknown — no declared timing, curve did not overshoot;\n}\n.surface[data-state=\"closed\"] {\n  transform: none;\n}\n.surface[data-state=\"open\"] {\n  transform: none;\n}",
+        "framerMotion": {
+          "initial": {},
+          "animate": {},
+          "transition": {
+            "duration": 0,
+            "ease": "unknown — no declared timing, curve did not overshoot"
+          }
+        },
+        "note": null
+      },
+      {
+        "id": "s2686",
+        "css": ".surface {\n  transition: transform 100ms ease-out;\n}\n.surface[data-state=\"closed\"] {\n  transform: none;\n}\n.surface[data-state=\"open\"] {\n  transform: none;\n}",
+        "framerMotion": {
+          "initial": {},
+          "animate": {},
+          "transition": {
+            "duration": 0.1,
+            "ease": "ease-out"
+          }
+        },
+        "note": null
+      }
+    ]
+  },
+  "maximize": {
+    "trigger": "s4119",
+    "via": "click",
+    "nodeCount": 6,
+    "frames": 153,
+    "frameIntervalMs": 16.1,
+    "nodes": [
+      {
+        "id": "s1967",
+        "properties": {},
+        "declared": [
+          {
+            "type": "CSSAnimation",
+            "property": null,
+            "animationName": "sx-18re5ia-B",
+            "timing": {
+              "duration": null,
+              "delay": 0,
+              "endTime": null,
+              "activeDuration": null,
+              "easing": "linear",
+              "iterations": 1,
+              "fill": "both"
+            },
+            "keyframes": [
+              {
+                "offset": 0,
+                "easing": "ease",
+                "composite": "auto",
+                "opacity": "0",
+                "computedOffset": 0
+              },
+              {
+                "offset": 1,
+                "easing": "ease",
+                "composite": "auto",
+                "opacity": "1",
+                "computedOffset": 1
+              }
+            ]
+          }
+        ],
+        "measured": {
+          "durationMs": 0,
+          "overshoot": 0,
+          "frames": 153
+        },
+        "fit": {
+          "type": "tween",
+          "duration": 0,
+          "easing": "unknown — no declared timing, curve did not overshoot"
+        },
+        "agreement": "nothing declared; measured only — treat duration as approximate"
+      },
+      {
+        "id": "s2686",
+        "properties": {},
+        "declared": [
+          {
+            "type": "CSSAnimation",
+            "property": null,
+            "animationName": "sx-18re5ia-B",
+            "timing": {
+              "duration": 100,
+              "delay": 0,
+              "endTime": 100,
+              "activeDuration": 100,
+              "easing": "linear",
+              "iterations": 1,
+              "fill": "forwards"
+            },
+            "keyframes": [
+              {
+                "offset": 0,
+                "easing": "ease-out",
+                "composite": "auto",
+                "opacity": "0",
+                "computedOffset": 0
+              },
+              {
+                "offset": 1,
+                "easing": "ease-out",
+                "composite": "auto",
+                "opacity": "1",
+                "computedOffset": 1
+              }
+            ]
+          }
+        ],
+        "measured": {
+          "durationMs": 0,
+          "overshoot": 0,
+          "frames": 153
+        },
+        "fit": {
+          "type": "tween",
+          "duration": 100,
+          "easing": "linear"
+        },
+        "agreement": "declared 100ms vs measured 0ms — investigate; measurement is sampled at ~16ms/frame"
+      },
+      {
+        "id": "s4100",
+        "properties": {
+          "padding-bottom": {
+            "from": 93.99,
+            "to": 43.38,
+            "durationMs": 284,
+            "onsetMs": 158,
+            "overshoot": 0
+          },
+          "padding-top": {
+            "from": 94,
+            "to": 43,
+            "durationMs": 284,
+            "onsetMs": 158,
+            "overshoot": 0
+          }
+        },
+        "declared": [
+          {
+            "type": "CSSTransition",
+            "property": "padding-bottom",
+            "animationName": null,
+            "timing": {
+              "duration": 300,
+              "delay": 0,
+              "endTime": 300,
+              "activeDuration": 300,
+              "easing": "cubic-bezier(0.43, 0.07, 0.59, 0.94)",
+              "iterations": 1,
+              "fill": "backwards"
+            },
+            "keyframes": [
+              {
+                "offset": 0,
+                "easing": "linear",
+                "composite": "auto",
+                "paddingBottom": "93.99px",
+                "computedOffset": 0
+              },
+              {
+                "offset": 1,
+                "easing": "linear",
+                "composite": "auto",
+                "paddingBottom": "43.38px",
+                "computedOffset": 1
+              }
+            ]
+          },
+          {
+            "type": "CSSTransition",
+            "property": "padding-top",
+            "animationName": null,
+            "timing": {
+              "duration": 300,
+              "delay": 0,
+              "endTime": 300,
+              "activeDuration": 300,
+              "easing": "cubic-bezier(0.43, 0.07, 0.59, 0.94)",
+              "iterations": 1,
+              "fill": "backwards"
+            },
+            "keyframes": [
+              {
+                "offset": 0,
+                "easing": "linear",
+                "composite": "auto",
+                "paddingTop": "94px",
+                "computedOffset": 0
+              },
+              {
+                "offset": 1,
+                "easing": "linear",
+                "composite": "auto",
+                "paddingTop": "43px",
+                "computedOffset": 1
+              }
+            ]
+          }
+        ],
+        "measured": {
+          "durationMs": 284,
+          "overshoot": 0,
+          "frames": 145
+        },
+        "fit": {
+          "type": "tween",
+          "duration": 300,
+          "easing": "cubic-bezier(0.43, 0.07, 0.59, 0.94)"
+        },
+        "agreement": "declared timing confirmed by measurement"
+      },
+      {
+        "id": "anim-3",
+        "properties": {
+          "w": {
+            "from": 750,
+            "to": 820,
+            "durationMs": 284,
+            "onsetMs": 158,
+            "overshoot": 0
+          },
+          "h": {
+            "from": 261.2,
+            "to": 636.63,
+            "durationMs": 171,
+            "onsetMs": 271,
+            "overshoot": 0
+          },
+          "max-width": {
+            "from": 750,
+            "to": 820,
+            "durationMs": 284,
+            "onsetMs": 158,
+            "overshoot": 0
+          }
+        },
+        "declared": [
+          {
+            "type": "CSSTransition",
+            "property": "max-width",
+            "animationName": null,
+            "timing": {
+              "duration": 300,
+              "delay": 0,
+              "endTime": 300,
+              "activeDuration": 300,
+              "easing": "cubic-bezier(0.43, 0.07, 0.59, 0.94)",
+              "iterations": 1,
+              "fill": "backwards"
+            },
+            "keyframes": [
+              {
+                "offset": 0,
+                "easing": "linear",
+                "composite": "auto",
+                "maxWidth": "750px",
+                "computedOffset": 0
+              },
+              {
+                "offset": 1,
+                "easing": "linear",
+                "composite": "auto",
+                "maxWidth": "820px",
+                "computedOffset": 1
+              }
+            ]
+          }
+        ],
+        "measured": {
+          "durationMs": 284,
+          "overshoot": 0,
+          "frames": 145
+        },
+        "fit": {
+          "type": "tween",
+          "duration": 300,
+          "easing": "cubic-bezier(0.43, 0.07, 0.59, 0.94)"
+        },
+        "agreement": "declared timing confirmed by measurement"
+      },
+      {
+        "id": "s4103",
+        "properties": {
+          "w": {
+            "from": 749,
+            "to": 819,
+            "durationMs": 284,
+            "onsetMs": 158,
+            "overshoot": 0
+          },
+          "h": {
+            "from": 260.2,
+            "to": 636.23,
+            "durationMs": 171,
+            "onsetMs": 271,
+            "overshoot": 0
+          },
+          "min-height": {
+            "from": 0,
+            "to": 636.24,
+            "durationMs": 284,
+            "onsetMs": 158,
+            "overshoot": 0
+          }
+        },
+        "declared": [
+          {
+            "type": "CSSTransition",
+            "property": "min-height",
+            "animationName": null,
+            "timing": {
+              "duration": 300,
+              "delay": 0,
+              "endTime": 300,
+              "activeDuration": 300,
+              "easing": "cubic-bezier(0.43, 0.07, 0.59, 0.94)",
+              "iterations": 1,
+              "fill": "backwards"
+            },
+            "keyframes": [
+              {
+                "offset": 0,
+                "easing": "linear",
+                "composite": "auto",
+                "minHeight": "0px",
+                "computedOffset": 0
+              },
+              {
+                "offset": 1,
+                "easing": "linear",
+                "composite": "auto",
+                "minHeight": "636.24px",
+                "computedOffset": 1
+              }
+            ]
+          }
+        ],
+        "measured": {
+          "durationMs": 284,
+          "overshoot": 0,
+          "frames": 145
+        },
+        "fit": {
+          "type": "tween",
+          "duration": 300,
+          "easing": "cubic-bezier(0.43, 0.07, 0.59, 0.94)"
+        },
+        "agreement": "declared timing confirmed by measurement"
+      },
+      {
+        "id": "s4119",
+        "properties": {
+          "color": {
+            "from": 1,
+            "to": 91.2,
+            "durationMs": 27,
+            "onsetMs": 415,
+            "overshoot": 0
+          }
+        },
+        "declared": [
+          {
+            "type": "CSSTransition",
+            "property": "background-color",
+            "animationName": null,
+            "timing": {
+              "duration": 150,
+              "delay": 0,
+              "endTime": 150,
+              "activeDuration": 150,
+              "easing": "ease",
+              "iterations": 1,
+              "fill": "backwards"
+            },
+            "keyframes": [
+              {
+                "offset": 0,
+                "easing": "linear",
+                "composite": "auto",
+                "backgroundColor": "oklab(0.316336 0.0000633448 -0.00624812)",
+                "computedOffset": 0
+              },
+              {
+                "offset": 1,
+                "easing": "linear",
+                "composite": "auto",
+                "backgroundColor": "rgba(0, 0, 0, 0)",
+                "computedOffset": 1
+              }
+            ]
+          },
+          {
+            "type": "CSSTransition",
+            "property": "color",
+            "animationName": null,
+            "timing": {
+              "duration": 150,
+              "delay": 0,
+              "endTime": 150,
+              "activeDuration": 150,
+              "easing": "ease",
+              "iterations": 1,
+              "fill": "backwards"
+            },
+            "keyframes": [
+              {
+                "offset": 0,
+                "easing": "linear",
+                "composite": "auto",
+                "color": "oklab(0.999998 -0.00000980496 0.0000234246)",
+                "computedOffset": 0
+              },
+              {
+                "offset": 1,
+                "easing": "linear",
+                "composite": "auto",
+                "color": "oklab(0.924357 0.0000941157 -0.00432163)",
+                "computedOffset": 1
+              }
+            ]
+          }
+        ],
+        "measured": {
+          "durationMs": 27,
+          "overshoot": 0,
+          "frames": 137
+        },
+        "fit": {
+          "type": "tween",
+          "duration": 150,
+          "easing": "ease"
+        },
+        "agreement": "declared 150ms vs measured 27ms — investigate; measurement is sampled at ~16ms/frame"
+      }
+    ],
+    "emit": [
+      {
+        "id": "s1967",
+        "css": ".surface {\n  transition: transform 0ms unknown — no declared timing, curve did not overshoot;\n}\n.surface[data-state=\"closed\"] {\n  transform: none;\n}\n.surface[data-state=\"open\"] {\n  transform: none;\n}",
+        "framerMotion": {
+          "initial": {},
+          "animate": {},
+          "transition": {
+            "duration": 0,
+            "ease": "unknown — no declared timing, curve did not overshoot"
+          }
+        },
+        "note": null
+      },
+      {
+        "id": "s2686",
+        "css": ".surface {\n  transition: transform 100ms ease-out;\n}\n.surface[data-state=\"closed\"] {\n  transform: none;\n}\n.surface[data-state=\"open\"] {\n  transform: none;\n}",
+        "framerMotion": {
+          "initial": {},
+          "animate": {},
+          "transition": {
+            "duration": 0.1,
+            "ease": "ease-out"
+          }
+        },
+        "note": null
+      },
+      {
+        "id": "s4100",
+        "css": ".surface {\n  transition: transform 300ms cubic-bezier(0.43, 0.07, 0.59, 0.94);\n}\n.surface[data-state=\"closed\"] {\n  transform: none;\n}\n.surface[data-state=\"open\"] {\n  transform: none;\n}",
+        "framerMotion": {
+          "initial": {},
+          "animate": {},
+          "transition": {
+            "duration": 0.3,
+            "ease": "cubic-bezier(0.43, 0.07, 0.59, 0.94)"
+          }
+        },
+        "note": null
+      },
+      {
+        "id": "anim-3",
+        "css": ".surface {\n  transition: transform 300ms cubic-bezier(0.43, 0.07, 0.59, 0.94);\n}\n.surface[data-state=\"closed\"] {\n  transform: none;\n}\n.surface[data-state=\"open\"] {\n  transform: none;\n}",
+        "framerMotion": {
+          "initial": {},
+          "animate": {},
+          "transition": {
+            "duration": 0.3,
+            "ease": "cubic-bezier(0.43, 0.07, 0.59, 0.94)"
+          }
+        },
+        "note": "Width/height change during this animation: it is a layout (FLIP) transition. Record start and end rects and animate the delta, or use a layout-animation primitive — transform alone will not reproduce it."
+      },
+      {
+        "id": "s4103",
+        "css": ".surface {\n  transition: transform 300ms cubic-bezier(0.43, 0.07, 0.59, 0.94);\n}\n.surface[data-state=\"closed\"] {\n  transform: none;\n}\n.surface[data-state=\"open\"] {\n  transform: none;\n}",
+        "framerMotion": {
+          "initial": {},
+          "animate": {},
+          "transition": {
+            "duration": 0.3,
+            "ease": "cubic-bezier(0.43, 0.07, 0.59, 0.94)"
+          }
+        },
+        "note": "Width/height change during this animation: it is a layout (FLIP) transition. Record start and end rects and animate the delta, or use a layout-animation primitive — transform alone will not reproduce it."
+      },
+      {
+        "id": "s4119",
+        "css": ".surface {\n  transition: transform 150ms ease;\n}\n.surface[data-state=\"closed\"] {\n  transform: none;\n}\n.surface[data-state=\"open\"] {\n  transform: none;\n}",
+        "framerMotion": {
+          "initial": {},
+          "animate": {},
+          "transition": {
+            "duration": 0.15,
+            "ease": "ease"
+          }
+        },
+        "note": null
+      }
+    ]
+  },
+  "collapse": {
+    "trigger": "s4119",
+    "via": "click",
+    "nodeCount": 6,
+    "frames": 148,
+    "frameIntervalMs": 16.7,
+    "nodes": [
+      {
+        "id": "s1967",
+        "properties": {},
+        "declared": [
+          {
+            "type": "CSSAnimation",
+            "property": null,
+            "animationName": "sx-18re5ia-B",
+            "timing": {
+              "duration": null,
+              "delay": 0,
+              "endTime": null,
+              "activeDuration": null,
+              "easing": "linear",
+              "iterations": 1,
+              "fill": "both"
+            },
+            "keyframes": [
+              {
+                "offset": 0,
+                "easing": "ease",
+                "composite": "auto",
+                "opacity": "0",
+                "computedOffset": 0
+              },
+              {
+                "offset": 1,
+                "easing": "ease",
+                "composite": "auto",
+                "opacity": "1",
+                "computedOffset": 1
+              }
+            ]
+          }
+        ],
+        "measured": {
+          "durationMs": 0,
+          "overshoot": 0,
+          "frames": 148
+        },
+        "fit": {
+          "type": "tween",
+          "duration": 0,
+          "easing": "unknown — no declared timing, curve did not overshoot"
+        },
+        "agreement": "nothing declared; measured only — treat duration as approximate"
+      },
+      {
+        "id": "s2686",
+        "properties": {},
+        "declared": [
+          {
+            "type": "CSSAnimation",
+            "property": null,
+            "animationName": "sx-18re5ia-B",
+            "timing": {
+              "duration": 100,
+              "delay": 0,
+              "endTime": 100,
+              "activeDuration": 100,
+              "easing": "linear",
+              "iterations": 1,
+              "fill": "forwards"
+            },
+            "keyframes": [
+              {
+                "offset": 0,
+                "easing": "ease-out",
+                "composite": "auto",
+                "opacity": "0",
+                "computedOffset": 0
+              },
+              {
+                "offset": 1,
+                "easing": "ease-out",
+                "composite": "auto",
+                "opacity": "1",
+                "computedOffset": 1
+              }
+            ]
+          }
+        ],
+        "measured": {
+          "durationMs": 0,
+          "overshoot": 0,
+          "frames": 148
+        },
+        "fit": {
+          "type": "tween",
+          "duration": 100,
+          "easing": "linear"
+        },
+        "agreement": "declared 100ms vs measured 0ms — investigate; measurement is sampled at ~17ms/frame"
+      },
+      {
+        "id": "s4100",
+        "properties": {
+          "padding-bottom": {
+            "from": 43.38,
+            "to": 93.99,
+            "durationMs": 281,
+            "onsetMs": 130,
+            "overshoot": 0
+          },
+          "padding-top": {
+            "from": 43,
+            "to": 94,
+            "durationMs": 281,
+            "onsetMs": 130,
+            "overshoot": 0
+          }
+        },
+        "declared": [
+          {
+            "type": "CSSTransition",
+            "property": "padding-bottom",
+            "animationName": null,
+            "timing": {
+              "duration": 300,
+              "delay": 0,
+              "endTime": 300,
+              "activeDuration": 300,
+              "easing": "cubic-bezier(0.43, 0.07, 0.59, 0.94)",
+              "iterations": 1,
+              "fill": "backwards"
+            },
+            "keyframes": [
+              {
+                "offset": 0,
+                "easing": "linear",
+                "composite": "auto",
+                "paddingBottom": "43.38px",
+                "computedOffset": 0
+              },
+              {
+                "offset": 1,
+                "easing": "linear",
+                "composite": "auto",
+                "paddingBottom": "93.99px",
+                "computedOffset": 1
+              }
+            ]
+          },
+          {
+            "type": "CSSTransition",
+            "property": "padding-top",
+            "animationName": null,
+            "timing": {
+              "duration": 300,
+              "delay": 0,
+              "endTime": 300,
+              "activeDuration": 300,
+              "easing": "cubic-bezier(0.43, 0.07, 0.59, 0.94)",
+              "iterations": 1,
+              "fill": "backwards"
+            },
+            "keyframes": [
+              {
+                "offset": 0,
+                "easing": "linear",
+                "composite": "auto",
+                "paddingTop": "43px",
+                "computedOffset": 0
+              },
+              {
+                "offset": 1,
+                "easing": "linear",
+                "composite": "auto",
+                "paddingTop": "94px",
+                "computedOffset": 1
+              }
+            ]
+          }
+        ],
+        "measured": {
+          "durationMs": 281,
+          "overshoot": 0,
+          "frames": 141
+        },
+        "fit": {
+          "type": "tween",
+          "duration": 300,
+          "easing": "cubic-bezier(0.43, 0.07, 0.59, 0.94)"
+        },
+        "agreement": "declared timing confirmed by measurement"
+      },
+      {
+        "id": "anim-3",
+        "properties": {
+          "w": {
+            "from": 820,
+            "to": 750,
+            "durationMs": 281,
+            "onsetMs": 130,
+            "overshoot": 0
+          },
+          "h": {
+            "from": 636.63,
+            "to": 261.2,
+            "durationMs": 161,
+            "onsetMs": 128,
+            "overshoot": 0
+          },
+          "max-width": {
+            "from": 820,
+            "to": 750,
+            "durationMs": 281,
+            "onsetMs": 130,
+            "overshoot": 0
+          }
+        },
+        "declared": [
+          {
+            "type": "CSSTransition",
+            "property": "max-width",
+            "animationName": null,
+            "timing": {
+              "duration": 300,
+              "delay": 0,
+              "endTime": 300,
+              "activeDuration": 300,
+              "easing": "cubic-bezier(0.43, 0.07, 0.59, 0.94)",
+              "iterations": 1,
+              "fill": "backwards"
+            },
+            "keyframes": [
+              {
+                "offset": 0,
+                "easing": "linear",
+                "composite": "auto",
+                "maxWidth": "820px",
+                "computedOffset": 0
+              },
+              {
+                "offset": 1,
+                "easing": "linear",
+                "composite": "auto",
+                "maxWidth": "750px",
+                "computedOffset": 1
+              }
+            ]
+          }
+        ],
+        "measured": {
+          "durationMs": 281,
+          "overshoot": 0,
+          "frames": 141
+        },
+        "fit": {
+          "type": "tween",
+          "duration": 300,
+          "easing": "cubic-bezier(0.43, 0.07, 0.59, 0.94)"
+        },
+        "agreement": "declared timing confirmed by measurement"
+      },
+      {
+        "id": "s4103",
+        "properties": {
+          "w": {
+            "from": 819,
+            "to": 749,
+            "durationMs": 281,
+            "onsetMs": 130,
+            "overshoot": 0
+          },
+          "h": {
+            "from": 636.23,
+            "to": 260.2,
+            "durationMs": 161,
+            "onsetMs": 128,
+            "overshoot": 0
+          },
+          "min-height": {
+            "from": 636.24,
+            "to": 0,
+            "durationMs": 281,
+            "onsetMs": 130,
+            "overshoot": 0
+          }
+        },
+        "declared": [
+          {
+            "type": "CSSTransition",
+            "property": "min-height",
+            "animationName": null,
+            "timing": {
+              "duration": 300,
+              "delay": 0,
+              "endTime": 300,
+              "activeDuration": 300,
+              "easing": "cubic-bezier(0.43, 0.07, 0.59, 0.94)",
+              "iterations": 1,
+              "fill": "backwards"
+            },
+            "keyframes": [
+              {
+                "offset": 0,
+                "easing": "linear",
+                "composite": "auto",
+                "minHeight": "636.24px",
+                "computedOffset": 0
+              },
+              {
+                "offset": 1,
+                "easing": "linear",
+                "composite": "auto",
+                "minHeight": "0px",
+                "computedOffset": 1
+              }
+            ]
+          }
+        ],
+        "measured": {
+          "durationMs": 281,
+          "overshoot": 0,
+          "frames": 141
+        },
+        "fit": {
+          "type": "tween",
+          "duration": 300,
+          "easing": "cubic-bezier(0.43, 0.07, 0.59, 0.94)"
+        },
+        "agreement": "declared timing confirmed by measurement"
+      },
+      {
+        "id": "s4119",
+        "properties": {
+          "color": {
+            "from": 1,
+            "to": 91.2,
+            "durationMs": 21,
+            "onsetMs": 390,
+            "overshoot": 0
+          }
+        },
+        "declared": [
+          {
+            "type": "CSSTransition",
+            "property": "background-color",
+            "animationName": null,
+            "timing": {
+              "duration": 150,
+              "delay": 0,
+              "endTime": 150,
+              "activeDuration": 150,
+              "easing": "ease",
+              "iterations": 1,
+              "fill": "backwards"
+            },
+            "keyframes": [
+              {
+                "offset": 0,
+                "easing": "linear",
+                "composite": "auto",
+                "backgroundColor": "oklab(0.316336 0.0000633448 -0.00624812)",
+                "computedOffset": 0
+              },
+              {
+                "offset": 1,
+                "easing": "linear",
+                "composite": "auto",
+                "backgroundColor": "rgba(0, 0, 0, 0)",
+                "computedOffset": 1
+              }
+            ]
+          },
+          {
+            "type": "CSSTransition",
+            "property": "color",
+            "animationName": null,
+            "timing": {
+              "duration": 150,
+              "delay": 0,
+              "endTime": 150,
+              "activeDuration": 150,
+              "easing": "ease",
+              "iterations": 1,
+              "fill": "backwards"
+            },
+            "keyframes": [
+              {
+                "offset": 0,
+                "easing": "linear",
+                "composite": "auto",
+                "color": "oklab(0.999998 -0.00000980496 0.0000234246)",
+                "computedOffset": 0
+              },
+              {
+                "offset": 1,
+                "easing": "linear",
+                "composite": "auto",
+                "color": "oklab(0.924357 0.0000941157 -0.00432163)",
+                "computedOffset": 1
+              }
+            ]
+          }
+        ],
+        "measured": {
+          "durationMs": 21,
+          "overshoot": 0,
+          "frames": 134
+        },
+        "fit": {
+          "type": "tween",
+          "duration": 150,
+          "easing": "ease"
+        },
+        "agreement": "declared 150ms vs measured 21ms — investigate; measurement is sampled at ~17ms/frame"
+      }
+    ],
+    "emit": [
+      {
+        "id": "s1967",
+        "css": ".surface {\n  transition: transform 0ms unknown — no declared timing, curve did not overshoot;\n}\n.surface[data-state=\"closed\"] {\n  transform: none;\n}\n.surface[data-state=\"open\"] {\n  transform: none;\n}",
+        "framerMotion": {
+          "initial": {},
+          "animate": {},
+          "transition": {
+            "duration": 0,
+            "ease": "unknown — no declared timing, curve did not overshoot"
+          }
+        },
+        "note": null
+      },
+      {
+        "id": "s2686",
+        "css": ".surface {\n  transition: transform 100ms ease-out;\n}\n.surface[data-state=\"closed\"] {\n  transform: none;\n}\n.surface[data-state=\"open\"] {\n  transform: none;\n}",
+        "framerMotion": {
+          "initial": {},
+          "animate": {},
+          "transition": {
+            "duration": 0.1,
+            "ease": "ease-out"
+          }
+        },
+        "note": null
+      },
+      {
+        "id": "s4100",
+        "css": ".surface {\n  transition: transform 300ms cubic-bezier(0.43, 0.07, 0.59, 0.94);\n}\n.surface[data-state=\"closed\"] {\n  transform: none;\n}\n.surface[data-state=\"open\"] {\n  transform: none;\n}",
+        "framerMotion": {
+          "initial": {},
+          "animate": {},
+          "transition": {
+            "duration": 0.3,
+            "ease": "cubic-bezier(0.43, 0.07, 0.59, 0.94)"
+          }
+        },
+        "note": null
+      },
+      {
+        "id": "anim-3",
+        "css": ".surface {\n  transition: transform 300ms cubic-bezier(0.43, 0.07, 0.59, 0.94);\n}\n.surface[data-state=\"closed\"] {\n  transform: none;\n}\n.surface[data-state=\"open\"] {\n  transform: none;\n}",
+        "framerMotion": {
+          "initial": {},
+          "animate": {},
+          "transition": {
+            "duration": 0.3,
+            "ease": "cubic-bezier(0.43, 0.07, 0.59, 0.94)"
+          }
+        },
+        "note": "Width/height change during this animation: it is a layout (FLIP) transition. Record start and end rects and animate the delta, or use a layout-animation primitive — transform alone will not reproduce it."
+      },
+      {
+        "id": "s4103",
+        "css": ".surface {\n  transition: transform 300ms cubic-bezier(0.43, 0.07, 0.59, 0.94);\n}\n.surface[data-state=\"closed\"] {\n  transform: none;\n}\n.surface[data-state=\"open\"] {\n  transform: none;\n}",
+        "framerMotion": {
+          "initial": {},
+          "animate": {},
+          "transition": {
+            "duration": 0.3,
+            "ease": "cubic-bezier(0.43, 0.07, 0.59, 0.94)"
+          }
+        },
+        "note": "Width/height change during this animation: it is a layout (FLIP) transition. Record start and end rects and animate the delta, or use a layout-animation primitive — transform alone will not reproduce it."
+      },
+      {
+        "id": "s4119",
+        "css": ".surface {\n  transition: transform 150ms ease;\n}\n.surface[data-state=\"closed\"] {\n  transform: none;\n}\n.surface[data-state=\"open\"] {\n  transform: none;\n}",
+        "framerMotion": {
+          "initial": {},
+          "animate": {},
+          "transition": {
+            "duration": 0.15,
+            "ease": "ease"
+          }
+        },
+        "note": null
+      }
+    ]
+  }
+}

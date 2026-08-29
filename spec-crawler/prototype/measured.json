@@ -1,0 +1,102 @@
+{
+  "trigger": "s8",
+  "via": "click",
+  "nodeCount": 1,
+  "frames": 16,
+  "frameIntervalMs": 16.7,
+  "nodes": [
+    {
+      "id": "s10",
+      "properties": {
+        "w": {
+          "from": 750,
+          "to": 820,
+          "durationMs": 222,
+          "onsetMs": 214,
+          "overshoot": 0
+        },
+        "max-width": {
+          "from": 750,
+          "to": 820,
+          "durationMs": 222,
+          "onsetMs": 214,
+          "overshoot": 0
+        }
+      },
+      "declared": [
+        {
+          "type": "CSSTransition",
+          "property": "max-width",
+          "animationName": null,
+          "timing": {
+            "duration": 300,
+            "delay": 0,
+            "endTime": 300,
+            "activeDuration": 300,
+            "easing": "cubic-bezier(0.43, 0.07, 0.59, 0.94)",
+            "iterations": 1,
+            "fill": "backwards"
+          },
+          "keyframes": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "maxWidth": "750px",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "maxWidth": "820px",
+              "computedOffset": 1
+            }
+          ]
+        }
+      ],
+      "measured": {
+        "durationMs": 222,
+        "overshoot": 0,
+        "frames": 16
+      },
+      "fit": {
+        "type": "tween",
+        "duration": 300,
+        "easing": "cubic-bezier(0.43, 0.07, 0.59, 0.94)"
+      },
+      "agreement": "declared timing confirmed by measurement"
+    }
+  ],
+  "emit": [
+    {
+      "id": "s10",
+      "css": ".surface {\n  transition: max-width 300ms cubic-bezier(0.43, 0.07, 0.59, 0.94), width 300ms cubic-bezier(0.43, 0.07, 0.59, 0.94);\n}\n.surface[data-state=\"closed\"] {\n  max-width: 750px;\n  width: 750px;\n}\n.surface[data-state=\"open\"] {\n  max-width: 820px;\n  width: 820px;\n}",
+      "framerMotion": {
+        "initial": {
+          "maxWidth": 750,
+          "width": 750
+        },
+        "animate": {
+          "maxWidth": 820,
+          "width": 820
+        },
+        "transition": {
+          "duration": 0.3,
+          "ease": "cubic-bezier(0.43, 0.07, 0.59, 0.94)"
+        }
+      },
+      "perProperty": [
+        {
+          "property": "w",
+          "durationMs": 222
+        },
+        {
+          "property": "max-width",
+          "durationMs": 222
+        }
+      ],
+      "note": "Size changes during this animation: it is a layout transition. Animate the dimensional properties directly (as emitted), or use a layout-animation primitive — transform alone will not reproduce it."
+    }
+  ]
+}

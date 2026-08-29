@@ -1,0 +1,299 @@
+{
+  "url": "https://linear.app/test-workspace-bb/team/TES/all",
+  "scannedRules": 7260,
+  "unreadableSheets": 0,
+  "stateNames": [
+    "active",
+    "hover"
+  ],
+  "components": [
+    {
+      "label": "a#1docs.sx-1xru068.sx-189xrh.sx-zjhap9",
+      "rect": {
+        "x": 13,
+        "y": 329,
+        "width": 317,
+        "height": 32
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "app.base"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:active"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "app.base",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:hover"
+          ]
+        }
+      ],
+      "id": "s3639"
+    },
+    {
+      "label": "a#4linear-status.sx-1xru068.sx-189xrh.sx-zjhap9",
+      "rect": {
+        "x": 13,
+        "y": 425,
+        "width": 317,
+        "height": 32
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "app.base"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:active"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "app.base",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:hover"
+          ]
+        }
+      ],
+      "id": "s3672"
+    },
+    {
+      "label": "a#5download-apps.sx-1xru068.sx-189xrh.sx-zjhap9",
+      "rect": {
+        "x": 13,
+        "y": 457,
+        "width": 317,
+        "height": 32
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "app.base"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:active"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "app.base",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:hover"
+          ]
+        }
+      ],
+      "id": "s3681"
+    },
+    {
+      "label": "a#6settings.sx-1xru068.sx-189xrh.sx-zjhap9",
+      "rect": {
+        "x": 13,
+        "y": 489,
+        "width": 317,
+        "height": 32
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "app.base"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:active"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "app.base",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:hover"
+          ]
+        }
+      ],
+      "id": "s3691"
+    },
+    {
+      "label": "a#7slack-community.sx-1xru068.sx-189xrh.sx-zjhap9",
+      "rect": {
+        "x": 13,
+        "y": 521,
+        "width": 317,
+        "height": 32
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "app.base"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:active"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "app.base",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:hover"
+          ]
+        }
+      ],
+      "id": "s3707"
+    },
+    {
+      "label": "a#10full-changelog.sx-1xru068.sx-189xrh.sx-zjhap9",
+      "rect": {
+        "x": 13,
+        "y": 647,
+        "width": 317,
+        "height": 32
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "app.base"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:active"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "app.base",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:hover"
+          ]
+        }
+      ],
+      "id": "s3741"
+    }
+  ]
+}

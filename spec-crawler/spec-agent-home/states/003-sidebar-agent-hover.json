@@ -1,0 +1,179 @@
+{
+  "url": "https://linear.app/test-workspace-bb/agent",
+  "scannedRules": 7251,
+  "unreadableSheets": 0,
+  "stateNames": [
+    "active",
+    "focus-visible",
+    "hover"
+  ],
+  "components": [
+    {
+      "label": "a.sx-6s0dn4.sx-1i9j6mr.sx-vijh9v",
+      "rect": {
+        "x": 12,
+        "y": 176,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "app.base"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:active"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "-1px"
+            }
+          ],
+          "selectors": [
+            ".sx-y9f4xx:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "app.base",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:hover"
+          ]
+        }
+      ],
+      "id": "s2033"
+    },
+    {
+      "label": "div.sx-1n2onr6.sx-2u8bby.sx-5rfsx9",
+      "rect": {
+        "x": 12,
+        "y": 176,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "calc(-1 * var(--focus-ring-width))"
+            }
+          ],
+          "selectors": [
+            ".sx-198e2n:focus-visible"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-4vndy0:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-rh77ze:hover"
+          ]
+        }
+      ],
+      "id": "s2028"
+    },
+    {
+      "label": "span.sx-1j61x8r.sx-ggjnk3.sx-1srpx65",
+      "rect": {
+        "x": 12,
+        "y": 176,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "lch(100% 0 272 / 1)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "lch(100% 0 272 / 1)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:hover *)"
+          ]
+        }
+      ],
+      "id": "s2034"
+    }
+  ]
+}

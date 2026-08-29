@@ -1,0 +1,29 @@
+{
+  "name": "spec-crawler",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Capture a web app's design spec — CSS states, overlay states, agent-driven flows — as Paper-pasteable frames. Usable as a CLI or as an MCP server.",
+  "bin": {
+    "spec-crawler": "./index.mjs",
+    "spec-crawler-mcp": "./mcp.mjs"
+  },
+  "scripts": {
+    "edge": "./bin/spec-up-paired.sh",
+    "crawl": "node index.mjs",
+    "scenario": "node scenario-run.mjs",
+    "validate:bundles": "node validate-bundles.mjs",
+    "test": "node --test --test-concurrency=1",
+    "test:unit": "node --test --test-concurrency=1 test/unit/*.test.mjs",
+    "test:browser": "node --test --test-concurrency=1 test/browser/*.test.mjs",
+    "test:integration": "node --test --test-concurrency=1 test/integration/*.test.mjs",
+    "test:repeatability": "node --test --test-concurrency=1 test/repeatability/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "playwright-core": "^1.62.1"
+  }
+}

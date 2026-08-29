@@ -1,0 +1,323 @@
+{
+  "url": "https://linear.app/test-workspace-bb/issue/TES-52/enhance-onboarding-and-align-it-with-brand-colors",
+  "scannedRules": 7246,
+  "unreadableSheets": 0,
+  "stateNames": [
+    "active",
+    "hover"
+  ],
+  "components": [
+    {
+      "label": "div.sx-1n2onr6.sx-3nfvp2.sx-6s0dn4",
+      "rect": {
+        "x": 818,
+        "y": 527,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority3"
+          ],
+          "changes": [
+            {
+              "property": "border-top-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-right-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-bottom-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-left-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            }
+          ],
+          "selectors": [
+            ".sx-giht08:active"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority3",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "border-top-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-right-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-bottom-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-left-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            }
+          ],
+          "selectors": [
+            ".sx-giht08:hover"
+          ]
+        }
+      ],
+      "id": "s3198"
+    },
+    {
+      "label": "div.sx-1n2onr6.sx-3nfvp2.sx-6s0dn4",
+      "rect": {
+        "x": 818,
+        "y": 559,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority3"
+          ],
+          "changes": [
+            {
+              "property": "border-top-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-right-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-bottom-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-left-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            }
+          ],
+          "selectors": [
+            ".sx-giht08:active"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority3",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "border-top-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-right-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-bottom-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-left-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            }
+          ],
+          "selectors": [
+            ".sx-giht08:hover"
+          ]
+        }
+      ],
+      "id": "s3213"
+    },
+    {
+      "label": "div.sx-1n2onr6.sx-3nfvp2.sx-6s0dn4",
+      "rect": {
+        "x": 818,
+        "y": 621,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority3"
+          ],
+          "changes": [
+            {
+              "property": "border-top-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-right-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-bottom-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-left-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            }
+          ],
+          "selectors": [
+            ".sx-giht08:active"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority3",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "border-top-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-right-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-bottom-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-left-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            }
+          ],
+          "selectors": [
+            ".sx-giht08:hover"
+          ]
+        }
+      ],
+      "id": "s3230"
+    },
+    {
+      "label": "div.sx-1n2onr6.sx-3nfvp2.sx-6s0dn4",
+      "rect": {
+        "x": 818,
+        "y": 653,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority3"
+          ],
+          "changes": [
+            {
+              "property": "border-top-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-right-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-bottom-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-left-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            }
+          ],
+          "selectors": [
+            ".sx-giht08:active"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority3",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "border-top-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-right-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-bottom-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "border-left-color",
+              "from": "lch(41.778 1.425 272)",
+              "to": ""
+            }
+          ],
+          "selectors": [
+            ".sx-giht08:hover"
+          ]
+        }
+      ],
+      "id": "s3245"
+    }
+  ]
+}

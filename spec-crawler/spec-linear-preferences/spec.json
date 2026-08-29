@@ -1,0 +1,173 @@
+{
+  "url": "https://linear.app/test-workspace-bb/team/TES/all",
+  "capturedAt": "2026-08-21T18:22:56.484Z",
+  "stateCount": 4,
+  "states": [
+    {
+      "id": "001-preferences-rest-light",
+      "name": "preferences-rest-light",
+      "tier": 3,
+      "kind": "agent-captured",
+      "notes": "Linear settings account/preferences rest, light theme. Back to app + settings rail + SceneSettings white scene. Coding sessions promo overlapping sidebar.",
+      "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.theme-provider-bfca8e2c6cb3c7c4d40b8464adad582727b37d10|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv",
+      "path": [],
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1432,
+        "height": 723
+      },
+      "frame": "frames/001-preferences-rest-light.html",
+      "jsx": "jsx/001-preferences-rest-light.jsx",
+      "shot": "shots/001-preferences-rest-light.png",
+      "shots": {
+        "surface": "shots/001-preferences-rest-light.png"
+      },
+      "bytes": 852748
+    },
+    {
+      "id": "002-preferences-home-view-select-open",
+      "name": "preferences-home-view-select-open",
+      "tier": 3,
+      "kind": "agent-captured",
+      "notes": "Clicked Default home view combobox (Reviews). Listbox 182x621 at (1046,92), portalled. Light theme.",
+      "hash": "BODY.content-loaded.is-bootstrapped|SPAN.|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.theme-provider-bfca8e2c6cb3c7c4d40b8464adad582727b37d10|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.sx-ixxii4.sx-13vifvy|DIV.|DIV.theme-provider-8d5298075bdf8db935e6006e0133796a97f4b546|DIV.sx-1lmytr0.sx-8du1vd[data-state=open]|STYLE.|DIV.sx-1iorvi4.sx-jkvuk6|SPAN.",
+      "path": [],
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1432,
+        "height": 723
+      },
+      "frame": "frames/002-preferences-home-view-select-open.html",
+      "jsx": "jsx/002-preferences-home-view-select-open.jsx",
+      "shot": "shots/002-preferences-home-view-select-open.png",
+      "shots": {
+        "surface": "shots/002-preferences-home-view-select-open.png"
+      },
+      "bytes": 897811
+    },
+    {
+      "id": "003-back-to-app",
+      "name": "Back to app",
+      "tier": 2,
+      "level": 0,
+      "path": [],
+      "kind": "inline",
+      "roleEvidence": {
+        "triggerHasPopup": null,
+        "innerRole": null,
+        "containerRole": null
+      },
+      "detectedBy": "mounted",
+      "trigger": {
+        "label": "Back to app",
+        "role": null,
+        "hasPopup": null
+      },
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1432,
+        "height": 723
+      },
+      "anchor": {
+        "side": "left",
+        "align": "start",
+        "gap": -1416,
+        "triggerRect": {
+          "x": 16,
+          "y": 16,
+          "width": 112,
+          "height": 28
+        },
+        "surfaceRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1432,
+          "height": 723
+        }
+      },
+      "hash": "DIV.sx-78zum5.sx-131h156|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.|DIV.sx-5yr21d|DIV.sx-ixxii4.sx-w2c716|DIV.sx-1n2onr6.sx-98rzlu|DIV.sx-10l6tqk.sx-13vifvy|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-78zum5.sx-dt5ytf|MAIN.sx-78zum5.sx-131h156|DIV.|DIV.sx-1hc1fzr.sx-1bdbk01|DIV.sx-10l6tqk.sx-13vifvy|DIV.|DIV.sx-h8yej3.sx-2lah0s|DIV.sx-ffx93g.sx-1qcyuwa|DIV.sx-1n2onr6.sx-h8yej3",
+      "cssStates": {
+        "components": 230,
+        "stateNames": [
+          "[data-disabled=\"true\"]",
+          "active",
+          "disabled",
+          "focus",
+          "focus-visible",
+          "focus-within",
+          "hover"
+        ]
+      },
+      "frame": "frames/003-back-to-app.html",
+      "jsx": "jsx/003-back-to-app.jsx",
+      "shot": "shots/003-back-to-app.png",
+      "shots": {
+        "surface": "shots/003-back-to-app.png",
+        "context": "shots/003-back-to-app@context.png",
+        "trigger": "shots/003-back-to-app@trigger.png"
+      },
+      "states": "states/003-back-to-app.json",
+      "bytes": 1408529
+    },
+    {
+      "id": "004-reviews",
+      "name": "Reviews",
+      "tier": 2,
+      "level": 0,
+      "path": [],
+      "kind": "overlay",
+      "roleEvidence": {
+        "triggerHasPopup": null,
+        "innerRole": null,
+        "containerRole": null
+      },
+      "detectedBy": "mounted",
+      "trigger": {
+        "label": "Reviews",
+        "role": "combobox",
+        "hasPopup": null
+      },
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1432,
+        "height": 723
+      },
+      "anchor": {
+        "side": "left",
+        "align": "end",
+        "gap": -384,
+        "triggerRect": {
+          "x": 1048,
+          "y": 193,
+          "width": 90,
+          "height": 30
+        },
+        "surfaceRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1432,
+          "height": 723
+        }
+      },
+      "hash": "DIV.sx-ixxii4.sx-13vifvy",
+      "cssStates": {
+        "components": 0,
+        "stateNames": []
+      },
+      "frame": "frames/004-reviews.html",
+      "jsx": "jsx/004-reviews.jsx",
+      "shot": "shots/004-reviews.png",
+      "shots": {
+        "surface": "shots/004-reviews.png",
+        "context": "shots/004-reviews@context.png",
+        "trigger": "shots/004-reviews@trigger.png"
+      },
+      "states": "states/004-reviews.json",
+      "bytes": 1289
+    }
+  ]
+}

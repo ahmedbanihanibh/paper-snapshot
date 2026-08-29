@@ -1,0 +1,29 @@
+{
+  "id": "003-favorites-collapsed",
+  "trigger": "Favorites",
+  "requiredNodes": [
+    {
+      "node": "s2640",
+      "transition": "opacity, width",
+      "durationMs": 150,
+      "easing": "ease",
+      "owns": null,
+      "animate": [
+        {
+          "property": "opacity",
+          "from": 1,
+          "to": 0
+        },
+        {
+          "property": "w",
+          "from": 24,
+          "to": 0
+        }
+      ],
+      "doNotAnimate": [
+        "h"
+      ]
+    }
+  ],
+  "reference": null
+}

@@ -1,0 +1,71 @@
+{
+  "url": "https://linear.app/test-workspace-bb/team/TES/all",
+  "capturedAt": "2026-08-11T12:59:17.796Z",
+  "stateCount": 4,
+  "states": [
+    {
+      "id": "001-row-rest",
+      "name": "row-rest",
+      "tier": 3,
+      "kind": "agent-captured",
+      "hash": "A._gridRowShared_1bk15_65[data-active=true,data-selected=false,data-apply-background=true,data-keyboard-active=false,data-first-selected=false,data-last-selected=false,data-first-in-group=true,data-last-in-group=false]|DIV.sx-rvj5dj.sx-4w6khx|DIV.|DIV.sx-vx4679.sx-1q0g3np[data-selected=false]|DIV.sx-78zum5.sx-1n2onr6|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-vx4679|SPAN.sx-78zum5.sx-vx4679|DIV._deprioritizedRendering_1cau4_1|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.",
+      "path": [],
+      "notes": "Issue row at rest — the primitive the whole surface is built from. REACHED BY: Team issue list, List layout. Pointer parked outside the list, verified clear. MEASURED: 1179x44 at (244.5, 214). pseudo-element paint: ::before lch(9.345 0.85 272) — this is invisible to a screenshot and to the accessibility tree. radius 8px type 16px / 24px 400 \"Inter Variable\" GRID tracks [indent] 8px [checkbox] 18px [priority] 16px [identifier] 50px [status] 16px [title] 937px [createdAt] 60px [end-padding] 18px, column-gap 8px — resolved from subgrid at capture time so the frame lays out standalone. STATE ATTRIBUTES data-active=true, data-selected=false, data-apply-background=true, data-keyboard-active=false, data-first-selected=false, data-last-selected=false, data-first-in-group=true, data-last-in-group=false — this component expresses state through attributes, so a CSS :hover rule will not reproduce it.",
+      "frame": "frames/001-row-rest.html",
+      "jsx": "jsx/001-row-rest.jsx",
+      "shot": "shots/001-row-rest.png",
+      "shots": {
+        "surface": "shots/001-row-rest.png"
+      },
+      "bytes": 108078
+    },
+    {
+      "id": "002-group-header",
+      "name": "group-header",
+      "tier": 3,
+      "kind": "agent-captured",
+      "hash": "DIV._rowShared_1bk15_8._elementTransition_1bk15_123|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.theme-provider-258b47ffd67cff212f1f2d7067e800af91e6cc08|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-vx4679|DIV.sx-78zum5.sx-1kky2od|DIV.sx-78zum5.sx-vx4679|DIV.sx-78zum5.sx-vx4679",
+      "path": [],
+      "notes": "Status group header — sticky, inset 8px from the rows it heads. REACHED BY: Grouping=Status. MEASURED: 1179x36 at (244.5, 176). radius 8px type 16px / 24px 400 \"Inter Variable\" GRID tracks none — resolved from subgrid at capture time so the frame lays out standalone.",
+      "frame": "frames/002-group-header.html",
+      "jsx": "jsx/002-group-header.jsx",
+      "shot": "shots/002-group-header.png",
+      "shots": {
+        "surface": "shots/002-group-header.png"
+      },
+      "bytes": 33923
+    },
+    {
+      "id": "003-toolbar-filter-btn",
+      "name": "toolbar-filter-btn",
+      "tier": 3,
+      "kind": "agent-captured",
+      "hash": "BUTTON.sx-3nfvp2.sx-16dsc37|SPAN.sx-3nfvp2.sx-6s0dn4|svg.|path.",
+      "path": [],
+      "notes": "Filter trigger in the view toolbar. REACHED BY: Top-right of the view header. MEASURED: 28x28 at (1319.5, 60.3). background lch(10.149 0.689 272) radius 9999px border 0.5px solid rgba(0, 0, 0, 0) type 12px / normal 500 \"Inter Variable\"",
+      "frame": "frames/003-toolbar-filter-btn.html",
+      "jsx": "jsx/003-toolbar-filter-btn.jsx",
+      "shot": "shots/003-toolbar-filter-btn.png",
+      "shots": {
+        "surface": "shots/003-toolbar-filter-btn.png"
+      },
+      "bytes": 10021
+    },
+    {
+      "id": "004-toolbar-display-btn",
+      "name": "toolbar-display-btn",
+      "tier": 3,
+      "kind": "agent-captured",
+      "hash": "BUTTON.sx-3nfvp2.sx-16dsc37|SPAN.sx-3nfvp2.sx-6s0dn4|DIV.sx-6jxa94.sx-1v9usgg|svg.|path.|path.",
+      "path": [],
+      "notes": "Display trigger in the view toolbar. REACHED BY: Top-right of the view header. MEASURED: 28x28 at (1353.5, 60.3). background lch(10.149 0.689 272) radius 9999px border 0.5px solid rgba(0, 0, 0, 0) type 12px / normal 500 \"Inter Variable\"",
+      "frame": "frames/004-toolbar-display-btn.html",
+      "jsx": "jsx/004-toolbar-display-btn.jsx",
+      "shot": "shots/004-toolbar-display-btn.png",
+      "shots": {
+        "surface": "shots/004-toolbar-display-btn.png"
+      },
+      "bytes": 12775
+    }
+  ]
+}

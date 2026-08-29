@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "name": "fixture-app-menu-open",
+  "description": "Open the fixture app's menu, pick Duplicate, and record the row state that follows.",
+  "target": {
+    "endpoint": "http://localhost:9222",
+    "urlPattern": "127\\.0\\.0\\.1",
+    "navigateTo": "http://127.0.0.1:8123/index.html"
+  },
+  "environment": {
+    "viewport": { "width": 1280, "height": 800 },
+    "colorScheme": "light",
+    "reducedMotion": "reduce",
+    "locale": "en-US",
+    "timezone": "UTC"
+  },
+  "region": { "include": ["body"] },
+  "resetPolicy": "after-scenario",
+  "captures": { "outDir": "specs/fixture-app-menu", "fresh": true, "meta": { "app": "fixture" } },
+  "verification": { "standalone": { "states": ["menu-open"], "threshold": 2 } },
+  "preconditions": [
+    {
+      "id": "size",
+      "action": "setViewport",
+      "width": 1280,
+      "height": 800,
+      "expect": { "name": "viewport is 1280x800", "kind": "viewport", "width": 1280, "height": 800 }
+    },
+    { "action": "verifyEnvironment" },
+    {
+      "id": "clean",
+      "action": "reset",
+      "mode": "ensureClean",
+      "expect": { "name": "no overlay is open before the run", "kind": "noOverlays" }
+    }
+  ],
+  "steps": [
+    {
+      "id": "open-menu",
+      "action": "click",
+      "target": { "role": "button", "labelIncludes": "Open menu" },
+      "notes": "pointerdown opens it; a DOM click would silently do nothing",
+      "expect": { "name": "the menu appears", "kind": "surfaceAppears", "role": "menu" }
+    },
+    {
+      "id": "menu-open-shot",
+      "action": "capture",
+      "target": { "role": "menu" },
+      "name": "menu-open",
+      "why": "resting state of the open menu, anchored on its trigger",
+      "path": "clicked the Open menu button in the fixture app"
+    },
+    {
+      "id": "expanded",
+      "action": "expect",
+      "expect": {
+        "name": "the trigger reports itself expanded",
+        "kind": "attribute",
+        "target": { "role": "button", "labelIncludes": "Open menu" },
+        "attributeName": "aria-expanded",
+        "equals": "true"
+      }
+    },
+    {
+      "id": "pick-duplicate",
+      "action": "click",
+      "target": { "role": "menuitem", "labelIncludes": "Duplicate" },
+      "expect": { "name": "the menu closes", "kind": "surfaceDisappears", "role": "menu" }
+    },
+    {
+      "id": "row-state",
+      "action": "expect",
+      "expect": {
+        "name": "the row records the duplicate action",
+        "kind": "attribute",
+        "target": { "role": "row" },
+        "attributeName": "data-state",
+        "equals": "duplicate"
+      }
+    },
+    { "id": "verify", "action": "verifyStandalone", "states": ["menu-open"] }
+  ],
+  "teardown": [
+    {
+      "id": "dismiss",
+      "action": "press",
+      "keys": "Escape",
+      "expect": { "name": "nothing is left open", "kind": "noOverlays" }
+    }
+  ]
+}

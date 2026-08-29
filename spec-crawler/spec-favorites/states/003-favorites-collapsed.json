@@ -1,0 +1,3635 @@
+{
+  "url": "https://linear.app/test-workspace-bb/agent/write-snmp-development-surface-project-update-09a52bcd3bdef",
+  "scannedRules": 7251,
+  "unreadableSheets": 0,
+  "stateNames": [
+    "active",
+    "focus",
+    "focus-visible",
+    "focus-within",
+    "hover"
+  ],
+  "components": [
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-6s0dn4",
+      "rect": {
+        "x": 206,
+        "y": 178,
+        "width": 24,
+        "height": 24
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            },
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sc2sx-SidebarSectionActionButton-a3f9c2d4:active"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-1gokwge.sx-1gokwge:where(.sx-ew8opw:active *)",
+            ".sx-1yt6nhl:active"
+          ]
+        },
+        {
+          "state": "focus",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            },
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sc2sx-SidebarSectionActionButton-a3f9c2d4:focus"
+          ]
+        },
+        {
+          "state": "focus",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-1uxbtfk:focus"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-toe6to.sx-toe6to:where(.sx-ew8opw:focus-visible *)"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-toe6to.sx-toe6to:where(.sx-ew8opw:focus-visible *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            },
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sc2sx-SidebarSectionActionButton-a3f9c2d4:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-1gokwge.sx-1gokwge:where(.sx-ew8opw:hover *)",
+            ".sx-1yt6nhl:hover"
+          ]
+        }
+      ],
+      "id": "s2013"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-6s0dn4",
+      "rect": {
+        "x": 206,
+        "y": 297,
+        "width": 24,
+        "height": 24
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "._wrapper_3952m_8:active",
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            },
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            "._wrapper_3952m_8:active .sc2sx-SidebarSectionActionButton-a3f9c2d4"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            },
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sc2sx-SidebarSectionActionButton-a3f9c2d4:active"
+          ]
+        },
+        {
+          "state": "focus",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            },
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sc2sx-SidebarSectionActionButton-a3f9c2d4:focus"
+          ]
+        },
+        {
+          "state": "focus-within",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            },
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-1abe2tr.sx-1abe2tr:where(.sx-1t3217l:focus-within *)",
+            ".sx-cxtu7q.sx-cxtu7q:where(.sx-1t3217l:focus-within *)"
+          ]
+        },
+        {
+          "state": "focus-within",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            },
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-1abe2tr.sx-1abe2tr:where(.sx-1t3217l:focus-within *)",
+            ".sx-cxtu7q.sx-cxtu7q:where(.sx-1t3217l:focus-within *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "._wrapper_3952m_8:hover",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            },
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            "._wrapper_3952m_8:hover .sc2sx-SidebarSectionActionButton-a3f9c2d4"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            },
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sc2sx-SidebarSectionActionButton-a3f9c2d4:hover"
+          ]
+        }
+      ],
+      "id": "s2104"
+    },
+    {
+      "label": "a.sx-6s0dn4.sx-1i9j6mr.sx-vijh9v",
+      "rect": {
+        "x": 12,
+        "y": 60,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "app.base"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:active"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:active"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-17mi88y:active"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "-1px"
+            }
+          ],
+          "selectors": [
+            ".sx-y9f4xx:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "app.base",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-17mi88y:hover"
+          ]
+        }
+      ],
+      "id": "s1948"
+    },
+    {
+      "label": "a.sx-6s0dn4.sx-1i9j6mr.sx-vijh9v",
+      "rect": {
+        "x": 12,
+        "y": 89,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "app.base"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:active"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:active"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-17mi88y:active"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "-1px"
+            }
+          ],
+          "selectors": [
+            ".sx-y9f4xx:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "app.base",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-17mi88y:hover"
+          ]
+        }
+      ],
+      "id": "s1959"
+    },
+    {
+      "label": "a.sx-6s0dn4.sx-1i9j6mr.sx-vijh9v",
+      "rect": {
+        "x": 12,
+        "y": 118,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "app.base"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:active"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:active"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-17mi88y:active"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "-1px"
+            }
+          ],
+          "selectors": [
+            ".sx-y9f4xx:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "app.base",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-17mi88y:hover"
+          ]
+        }
+      ],
+      "id": "s1972"
+    },
+    {
+      "label": "a.sx-6s0dn4.sx-1i9j6mr.sx-vijh9v",
+      "rect": {
+        "x": 12,
+        "y": 147,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "app.base"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:active"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:active"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-17mi88y:active"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "-1px"
+            }
+          ],
+          "selectors": [
+            ".sx-y9f4xx:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "app.base",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-17mi88y:hover"
+          ]
+        }
+      ],
+      "id": "s1988"
+    },
+    {
+      "label": "a.sx-6s0dn4.sx-1i9j6mr.sx-vijh9v",
+      "rect": {
+        "x": 12,
+        "y": 251,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "app.base"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:active"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:active"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-17mi88y:active"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "-1px"
+            }
+          ],
+          "selectors": [
+            ".sx-y9f4xx:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "app.base",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-17mi88y:hover"
+          ]
+        }
+      ],
+      "id": "s2035"
+    },
+    {
+      "label": "a.sx-6s0dn4.sx-1i9j6mr.sx-vijh9v",
+      "rect": {
+        "x": 12,
+        "y": 280,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "app.base"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:active"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:active"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-17mi88y:active"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "-1px"
+            }
+          ],
+          "selectors": [
+            ".sx-y9f4xx:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "app.base",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-17mi88y:hover"
+          ]
+        }
+      ],
+      "id": "s2047"
+    },
+    {
+      "label": "a.sx-6s0dn4.sx-1i9j6mr.sx-vijh9v",
+      "rect": {
+        "x": 12,
+        "y": 309,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "app.base"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:active"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:active"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-17mi88y:active"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "-1px"
+            }
+          ],
+          "selectors": [
+            ".sx-y9f4xx:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "app.base",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-17mi88y:hover"
+          ]
+        }
+      ],
+      "id": "s2059"
+    },
+    {
+      "label": "div.sx-6s0dn4.sx-1i9j6mr.sx-vijh9v",
+      "rect": {
+        "x": 12,
+        "y": 339,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:active"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-17mi88y:active"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "-1px"
+            }
+          ],
+          "selectors": [
+            ".sx-y9f4xx:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-17mi88y:hover"
+          ]
+        }
+      ],
+      "id": "s2075"
+    },
+    {
+      "label": "div.sx-78zum5.sx-1q0g3np.sx-6s0dn4",
+      "rect": {
+        "x": 12,
+        "y": 221,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:active"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority3"
+          ],
+          "changes": [
+            {
+              "property": "outline-color",
+              "from": "lch(100 0 272)",
+              "to": ""
+            },
+            {
+              "property": "outline-style",
+              "from": "none",
+              "to": ""
+            },
+            {
+              "property": "outline-width",
+              "from": "3px",
+              "to": ""
+            }
+          ],
+          "selectors": [
+            ".sx-c3zeoq:has([data-sidebar-section-type=\"header\"]:focus-visible)"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "calc(-1 * var(--focus-ring-width))"
+            }
+          ],
+          "selectors": [
+            ".sx-pmobji:has([data-sidebar-section-type=\"header\"]:focus-visible)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:hover"
+          ]
+        }
+      ],
+      "id": "s2021"
+    },
+    {
+      "label": "div.sx-78zum5.sx-1q0g3np.sx-6s0dn4",
+      "rect": {
+        "x": 12,
+        "y": 258,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "lch(8.445 1.3 272)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:active"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority3"
+          ],
+          "changes": [
+            {
+              "property": "outline-color",
+              "from": "lch(100 0 272)",
+              "to": ""
+            },
+            {
+              "property": "outline-style",
+              "from": "none",
+              "to": ""
+            },
+            {
+              "property": "outline-width",
+              "from": "3px",
+              "to": ""
+            }
+          ],
+          "selectors": [
+            ".sx-c3zeoq:has([data-sidebar-section-type=\"header\"]:focus-visible)"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "calc(-1 * var(--focus-ring-width))"
+            }
+          ],
+          "selectors": [
+            ".sx-pmobji:has([data-sidebar-section-type=\"header\"]:focus-visible)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "lch(8.445 1.3 272)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:hover"
+          ]
+        }
+      ],
+      "id": "s2084"
+    },
+    {
+      "label": "div.sx-78zum5.sx-1q0g3np.sx-6s0dn4",
+      "rect": {
+        "x": 12,
+        "y": 295,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:active"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority3"
+          ],
+          "changes": [
+            {
+              "property": "outline-color",
+              "from": "lch(100 0 272)",
+              "to": ""
+            },
+            {
+              "property": "outline-style",
+              "from": "none",
+              "to": ""
+            },
+            {
+              "property": "outline-width",
+              "from": "3px",
+              "to": ""
+            }
+          ],
+          "selectors": [
+            ".sx-c3zeoq:has([data-sidebar-section-type=\"header\"]:focus-visible)"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "calc(-1 * var(--focus-ring-width))"
+            }
+          ],
+          "selectors": [
+            ".sx-pmobji:has([data-sidebar-section-type=\"header\"]:focus-visible)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:hover"
+          ]
+        }
+      ],
+      "id": "s2098"
+    },
+    {
+      "label": "div.sx-78zum5.sx-1q0g3np.sx-6s0dn4",
+      "rect": {
+        "x": 12,
+        "y": 332,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:active"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority3"
+          ],
+          "changes": [
+            {
+              "property": "outline-color",
+              "from": "lch(100 0 272)",
+              "to": ""
+            },
+            {
+              "property": "outline-style",
+              "from": "none",
+              "to": ""
+            },
+            {
+              "property": "outline-width",
+              "from": "3px",
+              "to": ""
+            }
+          ],
+          "selectors": [
+            ".sx-c3zeoq:has([data-sidebar-section-type=\"header\"]:focus-visible)"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "calc(-1 * var(--focus-ring-width))"
+            }
+          ],
+          "selectors": [
+            ".sx-pmobji:has([data-sidebar-section-type=\"header\"]:focus-visible)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            }
+          ],
+          "selectors": [
+            ".sx-1j12vre:hover"
+          ]
+        }
+      ],
+      "id": "s2112"
+    },
+    {
+      "label": "span.sx-1j61x8r.sx-ggjnk3.sx-1srpx65",
+      "rect": {
+        "x": 12,
+        "y": 60,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-14jutar.sx-14jutar:where(.sx-ew8opw:active *)"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "lch(60.621% 1.2 272 / 1)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-14jutar.sx-14jutar:where(.sx-ew8opw:hover *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "lch(60.621% 1.2 272 / 1)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:hover *)"
+          ]
+        }
+      ],
+      "id": "s1949"
+    },
+    {
+      "label": "span.sx-1j61x8r.sx-ggjnk3.sx-1srpx65",
+      "rect": {
+        "x": 12,
+        "y": 89,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-14jutar.sx-14jutar:where(.sx-ew8opw:active *)"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "lch(60.621% 1.2 272 / 1)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-14jutar.sx-14jutar:where(.sx-ew8opw:hover *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "lch(60.621% 1.2 272 / 1)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:hover *)"
+          ]
+        }
+      ],
+      "id": "s1960"
+    },
+    {
+      "label": "span.sx-1j61x8r.sx-ggjnk3.sx-1srpx65",
+      "rect": {
+        "x": 12,
+        "y": 118,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-14jutar.sx-14jutar:where(.sx-ew8opw:active *)"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "lch(60.621% 1.2 272 / 1)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-14jutar.sx-14jutar:where(.sx-ew8opw:hover *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "lch(60.621% 1.2 272 / 1)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:hover *)"
+          ]
+        }
+      ],
+      "id": "s1973"
+    },
+    {
+      "label": "span.sx-1j61x8r.sx-ggjnk3.sx-1srpx65",
+      "rect": {
+        "x": 12,
+        "y": 147,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-14jutar.sx-14jutar:where(.sx-ew8opw:active *)"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "lch(60.621% 1.2 272 / 1)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-14jutar.sx-14jutar:where(.sx-ew8opw:hover *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "lch(60.621% 1.2 272 / 1)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:hover *)"
+          ]
+        }
+      ],
+      "id": "s1989"
+    },
+    {
+      "label": "span.sx-1j61x8r.sx-ggjnk3.sx-1srpx65",
+      "rect": {
+        "x": 12,
+        "y": 251,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-14jutar.sx-14jutar:where(.sx-ew8opw:active *)"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "lch(60.621% 1.2 272 / 1)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-14jutar.sx-14jutar:where(.sx-ew8opw:hover *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "lch(60.621% 1.2 272 / 1)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:hover *)"
+          ]
+        }
+      ],
+      "id": "s2036"
+    },
+    {
+      "label": "span.sx-1j61x8r.sx-ggjnk3.sx-1srpx65",
+      "rect": {
+        "x": 12,
+        "y": 280,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-14jutar.sx-14jutar:where(.sx-ew8opw:active *)"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "lch(60.621% 1.2 272 / 1)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-14jutar.sx-14jutar:where(.sx-ew8opw:hover *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "lch(60.621% 1.2 272 / 1)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:hover *)"
+          ]
+        }
+      ],
+      "id": "s2048"
+    },
+    {
+      "label": "span.sx-1j61x8r.sx-ggjnk3.sx-1srpx65",
+      "rect": {
+        "x": 12,
+        "y": 309,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-14jutar.sx-14jutar:where(.sx-ew8opw:active *)"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "lch(60.621% 1.2 272 / 1)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-14jutar.sx-14jutar:where(.sx-ew8opw:hover *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "lch(60.621% 1.2 272 / 1)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:hover *)"
+          ]
+        }
+      ],
+      "id": "s2060"
+    },
+    {
+      "label": "span.sx-1j61x8r.sx-ggjnk3.sx-1srpx65",
+      "rect": {
+        "x": 12,
+        "y": 339,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-14jutar.sx-14jutar:where(.sx-ew8opw:active *)"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "lch(60.621% 1.2 272 / 1)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-14jutar.sx-14jutar:where(.sx-ew8opw:hover *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "lch(60.621% 1.2 272 / 1)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:hover *)"
+          ]
+        }
+      ],
+      "id": "s2076"
+    },
+    {
+      "label": "a.sx-6s0dn4.sx-1i9j6mr.sx-vijh9v",
+      "rect": {
+        "x": 12,
+        "y": 176,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "app.base"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:active"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "-1px"
+            }
+          ],
+          "selectors": [
+            ".sx-y9f4xx:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "app.base",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:hover"
+          ]
+        }
+      ],
+      "id": "s2005"
+    },
+    {
+      "label": "button.sx-78zum5.sx-6s0dn4.sx-1iyjqo2",
+      "rect": {
+        "x": 17,
+        "y": 221,
+        "width": 215,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-6xxmzv:active"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-1e06w84:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-6xxmzv:hover"
+          ]
+        }
+      ],
+      "id": "s2022"
+    },
+    {
+      "label": "button.sx-78zum5.sx-6s0dn4.sx-1iyjqo2",
+      "rect": {
+        "x": 17,
+        "y": 258,
+        "width": 189,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(100 0 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-6xxmzv:active"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(100 0 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-1e06w84:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(100 0 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-6xxmzv:hover"
+          ]
+        }
+      ],
+      "id": "s2085"
+    },
+    {
+      "label": "button.sx-78zum5.sx-6s0dn4.sx-1iyjqo2",
+      "rect": {
+        "x": 17,
+        "y": 295,
+        "width": 189,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-6xxmzv:active"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-1e06w84:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-6xxmzv:hover"
+          ]
+        }
+      ],
+      "id": "s2099"
+    },
+    {
+      "label": "button.sx-78zum5.sx-6s0dn4.sx-1iyjqo2",
+      "rect": {
+        "x": 17,
+        "y": 332,
+        "width": 215,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-6xxmzv:active"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-1e06w84:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-6xxmzv:hover"
+          ]
+        }
+      ],
+      "id": "s2113"
+    },
+    {
+      "label": "div.sx-1n2onr6.sx-2u8bby.sx-5rfsx9",
+      "rect": {
+        "x": 12,
+        "y": 60,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "calc(-1 * var(--focus-ring-width))"
+            }
+          ],
+          "selectors": [
+            ".sx-198e2n:focus-visible"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-4vndy0:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-rh77ze:hover"
+          ]
+        }
+      ],
+      "id": "s1943"
+    },
+    {
+      "label": "div.sx-1n2onr6.sx-2u8bby.sx-5rfsx9",
+      "rect": {
+        "x": 12,
+        "y": 89,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "calc(-1 * var(--focus-ring-width))"
+            }
+          ],
+          "selectors": [
+            ".sx-198e2n:focus-visible"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-4vndy0:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-rh77ze:hover"
+          ]
+        }
+      ],
+      "id": "s1954"
+    },
+    {
+      "label": "div.sx-1n2onr6.sx-2u8bby.sx-5rfsx9",
+      "rect": {
+        "x": 12,
+        "y": 118,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "calc(-1 * var(--focus-ring-width))"
+            }
+          ],
+          "selectors": [
+            ".sx-198e2n:focus-visible"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-4vndy0:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-rh77ze:hover"
+          ]
+        }
+      ],
+      "id": "s1967"
+    },
+    {
+      "label": "div.sx-1n2onr6.sx-2u8bby.sx-5rfsx9",
+      "rect": {
+        "x": 12,
+        "y": 147,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "calc(-1 * var(--focus-ring-width))"
+            }
+          ],
+          "selectors": [
+            ".sx-198e2n:focus-visible"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-4vndy0:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-rh77ze:hover"
+          ]
+        }
+      ],
+      "id": "s1982"
+    },
+    {
+      "label": "div.sx-1n2onr6.sx-2u8bby.sx-5rfsx9",
+      "rect": {
+        "x": 12,
+        "y": 176,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "calc(-1 * var(--focus-ring-width))"
+            }
+          ],
+          "selectors": [
+            ".sx-198e2n:focus-visible"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-4vndy0:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-rh77ze:hover"
+          ]
+        }
+      ],
+      "id": "s2000"
+    },
+    {
+      "label": "div.sx-1n2onr6.sx-2u8bby.sx-5rfsx9",
+      "rect": {
+        "x": 12,
+        "y": 251,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "calc(-1 * var(--focus-ring-width))"
+            }
+          ],
+          "selectors": [
+            ".sx-198e2n:focus-visible"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-4vndy0:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-rh77ze:hover"
+          ]
+        }
+      ],
+      "id": "s2030"
+    },
+    {
+      "label": "div.sx-1n2onr6.sx-2u8bby.sx-5rfsx9",
+      "rect": {
+        "x": 12,
+        "y": 280,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "calc(-1 * var(--focus-ring-width))"
+            }
+          ],
+          "selectors": [
+            ".sx-198e2n:focus-visible"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-4vndy0:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-rh77ze:hover"
+          ]
+        }
+      ],
+      "id": "s2042"
+    },
+    {
+      "label": "div.sx-1n2onr6.sx-2u8bby.sx-5rfsx9",
+      "rect": {
+        "x": 12,
+        "y": 309,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "calc(-1 * var(--focus-ring-width))"
+            }
+          ],
+          "selectors": [
+            ".sx-198e2n:focus-visible"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-4vndy0:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-rh77ze:hover"
+          ]
+        }
+      ],
+      "id": "s2054"
+    },
+    {
+      "label": "div.sx-1n2onr6.sx-2u8bby.sx-5rfsx9",
+      "rect": {
+        "x": 12,
+        "y": 338,
+        "width": 220,
+        "height": 0
+      },
+      "visible": false,
+      "states": [
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "calc(-1 * var(--focus-ring-width))"
+            }
+          ],
+          "selectors": [
+            ".sx-198e2n:focus-visible"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-4vndy0:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-rh77ze:hover"
+          ]
+        }
+      ],
+      "id": "s2065"
+    },
+    {
+      "label": "div.sx-1n2onr6.sx-2u8bby.sx-5rfsx9",
+      "rect": {
+        "x": 12,
+        "y": 338,
+        "width": 220,
+        "height": 0
+      },
+      "visible": false,
+      "states": [
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "calc(-1 * var(--focus-ring-width))"
+            }
+          ],
+          "selectors": [
+            ".sx-198e2n:focus-visible"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-4vndy0:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-fu49gr",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-rh77ze:hover"
+          ]
+        }
+      ],
+      "id": "s2068"
+    },
+    {
+      "label": "span.sx-1j61x8r.sx-ggjnk3.sx-84vug0",
+      "rect": {
+        "x": 21,
+        "y": 228,
+        "width": 65,
+        "height": 15
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-1ycqycg.sx-1ycqycg:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-1ycqycg.sx-1ycqycg:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s2023"
+    },
+    {
+      "label": "span.sx-1j61x8r.sx-ggjnk3.sx-84vug0",
+      "rect": {
+        "x": 21,
+        "y": 265,
+        "width": 53,
+        "height": 15
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(100 0 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-1ycqycg.sx-1ycqycg:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(100 0 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-1ycqycg.sx-1ycqycg:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s2086"
+    },
+    {
+      "label": "span.sx-1j61x8r.sx-ggjnk3.sx-84vug0",
+      "rect": {
+        "x": 21,
+        "y": 302,
+        "width": 65,
+        "height": 15
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-1ycqycg.sx-1ycqycg:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-1ycqycg.sx-1ycqycg:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s2100"
+    },
+    {
+      "label": "span.sx-1j61x8r.sx-ggjnk3.sx-84vug0",
+      "rect": {
+        "x": 21,
+        "y": 339,
+        "width": 19,
+        "height": 15
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-1ycqycg.sx-1ycqycg:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-1ycqycg.sx-1ycqycg:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s2114"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 211,
+        "y": 183,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s2014"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 211,
+        "y": 265,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s2091"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 211,
+        "y": 302,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s2105"
+    },
+    {
+      "label": "span.sx-1j61x8r.sx-ggjnk3.sx-1srpx65",
+      "rect": {
+        "x": 12,
+        "y": 176,
+        "width": 220,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "lch(100% 0 272 / 1)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "lch(100% 0 272 / 1)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:hover *)"
+          ]
+        }
+      ],
+      "id": "s2006"
+    }
+  ]
+}

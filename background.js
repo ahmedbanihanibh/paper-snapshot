@@ -1043,6 +1043,18 @@ async function elementSerializer(selector) {
   const toast = document.getElementsByTagName("ui2code-toast")[0];
   const styleNames = Array.from(window.getComputedStyle(document.body));
   styleNames.push("aspect-ratio", "text-underline-offset", "text-decoration-thickness", "transform-box");
+  // Ensure animation/transition longhands are captured so pasted markup replays motion.
+  // (getComputedStyle already enumerates these on every modern browser, but push them
+  //  defensively — duplicates just re-read the same key and are harmless.)
+  for (const animProp of [
+    "transition", "transition-property", "transition-duration",
+    "transition-timing-function", "transition-delay", "transition-behavior",
+    "animation", "animation-name", "animation-duration", "animation-timing-function",
+    "animation-delay", "animation-iteration-count", "animation-direction",
+    "animation-fill-mode", "animation-play-state",
+  ]) {
+    if (!styleNames.includes(animProp)) styleNames.push(animProp);
+  }
 
   let totalNodesToProcess = 0;
 
@@ -1183,13 +1195,31 @@ async function elementSerializer(selector) {
       referenceElement.style.listStyleType = "initial";
     }
 
+    // Place the reference element so its computed baseline is read in the same
+    // cascade context as `element`. Sibling placement is ideal (identical
+    // inherited context), but it THROWS HierarchyRequestError for two real cases
+    // that used to abort the whole capture: an element inside an SVG subtree
+    // (an HTML <link> is not a valid SVG-namespace sibling), and an element that
+    // a virtualised list detached mid-walk (no parent to insert beside). Fall
+    // back to the element's own parent, then into the element itself, then to
+    // body. A later fallback shifts the inherited baseline by one level at most,
+    // which mislabels a few inherited properties as non-default — verbose, but
+    // correct — and only for the elements sibling placement cannot handle.
+    let placed = false;
+    const tryPlace = (fn) => { if (placed) return; try { fn(); placed = true; } catch { /* try next */ } };
     if (element.parentElement?.lastElementChild === element) {
-      element.insertAdjacentElement("afterend", referenceElement);
+      tryPlace(() => element.insertAdjacentElement("afterend", referenceElement));
     } else {
-      element.insertAdjacentElement("beforebegin", referenceElement);
+      tryPlace(() => element.insertAdjacentElement("beforebegin", referenceElement));
     }
-
-    if (pseudo) {
+    tryPlace(() => element.parentElement.appendChild(referenceElement));
+    tryPlace(() => element.appendChild(referenceElement));
+    tryPlace(() => document.body.appendChild(referenceElement));
+    if (!placed) {
+      // Could not place it anywhere in this document — skip the diff for this
+      // node and keep every computed value, rather than throwing.
+      referenceElement.remove?.();
+    } else if (pseudo) {
       const referenceComputedStyles = window.getComputedStyle(referenceElement, pseudo);
       for (const key of styleNames) {
         referenceStyleValues.set(key, referenceComputedStyles.getPropertyValue(key));
@@ -1299,6 +1329,109 @@ async function elementSerializer(selector) {
     range.selectNode(node);
     if (range.getBoundingClientRect().width === 0) return "";
     return " ";
+  }
+
+  // ── CSS ANIMATION CAPTURE ─────────────────────────────────────────────────
+  // Computed styles reference animation names but never the @keyframes bodies,
+  // so pasted markup would lose its motion. Collect every animation name used by
+  // the captured subtree (element + descendants + ::before/::after), then resolve
+  // the matching @keyframes rules from the page's stylesheets into a <style> tag.
+
+  // Collect the set of animation-name values used across the subtree.
+  function collectAnimationNames(root) {
+    const names = new Set();
+    const readEl = (el) => {
+      for (const pseudo of [null, "::before", "::after"]) {
+        let animationName;
+        try {
+          animationName = window.getComputedStyle(el, pseudo).animationName;
+        } catch {
+          continue;
+        }
+        if (!animationName || animationName === "none") continue;
+        for (const part of animationName.split(",")) {
+          const name = part.trim();
+          if (name && name !== "none") names.add(name);
+        }
+      }
+    };
+    readEl(root);
+    root.querySelectorAll("*").forEach(readEl);
+    return names;
+  }
+
+  // Extract a single `@keyframes <name> { ... }` block from raw CSS text using
+  // brace matching (used as a fallback for cross-origin sheets fetched by URL).
+  function extractKeyframesBlockFromText(cssText, name) {
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const re = new RegExp("@(?:-webkit-)?keyframes\\s+" + escaped + "\\s*\\{", "g");
+    const match = re.exec(cssText);
+    if (!match) return "";
+    let i = match.index + match[0].length;
+    let depth = 1;
+    while (i < cssText.length && depth > 0) {
+      const c = cssText[i];
+      if (c === "{") depth++;
+      else if (c === "}") depth--;
+      i++;
+    }
+    return depth === 0 ? cssText.slice(match.index, i) : "";
+  }
+
+  // Walk document.styleSheets (recursing into @media / @supports groups) and
+  // collect the cssText of every @keyframes rule whose name is in `names`.
+  // Falls back to fetching cross-origin sheets and regex-parsing their text.
+  async function collectKeyframes(names) {
+    if (!names || names.size === 0) return "";
+    const found = new Map(); // name -> cssText
+    const crossOriginHrefs = [];
+
+    const scanRules = (rules) => {
+      for (const rule of rules) {
+        if (typeof CSSKeyframesRule !== "undefined" && rule instanceof CSSKeyframesRule) {
+          if (names.has(rule.name) && !found.has(rule.name)) found.set(rule.name, rule.cssText);
+        } else if (typeof CSSGroupingRule !== "undefined" && rule instanceof CSSGroupingRule && rule.cssRules) {
+          // @media / @supports — recurse.
+          try { scanRules(rule.cssRules); } catch {}
+        } else if (rule.cssRules) {
+          try { scanRules(rule.cssRules); } catch {}
+        }
+      }
+    };
+
+    for (const sheet of Array.from(document.styleSheets)) {
+      let rules;
+      try {
+        rules = sheet.cssRules; // cross-origin sheets throw here.
+      } catch {
+        if (sheet.href) crossOriginHrefs.push(sheet.href);
+        continue;
+      }
+      if (rules) {
+        try { scanRules(rules); } catch {}
+      }
+    }
+
+    // Fallback: fetch cross-origin sheets from the page origin and parse by regex.
+    // fetch may still be CORS-blocked — wrap per-sheet and skip failures silently.
+    if (crossOriginHrefs.length && [...names].some((n) => !found.has(n))) {
+      for (const href of crossOriginHrefs) {
+        if ([...names].every((n) => found.has(n))) break;
+        try {
+          const res = await fetch(href);
+          if (!res.ok) continue;
+          const text = await res.text();
+          for (const name of names) {
+            if (found.has(name)) continue;
+            const block = extractKeyframesBlockFromText(text, name);
+            if (block) found.set(name, block);
+          }
+        } catch {}
+      }
+    }
+
+    if (found.size === 0) return "";
+    return `<style data-captured-animations>${Array.from(found.values()).join("\n")}</style>`;
   }
 
   async function serialize(target, { abortSignal, dryRun = false, __isRoot = true, __processedNodes = 0 } = {}) {
@@ -1537,6 +1670,13 @@ async function elementSerializer(selector) {
     // Extract interactive CSS rules
     const interactiveCSS = extractInteractiveStyles(elementToSerialize);
 
+    // Resolve @keyframes for every animation used in the captured subtree so the
+    // pasted markup carries its motion (the editor's "Record CSS Anim" samples these).
+    let capturedAnimationsStyle = "";
+    try {
+      capturedAnimationsStyle = await collectKeyframes(collectAnimationNames(elementToSerialize));
+    } catch {}
+
     // Strip page-only positioning from root
     let rootHtml = result.html;
     rootHtml = rootHtml.replace(/^(<\w+\s[^>]*?)style="([^"]*)"/, (match, before, styleStr) => {
@@ -1554,7 +1694,7 @@ async function elementSerializer(selector) {
     const jsxCode = htmlToJsx(simplifyStyles(rootHtml));
     let claudeOutput = `/**\n * UI Snapshot — Convert to React component.\n * Match the EXACT visual appearance: colors, spacing, typography, icons, layout.\n */\nexport default function CapturedComponent() {\n  return (\n${jsxCode}\n  );\n}\n`;
 
-    return { status: "success", html: claudeOutput, rawHtml: rawHtml };
+    return { status: "success", html: claudeOutput, rawHtml: rawHtml, capturedAnimationsStyle: capturedAnimationsStyle };
   }
 
   return { status: "error", error: "Element not found" };
@@ -2316,7 +2456,7 @@ chrome.action.onClicked.addListener(async (tab) => {
                 await chrome.scripting.executeScript({
                   target: { tabId: tab.id },
                   func: copyToClipboardForPaper,
-                  args: [serializationResult.rawHtml],
+                  args: [(serializationResult.capturedAnimationsStyle || "") + serializationResult.rawHtml],
                 });
                 await chrome.scripting.executeScript({
                   target: { tabId: tab.id },
@@ -2327,7 +2467,7 @@ chrome.action.onClicked.addListener(async (tab) => {
                 await chrome.scripting.executeScript({
                   target: { tabId: tab.id },
                   func: copyToClipboardForOpenPencil,
-                  args: [serializationResult.rawHtml],
+                  args: [(serializationResult.capturedAnimationsStyle || "") + serializationResult.rawHtml],
                 });
                 await chrome.scripting.executeScript({
                   target: { tabId: tab.id },
@@ -2371,7 +2511,7 @@ chrome.action.onClicked.addListener(async (tab) => {
                 await chrome.scripting.executeScript({
                   target: { tabId: tab.id },
                   func: copyToClipboard,
-                  args: [serializationResult.rawHtml],
+                  args: [(serializationResult.capturedAnimationsStyle || "") + serializationResult.rawHtml],
                 });
                 await chrome.scripting.executeScript({
                   target: { tabId: tab.id },

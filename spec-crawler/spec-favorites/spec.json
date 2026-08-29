@@ -1,0 +1,507 @@
+{
+  "url": "https://linear.app/test-workspace-bb/agent/write-snmp-development-surface-project-update-09a52bcd3bdef",
+  "section": "Sidebar › Favorites",
+  "capturedAt": "2026-08-10T12:52:50.184Z",
+  "stateCount": 4,
+  "states": [
+    {
+      "id": "001-favorites-expanded",
+      "name": "favorites-expanded",
+      "tier": 3,
+      "level": 0,
+      "path": [],
+      "kind": "sidebar-section",
+      "trigger": {
+        "label": "Favorites"
+      },
+      "rect": {
+        "x": 0,
+        "y": 251,
+        "w": 244,
+        "h": 694
+      },
+      "notes": "Header, folder rows with carets, No items empty states",
+      "animation": null,
+      "virtualized": {
+        "note": "No DOM subtree exists for this section — the frame is the scroller that owns the rows; `rect` is the band.",
+        "scroller": {
+          "x": 0,
+          "y": 46,
+          "w": 244,
+          "h": 852
+        }
+      },
+      "cssStates": {
+        "components": 131,
+        "stateNames": [
+          "active",
+          "focus",
+          "focus-visible",
+          "focus-within",
+          "hover"
+        ]
+      },
+      "frame": "frames/001-favorites-expanded.html",
+      "jsx": "jsx/001-favorites-expanded.jsx",
+      "shot": "shots/001-favorites-expanded.png",
+      "shots": {
+        "surface": "shots/001-favorites-expanded.png",
+        "context": "shots/001-favorites-expanded@context.png"
+      },
+      "states": "states/001-favorites-expanded.json",
+      "bytes": 563407
+    },
+    {
+      "id": "002-favorites-row-hover",
+      "name": "favorites-row-hover",
+      "tier": 3,
+      "level": 0,
+      "path": [],
+      "kind": "sidebar-section",
+      "trigger": {
+        "label": "Favorites"
+      },
+      "rect": {
+        "x": 0,
+        "y": 251,
+        "w": 244,
+        "h": 694
+      },
+      "notes": "Hovering a folder row reveals its ⋯ action",
+      "animation": null,
+      "virtualized": {
+        "note": "No DOM subtree exists for this section — the frame is the scroller that owns the rows; `rect` is the band.",
+        "scroller": {
+          "x": 0,
+          "y": 46,
+          "w": 244,
+          "h": 852
+        }
+      },
+      "cssStates": {
+        "components": 130,
+        "stateNames": [
+          "active",
+          "focus",
+          "focus-visible",
+          "focus-within",
+          "hover"
+        ]
+      },
+      "frame": "frames/002-favorites-row-hover.html",
+      "jsx": "jsx/002-favorites-row-hover.jsx",
+      "shot": "shots/002-favorites-row-hover.png",
+      "shots": {
+        "surface": "shots/002-favorites-row-hover.png",
+        "context": "shots/002-favorites-row-hover@context.png"
+      },
+      "states": "states/002-favorites-row-hover.json",
+      "bytes": 563449
+    },
+    {
+      "id": "003-favorites-collapsed",
+      "name": "favorites-collapsed",
+      "tier": 3,
+      "level": 0,
+      "path": [],
+      "kind": "sidebar-section",
+      "trigger": {
+        "label": "Favorites"
+      },
+      "rect": {
+        "x": 0,
+        "y": 251,
+        "w": 244,
+        "h": 694
+      },
+      "notes": "Section collapsed via the header disclosure",
+      "animation": {
+        "trigger": "s2085",
+        "via": "click",
+        "nodeCount": 3,
+        "frames": 122,
+        "frameIntervalMs": 16.7,
+        "nodes": [
+          {
+            "id": "s1938",
+            "properties": {},
+            "declared": [
+              {
+                "type": "CSSAnimation",
+                "property": null,
+                "animationName": "sx-18re5ia-B",
+                "timing": {
+                  "duration": null,
+                  "delay": 0,
+                  "endTime": null,
+                  "activeDuration": null,
+                  "easing": "linear",
+                  "iterations": 1,
+                  "fill": "both"
+                },
+                "keyframes": [
+                  {
+                    "offset": 0,
+                    "easing": "ease",
+                    "composite": "auto",
+                    "opacity": "0",
+                    "computedOffset": 0
+                  },
+                  {
+                    "offset": 1,
+                    "easing": "ease",
+                    "composite": "auto",
+                    "opacity": "1",
+                    "computedOffset": 1
+                  }
+                ]
+              }
+            ],
+            "measured": {
+              "durationMs": 0,
+              "overshoot": 0,
+              "frames": 122,
+              "staggerMs": 0
+            },
+            "transition": {
+              "property": "none",
+              "duration": "0s",
+              "easing": "ease",
+              "delay": "0s"
+            },
+            "driven": [],
+            "owns": null,
+            "fit": {
+              "type": "tween",
+              "duration": 0,
+              "easing": "unknown — no declared timing, curve did not overshoot"
+            },
+            "agreement": "nothing declared; measured only — treat duration as approximate"
+          },
+          {
+            "id": "s2326",
+            "properties": {},
+            "declared": [
+              {
+                "type": "CSSAnimation",
+                "property": null,
+                "animationName": "sx-18re5ia-B",
+                "timing": {
+                  "duration": 100,
+                  "delay": 0,
+                  "endTime": 100,
+                  "activeDuration": 100,
+                  "easing": "linear",
+                  "iterations": 1,
+                  "fill": "forwards"
+                },
+                "keyframes": [
+                  {
+                    "offset": 0,
+                    "easing": "ease-out",
+                    "composite": "auto",
+                    "opacity": "0",
+                    "computedOffset": 0
+                  },
+                  {
+                    "offset": 1,
+                    "easing": "ease-out",
+                    "composite": "auto",
+                    "opacity": "1",
+                    "computedOffset": 1
+                  }
+                ]
+              }
+            ],
+            "measured": {
+              "durationMs": 0,
+              "overshoot": 0,
+              "frames": 122,
+              "staggerMs": 0
+            },
+            "transition": {
+              "property": "all",
+              "duration": "0s",
+              "easing": "ease",
+              "delay": "0s"
+            },
+            "driven": [
+              "all"
+            ],
+            "owns": null,
+            "fit": {
+              "type": "tween",
+              "duration": 100,
+              "easing": "linear"
+            },
+            "agreement": "declared 100ms vs measured 0ms — investigate; measurement is sampled at ~17ms/frame"
+          },
+          {
+            "id": "s2640",
+            "properties": {
+              "opacity": {
+                "source": "css",
+                "from": 1,
+                "to": 0,
+                "durationMs": 129,
+                "onsetMs": 125,
+                "overshoot": 0,
+                "driven": true,
+                "role": "driven"
+              },
+              "w": {
+                "source": "rect (derived)",
+                "from": 24,
+                "to": 0,
+                "durationMs": 129,
+                "onsetMs": 125,
+                "overshoot": 0,
+                "driven": true,
+                "role": "driven"
+              },
+              "h": {
+                "source": "rect (derived)",
+                "from": 24,
+                "to": 0,
+                "durationMs": 16,
+                "onsetMs": 288,
+                "overshoot": 0,
+                "driven": false,
+                "role": "consequence"
+              }
+            },
+            "declared": [
+              {
+                "type": "CSSTransition",
+                "property": "opacity",
+                "animationName": null,
+                "timing": {
+                  "duration": 150,
+                  "delay": 0,
+                  "endTime": 150,
+                  "activeDuration": 150,
+                  "easing": "ease",
+                  "iterations": 1,
+                  "fill": "backwards"
+                },
+                "keyframes": [
+                  {
+                    "offset": 0,
+                    "easing": "linear",
+                    "composite": "auto",
+                    "opacity": "1",
+                    "computedOffset": 0
+                  },
+                  {
+                    "offset": 1,
+                    "easing": "linear",
+                    "composite": "auto",
+                    "opacity": "0",
+                    "computedOffset": 1
+                  }
+                ]
+              },
+              {
+                "type": "CSSTransition",
+                "property": "width",
+                "animationName": null,
+                "timing": {
+                  "duration": 150,
+                  "delay": 0,
+                  "endTime": 150,
+                  "activeDuration": 150,
+                  "easing": "ease",
+                  "iterations": 1,
+                  "fill": "backwards"
+                },
+                "keyframes": [
+                  {
+                    "offset": 0,
+                    "easing": "linear",
+                    "composite": "auto",
+                    "width": "24px",
+                    "computedOffset": 0
+                  },
+                  {
+                    "offset": 1,
+                    "easing": "linear",
+                    "composite": "auto",
+                    "width": "0px",
+                    "computedOffset": 1
+                  }
+                ]
+              }
+            ],
+            "measured": {
+              "durationMs": 129,
+              "overshoot": 0,
+              "frames": 115,
+              "staggerMs": 0
+            },
+            "transition": {
+              "property": "opacity, width",
+              "duration": "0.15s",
+              "easing": "ease",
+              "delay": "0s"
+            },
+            "driven": [
+              "opacity",
+              "width"
+            ],
+            "owns": null,
+            "fit": {
+              "type": "tween",
+              "duration": 150,
+              "easing": "ease"
+            },
+            "agreement": "declared timing confirmed by measurement"
+          }
+        ],
+        "emit": [
+          {
+            "id": "s1938",
+            "css": ".surface {\n  transition: ;\n}\n.surface[data-state=\"closed\"] {\n\n}\n.surface[data-state=\"open\"] {\n\n}",
+            "framerMotion": {
+              "initial": {},
+              "animate": {},
+              "transition": {
+                "duration": 0,
+                "ease": "unknown — no declared timing, curve did not overshoot"
+              }
+            },
+            "perProperty": [],
+            "note": null
+          },
+          {
+            "id": "s2326",
+            "css": ".surface {\n  transition: ;\n}\n.surface[data-state=\"closed\"] {\n\n}\n.surface[data-state=\"open\"] {\n\n}",
+            "framerMotion": {
+              "initial": {},
+              "animate": {},
+              "transition": {
+                "duration": 0.1,
+                "ease": "ease-out"
+              }
+            },
+            "perProperty": [],
+            "note": null
+          },
+          {
+            "id": "s2640",
+            "css": ".surface {\n  transition: opacity 150ms ease, width 150ms ease, height 150ms ease;\n}\n.surface[data-state=\"closed\"] {\n  opacity: 1;\n  width: 24px;\n  height: 24px;\n}\n.surface[data-state=\"open\"] {\n  opacity: 0;\n  width: 0px;\n  height: 0px;\n}",
+            "framerMotion": {
+              "initial": {
+                "opacity": 1,
+                "width": 24,
+                "height": 24
+              },
+              "animate": {
+                "opacity": 0,
+                "width": 0,
+                "height": 0
+              },
+              "transition": {
+                "duration": 0.15,
+                "ease": "ease"
+              }
+            },
+            "perProperty": [
+              {
+                "property": "opacity",
+                "durationMs": 129
+              },
+              {
+                "property": "w",
+                "durationMs": 129
+              },
+              {
+                "property": "h",
+                "durationMs": 16
+              }
+            ],
+            "note": "Observed but NOT animated by this element: h. These follow from layout — write them instantly (or not at all). Driving a consequence applies it on the first frame and destroys the animation. Size changes during this animation: it is a layout transition. Animate the dimensional properties directly (as emitted), or use a layout-animation primitive — transform alone will not reproduce it. Properties do not finish together (113ms spread): opacity 129ms, w 129ms, h 16ms. Emitting one duration for all of them changes the feel."
+          }
+        ]
+      },
+      "virtualized": {
+        "note": "No DOM subtree exists for this section — the frame is the scroller that owns the rows; `rect` is the band.",
+        "scroller": {
+          "x": 0,
+          "y": 46,
+          "w": 244,
+          "h": 852
+        }
+      },
+      "cssStates": {
+        "components": 45,
+        "stateNames": [
+          "active",
+          "focus",
+          "focus-visible",
+          "focus-within",
+          "hover"
+        ]
+      },
+      "frame": "frames/003-favorites-collapsed.html",
+      "jsx": "jsx/003-favorites-collapsed.jsx",
+      "shot": "shots/003-favorites-collapsed.png",
+      "shots": {
+        "surface": "shots/003-favorites-collapsed.png",
+        "context": "shots/003-favorites-collapsed@context.png"
+      },
+      "states": "states/003-favorites-collapsed.json",
+      "contract": "contracts/003-favorites-collapsed.md",
+      "bytes": 164015
+    },
+    {
+      "id": "004-favorites-drag-reorder",
+      "name": "favorites-drag-reorder",
+      "tier": 3,
+      "level": 0,
+      "path": [],
+      "kind": "sidebar-section",
+      "trigger": {
+        "label": "Favorites"
+      },
+      "rect": {
+        "x": 0,
+        "y": 251,
+        "w": 244,
+        "h": 694
+      },
+      "notes": "Drag reorder. Drag-only surfaces: none",
+      "animation": null,
+      "virtualized": {
+        "note": "No DOM subtree exists for this section — the frame is the scroller that owns the rows; `rect` is the band.",
+        "scroller": {
+          "x": 0,
+          "y": 46,
+          "w": 244,
+          "h": 852
+        }
+      },
+      "cssStates": {
+        "components": 131,
+        "stateNames": [
+          "active",
+          "focus",
+          "focus-visible",
+          "focus-within",
+          "hover"
+        ]
+      },
+      "frame": "frames/004-favorites-drag-reorder.html",
+      "jsx": "jsx/004-favorites-drag-reorder.jsx",
+      "shot": "shots/004-favorites-drag-reorder.png",
+      "shots": {
+        "surface": "shots/004-favorites-drag-reorder.png",
+        "context": "shots/004-favorites-drag-reorder@context.png",
+        "before": "shots/004-favorites-drag-reorder@before.png",
+        "during": "shots/004-favorites-drag-reorder@during.png",
+        "after": "shots/004-favorites-drag-reorder@after.png"
+      },
+      "states": "states/004-favorites-drag-reorder.json",
+      "bytes": 563407
+    }
+  ]
+}

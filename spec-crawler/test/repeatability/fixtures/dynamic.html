@@ -1,0 +1,40 @@
+<meta charset="utf-8">
+<title>repeatability fixture — genuinely dynamic</title>
+<!--
+  The opposite of deterministic.html. #volatile renders a value that is drawn
+  once per page load and can never repeat: a random token plus a wall-clock
+  reading.
+
+  It is drawn ONCE, at load, and then never mutates. That is deliberate. A value
+  that keeps ticking would trip the capture transaction's own drift guard
+  (ERR_CAPTURE_DRIFT) and the run would fail for the wrong reason — we would be
+  testing the drift detector, not run-to-run repeatability. Freezing it at load
+  isolates exactly the property under test: stable WITHIN a capture, different
+  BETWEEN runs.
+
+  #stable sits beside it as the control, so a difference can be attributed to
+  the volatile region rather than to the page as a whole.
+-->
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.4 system-ui, sans-serif; background: #fff; color: #111; }
+  .panel {
+    position: fixed; left: 40px;
+    width: 320px; height: 72px;
+    border-radius: 8px; padding: 10px;
+    background: #eef1f8;
+    font-variant-numeric: tabular-nums;
+  }
+  #stable { top: 40px; }
+  #volatile { top: 140px; background: #f8eeee; }
+  .panel b { display: block; margin-bottom: 4px; }
+</style>
+
+<div id="stable" class="panel"><b>Control</b>This text is identical on every load.</div>
+<div id="volatile" class="panel"><b>Volatile</b><span id="volatile-value">…</span></div>
+
+<script>
+  // Drawn once, at load. Never updated — see the comment above.
+  const token = Math.random().toString(36).slice(2, 12);
+  document.getElementById('volatile-value').textContent = `token ${token} at ${Date.now()}`;
+</script>

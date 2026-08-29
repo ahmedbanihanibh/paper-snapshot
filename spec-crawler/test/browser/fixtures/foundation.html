@@ -1,0 +1,51 @@
+<base href="https://fixture.test/">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 100%; height: 100%; font-family: sans-serif; }
+  #target {
+    position: fixed; z-index: 2; left: 20px; top: 20px; width: 300px; height: 40px;
+    display: flex; align-items: center; padding: 0 12px; background: rgb(245, 245, 245);
+  }
+  #portal-wrapper {
+    position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: rgba(0, 0, 0, .24);
+  }
+  #dialog {
+    width: 420px; height: 240px; padding: 24px; background: white;
+    border: 1px solid rgb(220, 220, 220); border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .2);
+  }
+  #grid {
+    position: fixed; left: 20px; top: 500px; width: 420px;
+    display: grid;
+    grid-template-columns: [icon] 24px [title] 1fr [meta] 60px [end];
+    column-gap: 12px;
+  }
+  #contents { display: contents; }
+  #subgrid {
+    display: grid;
+    grid-column: icon / end;
+    grid-template-columns: subgrid;
+  }
+  #subgrid > :nth-child(1) { grid-column: icon; }
+  #subgrid > :nth-child(2) { grid-column: title; }
+  #subgrid > :nth-child(3) { grid-column: meta; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .finite { animation: spin 120ms linear 1; }
+  .infinite { animation: spin 1s linear infinite; }
+</style>
+<div id="target" role="row" data-list-key="issue-123">Issue ABC-123</div>
+<div id="portal-wrapper">
+  <section id="dialog" role="dialog" aria-label="Command dialog">
+    <button>Confirm</button>
+    <button>Cancel</button>
+  </section>
+</div>
+<div id="grid">
+  <div id="contents">
+    <div id="subgrid" style="color: rgb(1, 2, 3); --authored: 'a;b';">
+      <span>I</span><span>Named title</span><span>Now</span>
+    </div>
+  </div>
+</div>
+<div id="animation-target" style="position:fixed;left:500px;top:500px;width:20px;height:20px;background:red"></div>

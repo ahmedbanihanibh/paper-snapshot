@@ -1,0 +1,263 @@
+{
+  "url": "https://linear.app/test-workspace-bb/team/TES/all",
+  "capturedAt": "2026-08-11T12:08:47.016Z",
+  "stateCount": 13,
+  "states": [
+    {
+      "id": "001-row-01-rest",
+      "name": "row-01-rest",
+      "tier": 3,
+      "kind": "agent-captured",
+      "notes": "ISSUE ROW — state 1/6: REST. Route /test-workspace-bb/team/TES/all (List, Grouping=Status). Reached by parking the pointer at (120,660) in the sidebar. TRAP: parking anywhere inside the list body leaves data-active set on the last-hovered row and this frame would silently be the hover state. Verified data-active=false, data-apply-background=false, data-keyboard-active=false, data-selected=false. ANATOMY: a[data-list-row] 1179x44, radius 8px, own background transparent in EVERY state — the wash is a pseudo-element emitted as an absolutely-positioned div (z-index -1, opacity 0 here). The 18px left slot at x+16 reserves the 12x12 checkbox so nothing shifts when it appears.",
+      "hash": "A._gridRowShared_1bk15_65[data-active=false,data-selected=false,data-apply-background=false,data-keyboard-active=false,data-first-selected=false,data-last-selected=false,data-first-in-group=false,data-last-in-group=false]|DIV.sx-rvj5dj.sx-4w6khx|DIV.|DIV.sx-vx4679.sx-1q0g3np[data-selected=false]|DIV.sx-78zum5.sx-1n2onr6|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-vx4679|SPAN.sx-78zum5.sx-vx4679|DIV._deprioritizedRendering_1cau4_1|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.",
+      "path": [],
+      "frame": "frames/001-row-01-rest.html",
+      "jsx": "jsx/001-row-01-rest.jsx",
+      "shot": "shots/001-row-01-rest.png",
+      "shots": {
+        "surface": "shots/001-row-01-rest.png"
+      },
+      "bytes": 65403
+    },
+    {
+      "id": "002-row-02-hover",
+      "name": "row-02-hover",
+      "tier": 3,
+      "kind": "agent-captured",
+      "notes": "ISSUE ROW — state 2/6: HOVER. Reached with a REAL pointer at (700,239). force_state CANNOT produce this — Linear does not use CSS :hover on the row, it flips data attributes, so a forced pseudo-state changes nothing. Verified data-active=true, data-apply-background=true, keyboard-active=false, selected=false. WASH: pseudo-element background lch(9.345 0.85 272), which is exactly --color-bg-quaternary, the one measured value that maps to a real Linear token. The 12x12 checkbox becomes visible in the reserved 18px slot. RETENTION TRAP: data-active does NOT clear when the pointer leaves the row — only when it leaves the whole list container. The last-hovered row keeps the wash.",
+      "hash": "A._gridRowShared_1bk15_65[data-active=true,data-selected=false,data-apply-background=true,data-keyboard-active=false,data-first-selected=false,data-last-selected=false,data-first-in-group=false,data-last-in-group=false]|DIV.sx-rvj5dj.sx-4w6khx|DIV.|DIV.sx-vx4679.sx-1q0g3np[data-selected=false]|DIV.sx-78zum5.sx-1n2onr6|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-vx4679|SPAN.sx-78zum5.sx-vx4679|DIV._deprioritizedRendering_1cau4_1|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.",
+      "path": [],
+      "frame": "frames/002-row-02-hover.html",
+      "jsx": "jsx/002-row-02-hover.jsx",
+      "shot": "shots/002-row-02-hover.png",
+      "shots": {
+        "surface": "shots/002-row-02-hover.png"
+      },
+      "bytes": 65376
+    },
+    {
+      "id": "003-row-03-keyboard-cursor",
+      "name": "row-03-keyboard-cursor",
+      "tier": 3,
+      "kind": "agent-captured",
+      "notes": "ISSUE ROW — state 3/6: KEYBOARD CURSOR. Reached by parking the pointer at (120,660) in the sidebar, Escape to clear, then `j`. Verified data-keyboard-active=true AND data-active=true, data-selected=false, with NOTHING hovering the row. This is the falsification result: the cursor paints the same wash as hover (pseudo-element lch(9.345 0.85 272)) with the pointer three hundred pixels away, so a CSS :hover rule cannot reproduce this state and the data attribute is load-bearing. Cursor moves with j/k and ArrowUp/ArrowDown; it does NOT select. Note this row is also first-in-group, so its radius reads 8px.",
+      "hash": "A._gridRowShared_1bk15_65[data-active=true,data-selected=false,data-apply-background=true,data-keyboard-active=true,data-first-selected=false,data-last-selected=false,data-first-in-group=true,data-last-in-group=false]|DIV.sx-rvj5dj.sx-4w6khx|DIV.|DIV.sx-vx4679.sx-1q0g3np[data-selected=false]|DIV.sx-78zum5.sx-1n2onr6|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-vx4679|SPAN.sx-78zum5.sx-vx4679|DIV._deprioritizedRendering_1cau4_1|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.",
+      "path": [],
+      "frame": "frames/003-row-03-keyboard-cursor.html",
+      "jsx": "jsx/003-row-03-keyboard-cursor.jsx",
+      "shot": "shots/003-row-03-keyboard-cursor.png",
+      "shots": {
+        "surface": "shots/003-row-03-keyboard-cursor.png"
+      },
+      "bytes": 65508
+    },
+    {
+      "id": "004-row-05-selected-and-active",
+      "name": "row-05-selected-and-active",
+      "tier": 3,
+      "kind": "agent-captured",
+      "notes": "ISSUE ROW — state 5/6: SELECTED + ACTIVE (stacked). Reached: pointer parked in sidebar, cursor on this row via `j`, then `x` to select. Verified data-selected=true AND data-active=true AND data-keyboard-active=true. WASH lch(15.966 18.242 286.445). THIS IS THE CORRECTION TO ROUND 1: selection and active STACK, and round 1 recorded this stacked value as plain 'selected' because the pointer was still on the row I had just clicked. Unstacked selected is lch(12.141 17.792 286.445) — see state 4. Same hue, +3.8 L and +0.45 C when active. Build one token and every unhovered selected row is wrong. Hovering a selected row produces this identical value, so cursor and pointer are interchangeable as the 'active' input.",
+      "hash": "A._gridRowShared_1bk15_65[data-active=true,data-selected=true,data-apply-background=true,data-keyboard-active=true,data-first-selected=true,data-last-selected=true,data-first-in-group=true,data-last-in-group=false]|DIV.sx-rvj5dj.sx-4w6khx|DIV.|DIV.sx-vx4679.sx-1q0g3np[data-selected=true]|DIV.sx-78zum5.sx-1n2onr6|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-vx4679|SPAN.sx-78zum5.sx-vx4679|DIV._deprioritizedRendering_1cau4_1|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.",
+      "path": [],
+      "frame": "frames/004-row-05-selected-and-active.html",
+      "jsx": "jsx/004-row-05-selected-and-active.jsx",
+      "shot": "shots/004-row-05-selected-and-active.png",
+      "shots": {
+        "surface": "shots/004-row-05-selected-and-active.png"
+      },
+      "bytes": 69841
+    },
+    {
+      "id": "005-row-04-selected",
+      "name": "row-04-selected",
+      "tier": 3,
+      "kind": "agent-captured",
+      "notes": "ISSUE ROW — state 4/6: SELECTED, NOT ACTIVE. Reached: selected with `x`, then cursor moved away with `j` twice, pointer parked in sidebar. Verified data-selected=true, data-active=false, data-keyboard-active=false. WASH lch(12.141 17.792 286.445) — the unstacked selection value, 3.8 L darker than state 5. Checkbox is filled and checked; it stays visible while selected regardless of hover. Selection is a THIRD axis, independent of cursor and pointer: this row is selected while a different row (TES-25) holds the cursor. Selected hue is 286.445, which is the accent family but NOT the accent token (--focus-ring-color is 288.421) — author it as its own pair.",
+      "hash": "A._gridRowShared_1bk15_65[data-active=false,data-selected=true,data-apply-background=true,data-keyboard-active=false,data-first-selected=true,data-last-selected=true,data-first-in-group=true,data-last-in-group=false]|DIV.sx-rvj5dj.sx-4w6khx|DIV.|DIV.sx-vx4679.sx-1q0g3np[data-selected=true]|DIV.sx-78zum5.sx-1n2onr6|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-vx4679|SPAN.sx-78zum5.sx-vx4679|DIV._deprioritizedRendering_1cau4_1|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.",
+      "path": [],
+      "frame": "frames/005-row-04-selected.html",
+      "jsx": "jsx/005-row-04-selected.jsx",
+      "shot": "shots/005-row-04-selected.png",
+      "shots": {
+        "surface": "shots/005-row-04-selected.png"
+      },
+      "bytes": 69759
+    },
+    {
+      "id": "006-row-06-run-opens-first-selected",
+      "name": "row-06-run-opens-first-selected",
+      "tier": 3,
+      "kind": "agent-captured",
+      "notes": "ISSUE ROW — grouped run 1/4: RUN OPENS (first-selected). Reached: hover row, click its 12x12 checkbox to set the anchor, then shift-click a row five positions down to range-select across a status-group boundary. data-first-selected=true, data-last-selected=false, data-first-in-group=true. RADIUS 8px 8px 0px 0px. THE RULE, verified on this 5-row run: top corners round if (data-first-selected OR data-first-in-group); bottom corners round if (data-last-selected OR data-last-in-group); 0 otherwise. That OR is why all four flags exist and it is not derivable from the selection alone.",
+      "hash": "A._gridRowShared_1bk15_65[data-active=false,data-selected=true,data-apply-background=true,data-keyboard-active=false,data-first-selected=true,data-last-selected=false,data-first-in-group=true,data-last-in-group=false]|DIV.sx-rvj5dj.sx-4w6khx|DIV.|DIV.sx-vx4679.sx-1q0g3np[data-selected=true]|DIV.sx-78zum5.sx-1n2onr6|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-vx4679|SPAN.sx-78zum5.sx-vx4679|DIV._deprioritizedRendering_1cau4_1|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.",
+      "path": [],
+      "frame": "frames/006-row-06-run-opens-first-selected.html",
+      "jsx": "jsx/006-row-06-run-opens-first-selected.jsx",
+      "shot": "shots/006-row-06-run-opens-first-selected.png",
+      "shots": {
+        "surface": "shots/006-row-06-run-opens-first-selected.png"
+      },
+      "bytes": 69513
+    },
+    {
+      "id": "007-row-07-run-middle-square",
+      "name": "row-07-run-middle-square",
+      "tier": 3,
+      "kind": "agent-captured",
+      "notes": "ISSUE ROW — grouped run 2/4: RUN MIDDLE. Same 5-row cross-boundary run. All four flags false: data-first-selected=false, data-last-selected=false, data-first-in-group=false, data-last-in-group=false. RADIUS 0px — fully square, so it butts seamlessly against the rows above and below and the run reads as one continuous block. Wash is the unstacked selected value lch(12.141 17.792 286.445), identical to every other row in the run; only the radius differs.",
+      "hash": "A._gridRowShared_1bk15_65[data-active=false,data-selected=true,data-apply-background=true,data-keyboard-active=false,data-first-selected=false,data-last-selected=false,data-first-in-group=false,data-last-in-group=false]|DIV.sx-rvj5dj.sx-4w6khx|DIV.|DIV.sx-vx4679.sx-1q0g3np[data-selected=true]|DIV.sx-78zum5.sx-1n2onr6|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-vx4679|SPAN.sx-78zum5.sx-vx4679|DIV._deprioritizedRendering_1cau4_1|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.",
+      "path": [],
+      "frame": "frames/007-row-07-run-middle-square.html",
+      "jsx": "jsx/007-row-07-run-middle-square.jsx",
+      "shot": "shots/007-row-07-run-middle-square.png",
+      "shots": {
+        "surface": "shots/007-row-07-run-middle-square.png"
+      },
+      "bytes": 69256
+    },
+    {
+      "id": "008-row-08-run-closed-by-group-edge",
+      "name": "row-08-run-closed-by-group-edge",
+      "tier": 3,
+      "kind": "agent-captured",
+      "notes": "ISSUE ROW — grouped run 3/4: RUN CLOSED BY GROUP EDGE. THE EDGE CASE THE FOUR FLAGS EXIST FOR. This row is in the MIDDLE of the selection (data-first-selected=false, data-last-selected=false) but is the LAST row of its status group (data-last-in-group=true). RADIUS 0px 0px 8px 8px — it closes the run anyway. Consequence: a selected run that crosses a status-group boundary renders as TWO rounded runs, not one. If you derive radius from the selection alone this row is square and the group gap shows a hard-edged block bleeding into the header below.",
+      "hash": "A._gridRowShared_1bk15_65[data-active=false,data-selected=true,data-apply-background=true,data-keyboard-active=false,data-first-selected=false,data-last-selected=false,data-first-in-group=false,data-last-in-group=true]|DIV.sx-rvj5dj.sx-4w6khx|DIV.|DIV.sx-vx4679.sx-1q0g3np[data-selected=true]|DIV.sx-78zum5.sx-1n2onr6|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-vx4679|SPAN.sx-78zum5.sx-vx4679|DIV._deprioritizedRendering_1cau4_1|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.",
+      "path": [],
+      "frame": "frames/008-row-08-run-closed-by-group-edge.html",
+      "jsx": "jsx/008-row-08-run-closed-by-group-edge.jsx",
+      "shot": "shots/008-row-08-run-closed-by-group-edge.png",
+      "shots": {
+        "surface": "shots/008-row-08-run-closed-by-group-edge.png"
+      },
+      "bytes": 69509
+    },
+    {
+      "id": "009-row-09-run-reopened-by-group-edge",
+      "name": "row-09-run-reopened-by-group-edge",
+      "tier": 3,
+      "kind": "agent-captured",
+      "notes": "ISSUE ROW — grouped run 4/4: RUN REOPENED BY GROUP EDGE. The mirror of state 8 and the second half of the same cross-boundary selection. Middle of the selection (data-first-selected=false, data-last-selected=false) but FIRST row of the next status group (data-first-in-group=true). RADIUS 8px 8px 0px 0px — it opens a fresh rounded run under the group header. Together, states 6-9 are the complete radius contract: top = fs OR fg, bottom = ls OR lg.",
+      "hash": "A._gridRowShared_1bk15_65[data-active=false,data-selected=true,data-apply-background=true,data-keyboard-active=false,data-first-selected=false,data-last-selected=false,data-first-in-group=true,data-last-in-group=false]|DIV.sx-rvj5dj.sx-4w6khx|DIV.|DIV.sx-vx4679.sx-1q0g3np[data-selected=true]|DIV.sx-78zum5.sx-1n2onr6|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-vx4679|SPAN.sx-78zum5.sx-vx4679|DIV._deprioritizedRendering_1cau4_1|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.",
+      "path": [],
+      "frame": "frames/009-row-09-run-reopened-by-group-edge.html",
+      "jsx": "jsx/009-row-09-run-reopened-by-group-edge.jsx",
+      "shot": "shots/009-row-09-run-reopened-by-group-edge.png",
+      "shots": {
+        "surface": "shots/009-row-09-run-reopened-by-group-edge.png"
+      },
+      "bytes": 112828
+    },
+    {
+      "id": "010-list-01-multiselect-with-bulk-bar",
+      "name": "list-01-multiselect-with-bulk-bar",
+      "tier": 3,
+      "kind": "agent-captured",
+      "notes": "ASSEMBLY — Issue list with a 5-row selection crossing a status-group boundary, bulk action bar visible. Route /test-workspace-bb/team/TES/all, List layout, Grouping=Status. Reached: hover TES-27, click its checkbox, shift-click TES-58, park pointer in sidebar. Shows in one frame: the two-run radius behaviour across the Todo/Backlog boundary, both group headers, and the bulk bar. BULK BAR: 253.8x44 at x707.1, horizontally centred in the 1179px list column, 52.5px above the viewport bottom — that offset is CONSTANT in px, measured at viewport heights 723/536/416, NOT vh. Background lch(9.232 0.85 272) (same token as the group-header bar), border-radius 9999px, padding 8, gap 8, three-layer shadow. Contents L-to-R: '{n} selected' label (count is its own text node, no pluralisation change) | Actions button 84.4x28 filled lch(13.861 1.139 272) radius 9999px with a Command glyph | Ask Linear icon button 28x28 same fill | Clear-selected X 28x28 TRANSPARENT (the only ghost control in the bar).",
+      "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv",
+      "path": [],
+      "frame": "frames/010-list-01-multiselect-with-bulk-bar.html",
+      "jsx": "jsx/010-list-01-multiselect-with-bulk-bar.jsx",
+      "shot": "shots/010-list-01-multiselect-with-bulk-bar.png",
+      "shots": {
+        "surface": "shots/010-list-01-multiselect-with-bulk-bar.png"
+      },
+      "bytes": 1800522
+    },
+    {
+      "id": "011-group-header-01-expanded",
+      "name": "group-header-01-expanded",
+      "tier": 3,
+      "kind": "agent-captured",
+      "notes": "GROUP HEADER — EXPANDED (Backlog, count 16). Route /team/TES/all, List, Grouping=Status. Element tagged directly (it carries no interactive role so the crawler never tags it): the sticky wrapper is x244.5 w1179 h36, position:sticky top:-0.5px z-index:2. The PAINTED BAR inside is x252.5 w1163 h36 — INSET 8px on the left from the rows it heads (rows start at 244.5) with padding-right 8px, background lch(9.232 0.85 272) (the same token as the bulk action bar). Collapse chevron 20x20 at x261, hover-revealed. Status icon ~x288. Label 13px/500 lch(90.826 1.425 272) left edge x312.5. COUNT 13px/weight 450, lch(63.304 7 270.292), left edge x370.4, 8px after the label — weight 450 not 500, and hue 270.292 is the ONLY value in this whole capture that leaves the 272 neutral ramp without being an accent; treat it as deliberate, and expect it to trip an 'all neutrals are 272' lint. Trailing '+' add-issue button at the right end. THE COUNT is issues visible in this group AFTER filters and display options, not the group's true size.",
+      "hash": "DIV._rowShared_1bk15_8._elementTransition_1bk15_123|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.theme-provider-258b47ffd67cff212f1f2d7067e800af91e6cc08|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-vx4679|DIV.sx-78zum5.sx-1kky2od|DIV.sx-78zum5.sx-vx4679|DIV.sx-78zum5.sx-vx4679",
+      "path": [],
+      "frame": "frames/011-group-header-01-expanded.html",
+      "jsx": "jsx/011-group-header-01-expanded.jsx",
+      "shot": "shots/011-group-header-01-expanded.png",
+      "shots": {
+        "surface": "shots/011-group-header-01-expanded.png"
+      },
+      "bytes": 34070
+    },
+    {
+      "id": "012-palette-01-unscoped",
+      "name": "palette-01-unscoped",
+      "tier": 3,
+      "kind": "agent-captured",
+      "notes": "COMMAND PALETTE — UNSCOPED (no issue context). Reached: clear the selection with the bulk bar's X (which also drops the list's context target), then Meta+K. Top line reads 'Showing all items' and the first section is the labelled global 'Issues' group — there is NO issue context line. THIS CORRECTS ROUND 1, which claimed the palette is never unscoped on an issue list because the first row always holds an implicit target; clearing selection via the X does clear it. SURFACE 720x450 at (356,94), anchored to the view not the viewport centre. Background lch(12.72 0.85 272), radius 12px, border 0.5px solid lch(25.68 1.93 272), 4-layer shadow. THIS IS THE SHARED FLOATING-SURFACE PRIMITIVE — identical tokens serve the filter menu and the cycle-options menu. Item height 46, section-header height 30, item font 15px. Content is long: client 404 vs scroll ~6264. Header row carries the search input ('Type a command or search…') and a right-aligned 'Ask Linear / Tab' affordance which hands the typed string to the agent instead of the command matcher.",
+      "hash": "DIV.sx-1lmytr0.sx-8du1vd|DIV.sx-a70dff.sx-oxd7ts|SPAN.sx-c342km.sx-1hyvwdk|DIV.sx-1n2onr6.sx-78zum5|INPUT.sx-1ghz6dp.sx-1717udv[aria-expanded=true]|DIV.sx-78zum5.sx-vx4679|DIV.sx-78zum5.sx-vx4679|SPAN.sx-78zum5.sx-6s0dn4|DIV.sx-1j7g75q.sx-1lmytr0|DIV.sx-185mbhu.sx-1597r2g|UL.sx-1n2onr6.sx-1ghz6dp|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.sx-1j7g75q.sx-1qab1bc|DIV.sx-78zum5.sx-vx4679",
+      "path": [],
+      "frame": "frames/012-palette-01-unscoped.html",
+      "jsx": "jsx/012-palette-01-unscoped.jsx",
+      "shot": "shots/012-palette-01-unscoped.png",
+      "shots": {
+        "surface": "shots/012-palette-01-unscoped.png"
+      },
+      "bytes": 286330
+    },
+    {
+      "id": "013-dadas",
+      "name": "dadas",
+      "tier": 2,
+      "level": 0,
+      "path": [],
+      "kind": "inline",
+      "roleEvidence": {
+        "triggerHasPopup": null,
+        "innerRole": null,
+        "containerRole": null
+      },
+      "detectedBy": "mounted",
+      "trigger": {
+        "label": "dadas",
+        "role": "button",
+        "hasPopup": null
+      },
+      "rect": {
+        "x": 245,
+        "y": 9,
+        "width": 1179,
+        "height": 678
+      },
+      "anchor": {
+        "side": "left",
+        "align": "start",
+        "gap": -960,
+        "triggerRect": {
+          "x": 464,
+          "y": 60,
+          "width": 76,
+          "height": 28
+        },
+        "surfaceRect": {
+          "x": 245,
+          "y": 9,
+          "width": 1179,
+          "height": 678
+        }
+      },
+      "hash": "DIV.sx-vx4679.sx-dt5ytf|DIV.|HEADER.sx-78zum5.sx-2lah0s|DIV.sx-78zum5.sx-vx4679|DIV.sx-85fieu.sx-1ow8xz6|DIV.sx-78zum5.sx-vx4679|DIV.sx-78zum5.sx-1iyjqo2|DIV.sx-78zum5.sx-1iyjqo2|DIV.sx-1hc1fzr.sx-1bdbk01|DIV.sx-78zum5.sx-w2csxc|DIV.|DIV.",
+      "cssStates": {
+        "components": 123,
+        "stateNames": [
+          "[data-disabled=\"true\"]",
+          "[data-open=\"false\"]",
+          "active",
+          "disabled",
+          "focus-visible",
+          "hover"
+        ]
+      },
+      "frame": "frames/013-dadas.html",
+      "jsx": "jsx/013-dadas.jsx",
+      "shot": "shots/013-dadas.png",
+      "shots": {
+        "surface": "shots/013-dadas.png",
+        "context": "shots/013-dadas@context.png",
+        "trigger": "shots/013-dadas@trigger.png"
+      },
+      "states": "states/013-dadas.json",
+      "bytes": 1282989
+    }
+  ]
+}

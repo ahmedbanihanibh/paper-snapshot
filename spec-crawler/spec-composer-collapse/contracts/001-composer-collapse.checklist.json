@@ -1,0 +1,148 @@
+{
+  "id": "001-composer-collapse",
+  "trigger": "Collapse",
+  "requiredNodes": [
+    {
+      "node": "s2774",
+      "transition": "padding",
+      "durationMs": 300,
+      "easing": "cubic-bezier(0.43, 0.07, 0.59, 0.94)",
+      "animate": [
+        {
+          "property": "padding-bottom",
+          "from": 54,
+          "to": 117
+        },
+        {
+          "property": "padding-top",
+          "from": 54,
+          "to": 117
+        }
+      ],
+      "doNotAnimate": []
+    },
+    {
+      "node": "s2776",
+      "transition": "max-width",
+      "durationMs": 300,
+      "easing": "cubic-bezier(0.43, 0.07, 0.59, 0.94)",
+      "animate": [
+        {
+          "property": "max-width",
+          "from": 820,
+          "to": 750
+        }
+      ],
+      "doNotAnimate": [
+        "w",
+        "h"
+      ]
+    },
+    {
+      "node": "s2778",
+      "transition": "min-height",
+      "durationMs": 300,
+      "easing": "cubic-bezier(0.43, 0.07, 0.59, 0.94)",
+      "animate": [
+        {
+          "property": "min-height",
+          "from": 792,
+          "to": 0
+        }
+      ],
+      "doNotAnimate": [
+        "w",
+        "h"
+      ]
+    },
+    {
+      "node": "s2794",
+      "transition": "border, background-color, color, opacity",
+      "durationMs": 150,
+      "easing": "ease",
+      "animate": [
+        {
+          "property": "color",
+          "from": 1,
+          "to": 91.2
+        }
+      ],
+      "doNotAnimate": []
+    }
+  ],
+  "reference": {
+    "durationMs": 300,
+    "frames": [
+      {
+        "progress": 0,
+        "atMs": 0,
+        "subject": {
+          "w": 820,
+          "h": 792
+        },
+        "top": 54,
+        "footerFromBottom": 11
+      },
+      {
+        "progress": 0.15,
+        "atMs": 45,
+        "subject": {
+          "w": 816,
+          "h": 746
+        },
+        "top": 58,
+        "footerFromBottom": 13
+      },
+      {
+        "progress": 0.3,
+        "atMs": 90,
+        "subject": {
+          "w": 806,
+          "h": 635
+        },
+        "top": 67,
+        "footerFromBottom": 13
+      },
+      {
+        "progress": 0.5,
+        "atMs": 150,
+        "subject": {
+          "w": 786,
+          "h": 405
+        },
+        "top": 85,
+        "footerFromBottom": 13
+      },
+      {
+        "progress": 0.7,
+        "atMs": 210,
+        "subject": {
+          "w": 765,
+          "h": 262
+        },
+        "top": 104,
+        "footerFromBottom": 13
+      },
+      {
+        "progress": 0.85,
+        "atMs": 255,
+        "subject": {
+          "w": 754,
+          "h": 262
+        },
+        "top": 113,
+        "footerFromBottom": 13
+      },
+      {
+        "progress": 1,
+        "atMs": 300,
+        "subject": {
+          "w": 750,
+          "h": 262
+        },
+        "top": 117,
+        "footerFromBottom": 13
+      }
+    ]
+  }
+}

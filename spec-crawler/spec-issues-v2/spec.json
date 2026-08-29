@@ -1,0 +1,87 @@
+{
+  "url": "https://linear.app/test-workspace-bb/team/TES/all",
+  "capturedAt": "2026-08-11T12:49:01.340Z",
+  "stateCount": 5,
+  "states": [
+    {
+      "id": "001-row-02-hover",
+      "name": "row-02-hover",
+      "tier": 3,
+      "kind": "agent-captured",
+      "hash": "SPAN.attr|CODE.inline|CODE.inline",
+      "path": [],
+      "notes": "Issue row hovered. Wash is a pseudo-element, driven by data attributes not CSS :hover. REACHED BY: Real pointer moved onto the row; force_state cannot reproduce this. MEASURED: 652.9x162 at (305.7, 233.3). type 15px / 24px 450 \"Inter Variable\"",
+      "frame": "frames/001-row-02-hover.html",
+      "jsx": "jsx/001-row-02-hover.jsx",
+      "shot": "shots/001-row-02-hover.png",
+      "shots": {
+        "surface": "shots/001-row-02-hover.png"
+      },
+      "bytes": 5218
+    },
+    {
+      "id": "002-toolbar-filter-button",
+      "name": "toolbar-filter-button",
+      "tier": 3,
+      "kind": "agent-captured",
+      "hash": "DIV.sx-78zum5.sx-vx4679|BUTTON.sx-3nfvp2.sx-16dsc37|SPAN.sx-3nfvp2.sx-6s0dn4|svg.|path.|path.",
+      "path": [],
+      "notes": "Filter trigger in the view toolbar. REACHED BY: Top-right of the view header. MEASURED: 28x28 at (1319.5, 60.5). type 16px / 24px 400 \"Inter Variable\"",
+      "frame": "frames/002-toolbar-filter-button.html",
+      "jsx": "jsx/002-toolbar-filter-button.jsx",
+      "shot": "shots/002-toolbar-filter-button.png",
+      "shots": {
+        "surface": "shots/002-toolbar-filter-button.png"
+      },
+      "bytes": 14484
+    },
+    {
+      "id": "003-toolbar-display-button",
+      "name": "toolbar-display-button",
+      "tier": 3,
+      "kind": "agent-captured",
+      "hash": "DIV.sx-3nfvp2.sx-16dsc37|DIV.sx-78zum5.sx-vx4679|BUTTON.sx-3nfvp2.sx-16dsc37|SPAN.sx-3nfvp2.sx-6s0dn4|svg.|DIV.sx-78zum5.sx-vx4679|BUTTON.sx-3nfvp2.sx-16dsc37|SPAN.sx-3nfvp2.sx-6s0dn4|svg.",
+      "path": [],
+      "notes": "Display trigger in the view toolbar. REACHED BY: Top-right of the view header. MEASURED: 58x29 at (1353.5, 60). background lch(10.149 0.689 272) radius 9999px border 0.5px solid rgba(0, 0, 0, 0) type 16px / normal 500 \"Inter Variable\"",
+      "frame": "frames/003-toolbar-display-button.html",
+      "jsx": "jsx/003-toolbar-display-button.jsx",
+      "shot": "shots/003-toolbar-display-button.png",
+      "shots": {
+        "surface": "shots/003-toolbar-display-button.png"
+      },
+      "bytes": 31797
+    },
+    {
+      "id": "004-command-palette-scoped",
+      "name": "command-palette-scoped",
+      "tier": 3,
+      "kind": "agent-captured",
+      "hash": "LI.sx-aope02.sx-1ly3cv|DIV.sx-78zum5.sx-167g77z|DIV.sx-eq5yr9.sx-2lah0s|SPAN.sx-78zum5.sx-2lah0s|svg.|DIV.sx-1j61x8r.sx-oxd7ts|DIV.sx-1iyjqo2.sx-78zum5|SPAN.sx-s83m0k.sx-euugli|DIV.sx-78zum5.sx-vx4679|SPAN.sx-uxw1ft.sx-3nfvp2",
+      "path": [],
+      "notes": "Command palette scoped to the current issue — the scoped context line is the piece clones miss. REACHED BY: Cmd+K with a row selected; the palette scopes to the list cursor, not the selection. MEASURED: 708x46 at (362.5, 272.5). type 15px / 22.5px 400 \"Inter Variable\"",
+      "frame": "frames/004-command-palette-scoped.html",
+      "jsx": "jsx/004-command-palette-scoped.jsx",
+      "shot": "shots/004-command-palette-scoped.png",
+      "shots": {
+        "surface": "shots/004-command-palette-scoped.png"
+      },
+      "bytes": 19880
+    },
+    {
+      "id": "005-display-panel-list",
+      "name": "display-panel-list",
+      "tier": 3,
+      "kind": "agent-captured",
+      "hash": "DIV.sx-78zum5.sx-vx4679|DIV.sx-78zum5.sx-vx4679|BUTTON.sx-jyslct.sx-18o3ruo|svg.|rect.|rect.|rect.|SPAN.sx-1j61x8r.sx-ggjnk3",
+      "path": [],
+      "notes": "Display panel in List layout — grouping, ordering and the 14 display-property pills. REACHED BY: Clicked the Display button while the view was in List layout. MEASURED: 367.6x28 at (1007.6, 272.3). type 16px / 24px 400 \"Inter Variable\"",
+      "frame": "frames/005-display-panel-list.html",
+      "jsx": "jsx/005-display-panel-list.jsx",
+      "shot": "shots/005-display-panel-list.png",
+      "shots": {
+        "surface": "shots/005-display-panel-list.png"
+      },
+      "bytes": 13194
+    }
+  ]
+}

@@ -1,0 +1,2509 @@
+{
+  "url": "https://linear.app/test-workspace-bb/team/TES/all",
+  "scannedRules": 7260,
+  "unreadableSheets": 0,
+  "stateNames": [
+    "[data-disabled=\"true\"]",
+    "active",
+    "disabled",
+    "focus-visible",
+    "hover"
+  ],
+  "components": [
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-6s0dn4",
+      "rect": {
+        "x": 342,
+        "y": 647,
+        "width": 74,
+        "height": 24
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "currentColor",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "currentColor",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(64.805 1.65 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-6xxmzv:active"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "currentColor",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "currentColor",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "currentColor",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(64.805 1.65 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-6xxmzv:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "currentColor",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        }
+      ],
+      "id": "s3932"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-6s0dn4",
+      "rect": {
+        "x": 535,
+        "y": 122,
+        "width": 28,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        }
+      ],
+      "id": "s3767"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-6s0dn4",
+      "rect": {
+        "x": 633,
+        "y": 122,
+        "width": 28,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        }
+      ],
+      "id": "s3773"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-6s0dn4",
+      "rect": {
+        "x": 663,
+        "y": 122,
+        "width": 28,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        }
+      ],
+      "id": "s3778"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-6s0dn4",
+      "rect": {
+        "x": 693,
+        "y": 122,
+        "width": 28,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        }
+      ],
+      "id": "s3784"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-6s0dn4",
+      "rect": {
+        "x": 669,
+        "y": 30,
+        "width": 24,
+        "height": 24
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        }
+      ],
+      "id": "s3823"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-6s0dn4",
+      "rect": {
+        "x": 695,
+        "y": 30,
+        "width": 24,
+        "height": 24
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        }
+      ],
+      "id": "s3829"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-6s0dn4",
+      "rect": {
+        "x": 344,
+        "y": 534,
+        "width": 24,
+        "height": 24
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        }
+      ],
+      "id": "s3895"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-6s0dn4",
+      "rect": {
+        "x": 370,
+        "y": 534,
+        "width": 24,
+        "height": 24
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        }
+      ],
+      "id": "s3900"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-6s0dn4",
+      "rect": {
+        "x": 396,
+        "y": 534,
+        "width": 24,
+        "height": 24
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        }
+      ],
+      "id": "s3905"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-6s0dn4",
+      "rect": {
+        "x": 653,
+        "y": 647,
+        "width": 24,
+        "height": 24
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        }
+      ],
+      "id": "s3940"
+    },
+    {
+      "label": "a.sx-yh5bb9.sx-12oqio5.sx-1t35e8",
+      "rect": {
+        "x": 346,
+        "y": 80,
+        "width": 359,
+        "height": 40
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "app.base"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:active"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority3"
+          ],
+          "changes": [
+            {
+              "property": "outline-color",
+              "from": "lch(90.826 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "outline-style",
+              "from": "none",
+              "to": ""
+            },
+            {
+              "property": "outline-width",
+              "from": "3px",
+              "to": ""
+            }
+          ],
+          "selectors": [
+            ".sx-ueak1o:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(hover: hover)"
+          ],
+          "changes": [
+            {
+              "property": "text-decoration-line",
+              "from": "none",
+              "to": "underline"
+            },
+            {
+              "property": "text-decoration-color",
+              "from": "lch(58.717 70 288.421)",
+              "to": "var(--editor-label-link)"
+            }
+          ],
+          "selectors": [
+            ".editor a:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "app.base",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:hover"
+          ]
+        }
+      ],
+      "id": "s3858"
+    },
+    {
+      "label": "span.sx-1j61x8r.sx-ggjnk3.sx-84vug0",
+      "rect": {
+        "x": 346,
+        "y": 52,
+        "width": 126,
+        "height": 15
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(63.304 1.425 272)",
+              "to": "var(--sx-3zwjav)"
+            },
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-1fti3kg.sx-1fti3kg:where(.sx-1jjm1b4:active *)",
+            ".sx-11q3d82.sx-11q3d82:where(.sx-1jjm1b4:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(63.304 1.425 272)",
+              "to": "var(--sx-3zwjav)"
+            },
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-1fti3kg.sx-1fti3kg:where(.sx-1jjm1b4:hover *)",
+            ".sx-11q3d82.sx-11q3d82:where(.sx-1jjm1b4:hover *)"
+          ]
+        }
+      ],
+      "id": "s3844"
+    },
+    {
+      "label": "div.sx-78zum5.sx-vx4679.sx-1q0g3np",
+      "rect": {
+        "x": 669,
+        "y": 29,
+        "width": 50,
+        "height": 26
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            },
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-1r19lex.sx-1r19lex:where(.sx-9i23fu:active *)",
+            ".sx-1e2prk9.sx-1e2prk9:where(.sx-9i23fu:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            },
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-1r19lex.sx-1r19lex:where(.sx-9i23fu:hover *)",
+            ".sx-1e2prk9.sx-1e2prk9:where(.sx-9i23fu:hover *)"
+          ]
+        }
+      ],
+      "id": "s3821"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 542,
+        "y": 129,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3768"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 640,
+        "y": 129,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3774"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 670,
+        "y": 129,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3779"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 700,
+        "y": 129,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3785"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 674,
+        "y": 35,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3824"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 700,
+        "y": 35,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3830"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 349,
+        "y": 539,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3896"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 375,
+        "y": 539,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3901"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 401,
+        "y": 539,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3906"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 346,
+        "y": 652,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3933"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 658,
+        "y": 652,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3941"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 690,
+        "y": 652,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3947"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-6s0dn4",
+      "rect": {
+        "x": 685,
+        "y": 647,
+        "width": 24,
+        "height": 24
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        }
+      ],
+      "id": "s3946"
+    },
+    {
+      "label": "div.sx-78zum5.sx-vx4679.sx-dt5ytf",
+      "rect": {
+        "x": 425,
+        "y": -34,
+        "width": 294,
+        "height": 37
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority3"
+          ],
+          "changes": [
+            {
+              "property": "outline-color",
+              "from": "rgb(255, 255, 255)",
+              "to": ""
+            },
+            {
+              "property": "outline-style",
+              "from": "none",
+              "to": ""
+            },
+            {
+              "property": "outline-width",
+              "from": "3px",
+              "to": ""
+            }
+          ],
+          "selectors": [
+            ".sx-ueak1o:focus-visible"
+          ]
+        }
+      ],
+      "id": "s3801"
+    },
+    {
+      "label": "span.sx-yh5bb9.sx-12oqio5.sx-1t35e8",
+      "rect": {
+        "x": 437,
+        "y": -25,
+        "width": 156,
+        "height": 20
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority3"
+          ],
+          "changes": [
+            {
+              "property": "outline-color",
+              "from": "lch(90.826 1.425 272)",
+              "to": ""
+            },
+            {
+              "property": "outline-style",
+              "from": "none",
+              "to": ""
+            },
+            {
+              "property": "outline-width",
+              "from": "3px",
+              "to": ""
+            }
+          ],
+          "selectors": [
+            ".sx-ueak1o:focus-visible"
+          ]
+        }
+      ],
+      "id": "s3812"
+    }
+  ]
+}

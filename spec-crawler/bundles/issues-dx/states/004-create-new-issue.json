@@ -1,0 +1,1582 @@
+{
+  "url": "https://linear.app/test-workspace-bb/team/TES/all",
+  "scannedRules": 7260,
+  "unreadableSheets": 0,
+  "stateNames": [
+    "[data-disabled=\"true\"]",
+    "active",
+    "checked",
+    "disabled",
+    "enabled",
+    "focus-visible",
+    "hover"
+  ],
+  "components": [
+    {
+      "label": "input#createMoreToggle.sx-jyslct.sx-c342km.sx-2lah0s",
+      "rect": {
+        "x": 876,
+        "y": 322,
+        "width": 22,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "lch(48.296 1.13 271.996)",
+              "to": "var(--sx-y7jo44)"
+            }
+          ],
+          "selectors": [
+            ".sx-1v77m3y:active"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-gauayi",
+              "from": "2px",
+              "to": "var(--sx-puww38)"
+            }
+          ],
+          "selectors": [
+            ".sx-lxgqqn:active:checked"
+          ]
+        },
+        {
+          "state": "checked",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-1rwcria",
+              "from": "10px",
+              "to": "var(--sx-nnhj77)"
+            },
+            {
+              "property": "--sx-gauayi",
+              "from": "2px",
+              "to": "var(--sx-puww38)"
+            },
+            {
+              "property": "--sx-hsrmg4",
+              "from": "50ms",
+              "to": "0s"
+            },
+            {
+              "property": "--sx-imi5ey",
+              "from": "0s",
+              "to": "50ms"
+            },
+            {
+              "property": "--sx-q9soxx",
+              "from": "lch(48.296% 1.13 271.996 / 1)",
+              "to": "var(--sx-n8xqcl)"
+            },
+            {
+              "property": "--sx-y7jo44",
+              "from": "lch(56.846% 1.217 271.998 / 1)",
+              "to": "var(--sx-1jffjrl)"
+            }
+          ],
+          "selectors": [
+            ".sx-eeptly:checked",
+            ".sx-v2ts5r:checked",
+            ".sx-1xb414t:checked",
+            ".sx-adbs4c:checked",
+            ".sx-18bitfr:checked",
+            ".sx-12a5alu:checked",
+            ".sx-lxgqqn:active:checked"
+          ]
+        },
+        {
+          "state": "checked",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--sx-gauayi",
+              "from": "2px",
+              "to": "var(--sx-puww38)"
+            }
+          ],
+          "selectors": [
+            ".sx-lxgqqn:hover:checked"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.5"
+            }
+          ],
+          "selectors": [
+            ".sx-ijokvz:disabled"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--sx-q9soxx",
+              "from": "lch(48.296% 1.13 271.996 / 1)",
+              "to": "var(--x-ybx448)"
+            },
+            {
+              "property": "--sx-y7jo44",
+              "from": "lch(56.846% 1.217 271.998 / 1)",
+              "to": "var(--x-b1v2wl)"
+            }
+          ],
+          "selectors": [
+            ".sx-63m65b:disabled",
+            ".sx-lwusdu:disabled"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "2px"
+            }
+          ],
+          "selectors": [
+            ".sx-7s97pk:focus-visible"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "lch(48.296 1.13 271.996)",
+              "to": "var(--sx-y7jo44)"
+            }
+          ],
+          "selectors": [
+            ".sx-1v77m3y:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--sx-gauayi",
+              "from": "2px",
+              "to": "var(--sx-puww38)"
+            }
+          ],
+          "selectors": [
+            ".sx-lxgqqn:hover:checked"
+          ]
+        }
+      ],
+      "id": "s3573"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-6s0dn4",
+      "rect": {
+        "x": 1017,
+        "y": 107,
+        "width": 28,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        }
+      ],
+      "id": "s3466"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-6s0dn4",
+      "rect": {
+        "x": 1051,
+        "y": 107,
+        "width": 28,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:active:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--icon-replacement-color",
+              "from": "(unset)",
+              "to": "var(--btn-highlight-color)"
+            }
+          ],
+          "selectors": [
+            ".sx-12vwx15:hover:not(:is(:disabled, [data-disabled=\"true\"]))"
+          ]
+        }
+      ],
+      "id": "s3472"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-6s0dn4",
+      "rect": {
+        "x": 354,
+        "y": 315,
+        "width": 28,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--btn-highlight-bg",
+              "from": "lch(17.574% 1.589 272 / 1)",
+              "to": "var(--sx-vatjr0)"
+            }
+          ],
+          "selectors": [
+            ".sx-tyb1qr:enabled:active"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        },
+        {
+          "state": "enabled",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "--btn-highlight-bg",
+              "from": "lch(17.574% 1.589 272 / 1)",
+              "to": "var(--sx-vatjr0)"
+            }
+          ],
+          "selectors": [
+            ".sx-tyb1qr:enabled:active"
+          ]
+        },
+        {
+          "state": "enabled",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--btn-highlight-bg",
+              "from": "lch(17.574% 1.589 272 / 1)",
+              "to": "var(--sx-vatjr0)"
+            }
+          ],
+          "selectors": [
+            ".sx-tyb1qr:enabled:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "--btn-highlight-bg",
+              "from": "lch(17.574% 1.589 272 / 1)",
+              "to": "var(--sx-vatjr0)"
+            }
+          ],
+          "selectors": [
+            ".sx-tyb1qr:enabled:hover"
+          ]
+        }
+      ],
+      "id": "s3564"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-6s0dn4",
+      "rect": {
+        "x": 986,
+        "y": 315,
+        "width": 93,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "outline-offset",
+              "from": "0px",
+              "to": "2px"
+            }
+          ],
+          "selectors": [
+            ".sx-7s97pk:focus-visible"
+          ]
+        }
+      ],
+      "id": "s3576"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 359,
+        "y": 112,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3457"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 1024,
+        "y": 114,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3467"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 1058,
+        "y": 114,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3473"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 360,
+        "y": 272,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3501"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 464,
+        "y": 272,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3509"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 544,
+        "y": 272,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3518"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 636,
+        "y": 272,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3531"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 715,
+        "y": 272,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3538"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 794,
+        "y": 272,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3546"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 828,
+        "y": 272,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3553"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 361,
+        "y": 322,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s3565"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-l56j7k",
+      "rect": {
+        "x": 354,
+        "y": 267,
+        "width": 98,
+        "height": 24
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        }
+      ],
+      "id": "s3500"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-l56j7k",
+      "rect": {
+        "x": 457,
+        "y": 267,
+        "width": 74,
+        "height": 24
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        }
+      ],
+      "id": "s3508"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-l56j7k",
+      "rect": {
+        "x": 537,
+        "y": 267,
+        "width": 86,
+        "height": 24
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        }
+      ],
+      "id": "s3517"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-l56j7k",
+      "rect": {
+        "x": 629,
+        "y": 267,
+        "width": 73,
+        "height": 24
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        }
+      ],
+      "id": "s3530"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-l56j7k",
+      "rect": {
+        "x": 708,
+        "y": 267,
+        "width": 70,
+        "height": 24
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        }
+      ],
+      "id": "s3537"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-l56j7k",
+      "rect": {
+        "x": 785,
+        "y": 267,
+        "width": 32,
+        "height": 24
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        }
+      ],
+      "id": "s3545"
+    },
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-6s0dn4",
+      "rect": {
+        "x": 823,
+        "y": 267,
+        "width": 24,
+        "height": 24
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "[data-disabled=\"true\"]",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-19oxun3[data-disabled=\"true\"]:not([data-active=\"true\"])"
+          ]
+        },
+        {
+          "state": "disabled",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "1",
+              "to": "0.6"
+            }
+          ],
+          "selectors": [
+            ".sx-fqoyci:disabled"
+          ]
+        }
+      ],
+      "id": "s3552"
+    },
+    {
+      "label": "form.sx-mz0i5r.sx-78zum5.sx-b3r6kr",
+      "rect": {
+        "x": 342,
+        "y": 95,
+        "width": 749,
+        "height": 260
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "animation-duration",
+              "from": "0s",
+              "to": "2.5s"
+            },
+            {
+              "property": "animation-name",
+              "from": "none",
+              "to": "sx-1or9wxq-B"
+            },
+            {
+              "property": "animation-timing-function",
+              "from": "ease",
+              "to": "ease-out"
+            },
+            {
+              "property": "outline-color",
+              "from": "lch(90.826 1.425 272)",
+              "to": "rgba(0, 0, 0, 0)"
+            },
+            {
+              "property": "outline-style",
+              "from": "none",
+              "to": "solid"
+            },
+            {
+              "property": "outline-width",
+              "from": "3px",
+              "to": "var(--sx-1ele6il)"
+            }
+          ],
+          "selectors": [
+            ".sx-guaf7o:focus-visible",
+            ".sx-p5bmwf:focus-visible",
+            ".sx-1fjuri0:focus-visible",
+            ".sx-1il1oys:focus-visible",
+            ".sx-z2lg3n:focus-visible",
+            ".sx-9v5kkp:focus-visible",
+            ".sx-k9utmw:focus-visible"
+          ]
+        }
+      ],
+      "id": "s3450"
+    }
+  ]
+}

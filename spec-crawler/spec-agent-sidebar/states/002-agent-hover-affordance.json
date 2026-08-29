@@ -1,0 +1,223 @@
+{
+  "url": "https://linear.app/test-workspace-bb/agent/write-snmp-development-surface-project-update-09a52bcd3bdef",
+  "scannedRules": 7251,
+  "unreadableSheets": 0,
+  "stateNames": [
+    "active",
+    "focus",
+    "focus-visible",
+    "hover"
+  ],
+  "components": [
+    {
+      "label": "button.sx-3nfvp2.sx-16dsc37.sx-6s0dn4",
+      "rect": {
+        "x": 206,
+        "y": 178,
+        "width": 24,
+        "height": 24
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            },
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sc2sx-SidebarSectionActionButton-a3f9c2d4:active"
+          ]
+        },
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-1gokwge.sx-1gokwge:where(.sx-ew8opw:active *)",
+            ".sx-1yt6nhl:active"
+          ]
+        },
+        {
+          "state": "focus",
+          "trigger": "self",
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            },
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sc2sx-SidebarSectionActionButton-a3f9c2d4:focus"
+          ]
+        },
+        {
+          "state": "focus",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-1uxbtfk:focus"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-toe6to.sx-toe6to:where(.sx-ew8opw:focus-visible *)"
+          ]
+        },
+        {
+          "state": "focus-visible",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-toe6to.sx-toe6to:where(.sx-ew8opw:focus-visible *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            },
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sc2sx-SidebarSectionActionButton-a3f9c2d4:hover"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "opacity",
+              "from": "0",
+              "to": "1"
+            }
+          ],
+          "selectors": [
+            ".sx-1gokwge.sx-1gokwge:where(.sx-ew8opw:hover *)",
+            ".sx-1yt6nhl:hover"
+          ]
+        }
+      ],
+      "id": "s2041"
+    },
+    {
+      "label": "span.sx-3nfvp2.sx-6s0dn4.sx-l56j7k",
+      "rect": {
+        "x": 211,
+        "y": 183,
+        "width": 14,
+        "height": 14
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:active *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "0s"
+            }
+          ],
+          "selectors": [
+            ".sx-155x3hb.sx-155x3hb:where(.sx--default-marker:hover *)"
+          ]
+        }
+      ],
+      "id": "s2042"
+    }
+  ]
+}

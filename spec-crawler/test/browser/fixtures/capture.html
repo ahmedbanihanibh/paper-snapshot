@@ -1,0 +1,119 @@
+<meta charset="utf-8">
+<title>capture transaction fixture</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.4 system-ui, sans-serif; background: #fff; color: #111; }
+
+  /* A row that borrows its columns from an ancestor grid, four levels up, exactly
+     like the list rows that reached Paper as vertical stacks. */
+  #list {
+    display: grid;
+    grid-template-columns: [icon] 24px [title] 320px [meta] 80px;
+    column-gap: 12px;
+    width: 460px;
+    padding: 8px;
+  }
+  #row {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: icon / meta;
+    align-items: center;
+    height: 36px;
+    border-radius: 6px;
+    background: #f4f5f8;
+  }
+  #row[data-active="true"] { background: #dde3f5; }
+  #row .icon { justify-self: center; width: 14px; height: 14px; border-radius: 3px; background: #6b7bb5; }
+  #row .title { font-weight: 600; }
+  #row .meta { color: #7b8194; text-align: right; }
+
+  #panel {
+    position: fixed; left: 40px; top: 120px;
+    width: 260px; height: 96px;
+    border-radius: 10px;
+    border: 1px solid #d7dae4;
+    box-shadow: 0 8px 24px rgba(16, 20, 40, 0.14);
+    background: #fff;
+    padding: 12px;
+  }
+
+  #drifter { position: fixed; left: 340px; top: 120px; width: 180px; height: 48px; background: #eef1f8; border-radius: 8px; padding: 8px; }
+
+  /* Hover styled purely in CSS — no attribute, no class, no script. Rest and
+     hover are byte-identical in the DOM, so a dedupe that only hashes topology
+     discards the hover frame as "structurally identical to a state already
+     captured". This is the common case: most apps style hover this way. */
+  #css-hover {
+    position: fixed; left: 340px; top: 200px; width: 180px; height: 48px;
+    background: #eef1f8; border-radius: 8px; padding: 8px;
+  }
+  #css-hover:hover { background: #c9d4f2; }
+
+  #live-card {
+    position: fixed; left: 340px; top: 280px; width: 180px;
+    background: #f4f5f8; border-radius: 8px; padding: 8px;
+    display: flex; justify-content: space-between;
+  }
+  /* Fixed width so the ticking value cannot reflow the card. A volatile region
+     that changes its parent's geometry is a layout change, and the capture is
+     right to reject that — declaring content volatile must not excuse it. */
+  #live-count { width: 40px; text-align: right; font-variant-numeric: tabular-nums; }
+</style>
+
+<div id="list">
+  <div id="row" role="row" data-list-row="true" data-list-key="issue-123">
+    <span class="icon"></span>
+    <span class="title">Issue ABC-123 — subgrid row</span>
+    <span class="meta">2d</span>
+  </div>
+</div>
+
+<div id="panel" role="dialog" aria-label="Details panel">Details panel body</div>
+
+<div id="drifter">Original label</div>
+
+<div id="css-hover">CSS-only hover</div>
+
+<!-- A live region. Real apps are full of these — relative timestamps, unread
+     counts, presence dots — and every one of them makes its whole component
+     uncapturable unless the caller can declare it as expected to vary. -->
+<div id="live-card">
+  <span class="label">Issue ABC-123</span>
+  <span id="live-count">0</span>
+</div>
+
+<script>
+  window.__pointer = { downs: 0, ups: 0 };
+  addEventListener('mousedown', () => { window.__pointer.downs += 1; }, true);
+  addEventListener('mouseup', () => { window.__pointer.ups += 1; }, true);
+  document.getElementById('row').addEventListener('mouseenter', (event) => {
+    event.currentTarget.setAttribute('data-active', 'true');
+  });
+  document.getElementById('row').addEventListener('mouseleave', (event) => {
+    event.currentTarget.removeAttribute('data-active');
+  });
+
+  // Opt-in, not automatic. A live region anywhere on the page also makes every
+  // WHOLE-PAGE capture drift — true, and worth knowing, but it would poison every
+  // other test in this file rather than testing anything.
+  //
+  // Wrapped in an IIFE, and every binding hung off `window`, because the tests
+  // share one page: `setContent` re-runs this script in the SAME global, and a
+  // top-level `let` redeclaration is a parse-time error that silently voids the
+  // whole script — including the pointer listeners above, which are what the
+  // unrelated tests depend on.
+  (function () {
+    // The global outlives setContent too, so a ticker started by one test would
+    // keep firing through every test after it.
+    if (window.__liveTicker) clearInterval(window.__liveTicker);
+    window.__liveTicker = null;
+    window.__liveTicks = 0;
+    window.__startLiveTicker = function () {
+      if (window.__liveTicker) return;
+      window.__liveTicker = setInterval(function () {
+        window.__liveTicks += 1;
+        document.getElementById('live-count').textContent = String(window.__liveTicks);
+      }, 30);
+    };
+  }());
+</script>

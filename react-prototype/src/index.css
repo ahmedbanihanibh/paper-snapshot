@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+/**
+ * Tokens read out of Linear's live composer, not sampled by eye.
+ *
+ * The colours are kept in lch() exactly as Linear declares them. Converting to
+ * hex would quantise them and lose the tiny chroma each one carries (every
+ * neutral here sits at hue 272, which is what stops the panel reading as flat
+ * grey), so they stay verbatim.
+ */
+@theme {
+  --color-panel:        lch(9.232 0.85 272);
+  --color-panel-border: lch(22.193 1.93 272);
+  --color-chip:         lch(17.574 1.589 272);
+
+  --color-ink:          lch(100 0 272);      /* title, team name */
+  --color-ink-soft:     lch(91.201 1.65 272); /* "New issue", header glyphs */
+  --color-ink-body:     lch(90.826 1.425 272); /* description */
+  --color-ink-muted:    lch(64.805 1.65 272); /* pill labels */
+
+  --color-accent:       lch(47.918 59.303 288.421);
+  --color-accent-ink:   lch(100 5 288.421);
+
+  /* Measured curve and duration, shared by all three animated properties. */
+  --ease-composer: cubic-bezier(0.43, 0.07, 0.59, 0.94);
+
+  /* Five layers. A three-layer approximation reads as a harder edge. */
+  --shadow-composer:
+    0 4px 40px lch(0 0 0 / 0.1),
+    0 3px 20px lch(0 0 0 / 0.125),
+    0 3px 12px lch(0 0 0 / 0.125),
+    0 2px 8px  lch(0 0 0 / 0.125),
+    0 1px 1px  lch(0 0 0 / 0.125);
+
+  --font-sans: "Inter Variable", "SF Pro Display", -apple-system, system-ui,
+    "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+    "Helvetica Neue", sans-serif;
+}
+
+html, body { margin: 0; height: 100%; }
+body {
+  background: lch(5.52 0.4 272);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Editors are contenteditable divs in Linear, so the placeholder is drawn
+   rather than provided by ::placeholder. */
+[data-placeholder]:empty::before {
+  content: attr(data-placeholder);
+  color: var(--color-ink-muted);
+  pointer-events: none;
+}

@@ -1,0 +1,51 @@
+{
+  "url": "https://linear.app/test-workspace-bb/team/TES/all",
+  "capturedAt": "2026-08-21T18:01:26.679Z",
+  "stateCount": 2,
+  "states": [
+    {
+      "id": "001-issues-all-rest-light",
+      "name": "issues-all-rest-light",
+      "tier": 3,
+      "kind": "agent-captured",
+      "notes": "TES/all issues list rest in light theme. Grouped list: In Progress/Todo/Backlog/Done. Scene + 44px rows. Matches user screenshot minus workspace menu.",
+      "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.|DIV.|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.theme-provider-bfca8e2c6cb3c7c4d40b8464adad582727b37d10|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv",
+      "path": [],
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1432,
+        "height": 723
+      },
+      "frame": "frames/001-issues-all-rest-light.html",
+      "jsx": "jsx/001-issues-all-rest-light.jsx",
+      "shot": "shots/001-issues-all-rest-light.png",
+      "shots": {
+        "surface": "shots/001-issues-all-rest-light.png"
+      },
+      "bytes": 2105200
+    },
+    {
+      "id": "002-workspace-menu-open-light",
+      "name": "workspace-menu-open-light",
+      "tier": 3,
+      "kind": "agent-captured",
+      "notes": "Clicked My Workspace. Menu dialog/listbox 225x197 at (12,48): Settings (G then S), Invite, Download desktop app, Switch workspace (O then W), Log out. Matches user screenshot 1.",
+      "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.|DIV.|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.theme-provider-bfca8e2c6cb3c7c4d40b8464adad582727b37d10|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-10a8y8t.sx-ysyzu8|DIV.theme-provider-7f292684964e07c427e9836f7355b0a0981e5062|DIV.sx-1lmytr0.sx-8du1vd|DIV.|DIV.theme-provider-7f292684964e07c427e9836f7355b0a0981e5062",
+      "path": [],
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1432,
+        "height": 723
+      },
+      "frame": "frames/002-workspace-menu-open-light.html",
+      "jsx": "jsx/002-workspace-menu-open-light.jsx",
+      "shot": "shots/002-workspace-menu-open-light.png",
+      "shots": {
+        "surface": "shots/002-workspace-menu-open-light.png"
+      },
+      "bytes": 2105092
+    }
+  ]
+}

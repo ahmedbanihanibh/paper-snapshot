@@ -1,0 +1,107 @@
+{
+  "url": "https://linear.app/test-workspace-bb/team/TES/all",
+  "scannedRules": 7214,
+  "unreadableSheets": 0,
+  "stateNames": [
+    "active",
+    "hover"
+  ],
+  "components": [
+    {
+      "label": "a#0settings.sx-1xru068.sx-189xrh.sx-zjhap9",
+      "rect": {
+        "x": 13,
+        "y": 55,
+        "width": 224,
+        "height": 32
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "app.base"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:active"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "app.base",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:hover"
+          ]
+        }
+      ],
+      "id": "s3067"
+    },
+    {
+      "label": "a#1invite-and-manage-members.sx-1xru068.sx-189xrh.sx-zjhap9",
+      "rect": {
+        "x": 13,
+        "y": 87,
+        "width": 224,
+        "height": 32
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "app.base"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:active"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "app.base",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:hover"
+          ]
+        }
+      ],
+      "id": "s3080"
+    }
+  ]
+}

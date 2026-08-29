@@ -1,0 +1,251 @@
+{
+  "url": "https://linear.app/test-workspace-bb/team/TES/all",
+  "capturedAt": "2026-08-21T17:55:53.903Z",
+  "stateCount": 1,
+  "states": [
+    {
+      "id": "001-workspace-all-issues-rest",
+      "name": "workspace-all-issues-rest",
+      "tier": 3,
+      "kind": "agent-captured",
+      "notes": "Signed-in Linear TES/all at 1432×723. Entry: CDP attach to existing tab after PUT /json/new. Resting workspace: sidebar + issues scene + agent dock.",
+      "hash": "BODY.content-loaded.loadingText|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.theme-provider-399572923184751ace34e60b5a9654a7b0a6f23b|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.theme-provider-bfca8e2c6cb3c7c4d40b8464adad582727b37d10|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-13a42de82027e928cbf4eb95da174c1bb1d29d79|DIV.sx-jp7ctv",
+      "path": [],
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1432,
+        "height": 723
+      },
+      "frame": "frames/001-workspace-all-issues-rest.html",
+      "jsx": "jsx/001-workspace-all-issues-rest.jsx",
+      "shot": "shots/001-workspace-all-issues-rest.png",
+      "shots": {
+        "surface": "shots/001-workspace-all-issues-rest.png"
+      },
+      "bytes": 2121714
+    }
+  ],
+  "cssSpec": {
+    "url": "https://linear.app/test-workspace-bb/team/TES/all",
+    "scannedRules": 7408,
+    "unreadableSheets": 0,
+    "stateNames": [
+      "active",
+      "focus-visible",
+      "hover"
+    ],
+    "components": [
+      {
+        "label": "a.sx-6s0dn4.sx-1i9j6mr.sx-vijh9v",
+        "rect": {
+          "x": 12,
+          "y": 61,
+          "width": 220,
+          "height": 28
+        },
+        "visible": true,
+        "states": [
+          {
+            "state": "active",
+            "trigger": "self",
+            "conditions": [
+              "app.base"
+            ],
+            "changes": [
+              {
+                "property": "transition-duration",
+                "from": "0.15s",
+                "to": "var(--speed-highlightFadeIn)"
+              }
+            ],
+            "selectors": [
+              "a:active"
+            ]
+          },
+          {
+            "state": "active",
+            "trigger": "self",
+            "conditions": [
+              "priority4"
+            ],
+            "changes": [
+              {
+                "property": "background-color",
+                "from": "rgba(0, 0, 0, 0)",
+                "to": "var(--sx-16hn3q3)"
+              }
+            ],
+            "selectors": [
+              ".sx-1j12vre:active"
+            ]
+          },
+          {
+            "state": "active",
+            "trigger": "self",
+            "changes": [
+              {
+                "property": "--icon-replacement-color",
+                "from": "(unset)",
+                "to": "var(--sx-ys2i3t)"
+              }
+            ],
+            "selectors": [
+              ".sx-17mi88y:active"
+            ]
+          },
+          {
+            "state": "focus-visible",
+            "trigger": "self",
+            "conditions": [
+              "priority4"
+            ],
+            "changes": [
+              {
+                "property": "outline-offset",
+                "from": "0px",
+                "to": "-1px"
+              }
+            ],
+            "selectors": [
+              ".sx-y9f4xx:focus-visible"
+            ]
+          },
+          {
+            "state": "hover",
+            "trigger": "self",
+            "conditions": [
+              "app.base",
+              "(any-hover: hover) and (any-pointer: fine)"
+            ],
+            "changes": [
+              {
+                "property": "transition-duration",
+                "from": "0.15s",
+                "to": "var(--speed-highlightFadeIn)"
+              }
+            ],
+            "selectors": [
+              "a:hover"
+            ]
+          },
+          {
+            "state": "hover",
+            "trigger": "self",
+            "conditions": [
+              "priority4",
+              "(any-hover: hover) and (any-pointer: fine)"
+            ],
+            "changes": [
+              {
+                "property": "background-color",
+                "from": "rgba(0, 0, 0, 0)",
+                "to": "var(--sx-16hn3q3)"
+              }
+            ],
+            "selectors": [
+              ".sx-1j12vre:hover"
+            ]
+          },
+          {
+            "state": "hover",
+            "trigger": "self",
+            "conditions": [
+              "(any-hover: hover) and (any-pointer: fine)"
+            ],
+            "changes": [
+              {
+                "property": "--icon-replacement-color",
+                "from": "(unset)",
+                "to": "var(--sx-ys2i3t)"
+              }
+            ],
+            "selectors": [
+              ".sx-17mi88y:hover"
+            ]
+          }
+        ],
+        "id": "s1983"
+      },
+      {
+        "label": "span.sx-1j61x8r.sx-ggjnk3.sx-1srpx65",
+        "rect": {
+          "x": 12,
+          "y": 61,
+          "width": 220,
+          "height": 28
+        },
+        "visible": true,
+        "states": [
+          {
+            "state": "active",
+            "trigger": "self",
+            "conditions": [
+              "priority4"
+            ],
+            "changes": [
+              {
+                "property": "color",
+                "from": "lch(37.776 1.25 282)",
+                "to": "var(--sx-ys2i3t)"
+              }
+            ],
+            "selectors": [
+              ".sx-14jutar.sx-14jutar:where(.sx-ew8opw:active *)"
+            ]
+          },
+          {
+            "state": "active",
+            "trigger": "self",
+            "changes": [
+              {
+                "property": "--icon-replacement-color",
+                "from": "lch(37.776% 1.25 282 / 1)",
+                "to": "var(--sx-ys2i3t)"
+              }
+            ],
+            "selectors": [
+              ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:active *)"
+            ]
+          },
+          {
+            "state": "hover",
+            "trigger": "self",
+            "conditions": [
+              "priority4",
+              "(any-hover: hover) and (any-pointer: fine)"
+            ],
+            "changes": [
+              {
+                "property": "color",
+                "from": "lch(37.776 1.25 282)",
+                "to": "var(--sx-ys2i3t)"
+              }
+            ],
+            "selectors": [
+              ".sx-14jutar.sx-14jutar:where(.sx-ew8opw:hover *)"
+            ]
+          },
+          {
+            "state": "hover",
+            "trigger": "self",
+            "conditions": [
+              "(any-hover: hover) and (any-pointer: fine)"
+            ],
+            "changes": [
+              {
+                "property": "--icon-replacement-color",
+                "from": "lch(37.776% 1.25 282 / 1)",
+                "to": "var(--sx-ys2i3t)"
+              }
+            ],
+            "selectors": [
+              ".sx-zg31di.sx-zg31di:where(.sx-ew8opw:hover *)"
+            ]
+          }
+        ],
+        "id": "s1984"
+      }
+    ]
+  }
+}

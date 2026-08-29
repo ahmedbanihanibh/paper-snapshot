@@ -1,0 +1,374 @@
+[
+ {
+  "file": "unnamed.svg",
+  "ctx": "",
+  "w": 0,
+  "h": 0
+ },
+ {
+  "file": "unnamed-2.svg",
+  "ctx": "",
+  "w": 0,
+  "h": 0
+ },
+ {
+  "file": "unnamed-3.svg",
+  "ctx": "",
+  "w": 0,
+  "h": 0
+ },
+ {
+  "file": "unnamed-4.svg",
+  "ctx": "",
+  "w": 0,
+  "h": 0
+ },
+ {
+  "file": "my-workspace-workspace-menu.svg",
+  "ctx": "My Workspace Workspace Menu",
+  "w": 8,
+  "h": 8
+ },
+ {
+  "file": "search-workspace.svg",
+  "ctx": "Search workspace",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "create-new-issue.svg",
+  "ctx": "Create new issue",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "in-test-workspace-bb-my-issues-created.svg",
+  "ctx": "in:/test-workspace-bb/my-issues/created",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "in-test-workspace-bb-inbox.svg",
+  "ctx": "in:/test-workspace-bb/inbox",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "in-test-workspace-bb-reviews.svg",
+  "ctx": "in:/test-workspace-bb/reviews",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "in-test-workspace-bb-agent.svg",
+  "ctx": "in:/test-workspace-bb/agent",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "in-test-workspace-bb-drafts.svg",
+  "ctx": "in:/test-workspace-bb/drafts",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "unnamed-5.svg",
+  "ctx": "",
+  "w": 16,
+  "h": 16
+ },
+ {
+  "file": "in-test-workspace-bb-views.svg",
+  "ctx": "in:/test-workspace-bb/views",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "in-test-workspace-bb-initiatives-active.svg",
+  "ctx": "in:/test-workspace-bb/initiatives/active",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "in-test-workspace-bb-projects-all.svg",
+  "ctx": "in:/test-workspace-bb/projects/all",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "show-more-links.svg",
+  "ctx": "Show more links",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "create-new-folder-for-favorites.svg",
+  "ctx": "Create new folder for favorites",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "unnamed-6.svg",
+  "ctx": "",
+  "w": 16,
+  "h": 16
+ },
+ {
+  "file": "join-a-team.svg",
+  "ctx": "Join a team",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "unnamed-7.svg",
+  "ctx": "",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "unnamed-8.svg",
+  "ctx": "",
+  "w": 16,
+  "h": 16
+ },
+ {
+  "file": "team-menu.svg",
+  "ctx": "Team menu",
+  "w": 12,
+  "h": 16
+ },
+ {
+  "file": "in-test-workspace-bb-team-tes-overview.svg",
+  "ctx": "in:/test-workspace-bb/team/TES/overview",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "in-test-workspace-bb-team-tes-all.svg",
+  "ctx": "in:/test-workspace-bb/team/TES/all",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "in-test-workspace-bb-team-tes-cycles.svg",
+  "ctx": "in:/test-workspace-bb/team/TES/cycles",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "in-test-workspace-bb-team-tes-projects-all.svg",
+  "ctx": "in:/test-workspace-bb/team/TES/projects/all",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "in-test-workspace-bb-team-tes-views-issues.svg",
+  "ctx": "in:/test-workspace-bb/team/TES/views/issues",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "open-help-menu.svg",
+  "ctx": "Open Help menu",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "team-overview.svg",
+  "ctx": "Team overview",
+  "w": 16,
+  "h": 16
+ },
+ {
+  "file": "remove-from-favorites.svg",
+  "ctx": "Remove from favorites",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "setup-team-notifications.svg",
+  "ctx": "Setup team notifications",
+  "w": 13.300048828125,
+  "h": 13.30000114440918
+ },
+ {
+  "file": "setup-team-notifications-2.svg",
+  "ctx": "Setup team notifications",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "in-test-workspace-bb-team-tes-view-dadas-0.svg",
+  "ctx": "in:/test-workspace-bb/team/TES/view/dadas-0",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "add-new-view.svg",
+  "ctx": "Add new view",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "add-filter.svg",
+  "ctx": "Add filter",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "display-options.svg",
+  "ctx": "Display options",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "open-details.svg",
+  "ctx": "Open details",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "collapse-group.svg",
+  "ctx": "Collapse group",
+  "w": 16,
+  "h": 16
+ },
+ {
+  "file": "unnamed-9.svg",
+  "ctx": "",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "create-new-issue-2.svg",
+  "ctx": "Create new issue",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "collapse-group-2.svg",
+  "ctx": "Collapse group",
+  "w": 16,
+  "h": 16
+ },
+ {
+  "file": "unnamed-10.svg",
+  "ctx": "",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "create-new-issue-3.svg",
+  "ctx": "Create new issue",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "collapse-group-3.svg",
+  "ctx": "Collapse group",
+  "w": 16,
+  "h": 16
+ },
+ {
+  "file": "unnamed-11.svg",
+  "ctx": "",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "create-new-issue-4.svg",
+  "ctx": "Create new issue",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "high-priority.svg",
+  "ctx": "High Priority",
+  "w": 16,
+  "h": 16
+ },
+ {
+  "file": "in-test-workspace-bb-issue-tes-59-normaliz.svg",
+  "ctx": "in:/test-workspace-bb/issue/TES-59/normaliz",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "in-test-workspace-bb-issue-tes-59-normaliz-2.svg",
+  "ctx": "in:/test-workspace-bb/issue/TES-59/normaliz",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "in-test-workspace-bb-issue-tes-59-normaliz-3.svg",
+  "ctx": "in:/test-workspace-bb/issue/TES-59/normaliz",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "open-project.svg",
+  "ctx": "Open project",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "in-test-workspace-bb-issue-tes-58-generate.svg",
+  "ctx": "in:/test-workspace-bb/issue/TES-58/generate",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "in-test-workspace-bb-issue-tes-54-increase.svg",
+  "ctx": "in:/test-workspace-bb/issue/TES-54/increase",
+  "w": 18,
+  "h": 18
+ },
+ {
+  "file": "open-project-2.svg",
+  "ctx": "Open project",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "medium-priority.svg",
+  "ctx": "Medium Priority",
+  "w": 16,
+  "h": 16
+ },
+ {
+  "file": "low-priority.svg",
+  "ctx": "Low Priority",
+  "w": 16,
+  "h": 16
+ },
+ {
+  "file": "close.svg",
+  "ctx": "Close",
+  "w": 12,
+  "h": 12
+ },
+ {
+  "file": "agent.svg",
+  "ctx": "Agent",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "chat-history.svg",
+  "ctx": "Chat history",
+  "w": 14,
+  "h": 14
+ },
+ {
+  "file": "unnamed-12.svg",
+  "ctx": "",
+  "w": 0,
+  "h": 0
+ },
+ {
+  "file": "unnamed-13.svg",
+  "ctx": "",
+  "w": 0,
+  "h": 0
+ }
+]

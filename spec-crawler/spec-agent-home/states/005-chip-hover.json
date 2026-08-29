@@ -1,0 +1,217 @@
+{
+  "url": "https://linear.app/test-workspace-bb/agent",
+  "scannedRules": 7251,
+  "unreadableSheets": 0,
+  "stateNames": [
+    "active",
+    "hover"
+  ],
+  "components": [
+    {
+      "label": "div.sx-euugli.sx-h8yej3.sx-78zum5",
+      "rect": {
+        "x": 988,
+        "y": 874,
+        "width": 96,
+        "height": 15
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "mask-image",
+              "from": "linear-gradient(to left, rgba(0, 0, 0, 0) 0px, rgb(0, 0, 0) 10px)",
+              "to": "linear-gradient(to left, rgba(0, 0, 0, 0) 16px, rgb(0, 0, 0) 32px)"
+            }
+          ],
+          "selectors": [
+            ".sx-1ynz0ij.sx-1ynz0ij:where(.sx-kkc0tb:active:not([data-agent-panel-hovered]) *)",
+            ".sx-smjy5n.sx-smjy5n:where(.sx-kkc0tb:active:not([data-agent-panel-hovered]) *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "mask-image",
+              "from": "linear-gradient(to left, rgba(0, 0, 0, 0) 0px, rgb(0, 0, 0) 10px)",
+              "to": "linear-gradient(to left, rgba(0, 0, 0, 0) 16px, rgb(0, 0, 0) 32px)"
+            }
+          ],
+          "selectors": [
+            ".sx-1ynz0ij.sx-1ynz0ij:where(.sx-kkc0tb:hover:not([data-agent-panel-hovered]) *)",
+            ".sx-smjy5n.sx-smjy5n:where(.sx-kkc0tb:hover:not([data-agent-panel-hovered]) *)"
+          ]
+        }
+      ],
+      "id": "s2636"
+    },
+    {
+      "label": "div.sx-78zum5.sx-6s0dn4.sx-1jnr06f",
+      "rect": {
+        "x": 980,
+        "y": 868,
+        "width": 112,
+        "height": 28
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            },
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-x2u0gl:not([data-active=\"true\"]):active:not([data-agent-panel-hovered])",
+            ".sx-1y6456u:not([data-active=\"true\"]):active:not([data-agent-panel-hovered])"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "background-color",
+              "from": "rgba(0, 0, 0, 0)",
+              "to": "var(--sx-16hn3q3)"
+            },
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-x2u0gl:not([data-active=\"true\"]):hover:not([data-agent-panel-hovered])",
+            ".sx-1y6456u:not([data-active=\"true\"]):hover:not([data-agent-panel-hovered])"
+          ]
+        }
+      ],
+      "id": "s2634"
+    },
+    {
+      "label": "span.sx-1j61x8r.sx-ggjnk3.sx-167xe44",
+      "rect": {
+        "x": 988,
+        "y": 874,
+        "width": 88,
+        "height": 15
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-kxc3uv.sx-kxc3uv:where(.sx-kkc0tb:active:not([data-agent-panel-hovered]) *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "color",
+              "from": "lch(60.621 1.2 272)",
+              "to": "var(--sx-ys2i3t)"
+            }
+          ],
+          "selectors": [
+            ".sx-kxc3uv.sx-kxc3uv:where(.sx-kkc0tb:hover:not([data-agent-panel-hovered]) *)"
+          ]
+        }
+      ],
+      "id": "s2637"
+    },
+    {
+      "label": "div.sx-10l6tqk.sx-wa60dl.sx-1cb1t30",
+      "rect": {
+        "x": 1072,
+        "y": 874,
+        "width": 16,
+        "height": 16
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "priority4"
+          ],
+          "changes": [
+            {
+              "property": "visibility",
+              "from": "hidden",
+              "to": "visible"
+            }
+          ],
+          "selectors": [
+            ".sx-sl23ga.sx-sl23ga:where(.sx-kkc0tb:active:not([data-agent-panel-hovered]) *)"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "priority4",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "visibility",
+              "from": "hidden",
+              "to": "visible"
+            }
+          ],
+          "selectors": [
+            ".sx-sl23ga.sx-sl23ga:where(.sx-kkc0tb:hover:not([data-agent-panel-hovered]) *)"
+          ]
+        }
+      ],
+      "id": "s2638"
+    }
+  ]
+}

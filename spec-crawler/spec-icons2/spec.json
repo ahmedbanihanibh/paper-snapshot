@@ -1,0 +1,35 @@
+{
+  "url": "https://linear.app/test-workspace-bb/agent/write-snmp-development-surface-project-update-09a52bcd3bdef",
+  "section": "Switcher + chat row menu",
+  "capturedAt": "2026-08-10T14:25:15.999Z",
+  "stateCount": 1,
+  "states": [
+    {
+      "id": "001-chat-switcher",
+      "name": "chat-switcher",
+      "tier": 3,
+      "level": 0,
+      "path": [],
+      "kind": "listbox",
+      "trigger": {
+        "label": "Chat switcher panel"
+      },
+      "rect": {
+        "x": 263,
+        "y": 49,
+        "width": 384,
+        "height": 519
+      },
+      "hash": "DIV.sx-1lmytr0.sx-8du1vd|DIV.sx-zjhap9.sx-nuq7ks|FORM.sx-rvj5dj.sx-6s0dn4|SPAN.sx-c342km.sx-1hyvwdk|INPUT.sx-889kno.sx-dvlbce|DIV.sx-78zum5.sx-vx4679|DIV.sx-1rohswg.sx-fk6m8|DIV.sx-7wzq59.sx-u96u03|UL.sx-1ghz6dp.sx-g0xzth|DIV.|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|DIV.sx-1j61x8r.sx-ggjnk3|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|DIV.sx-1j61x8r.sx-ggjnk3|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|DIV.sx-1j61x8r.sx-ggjnk3|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|DIV.sx-1j61x8r.sx-ggjnk3|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|DIV.sx-1j61x8r.sx-ggjnk3|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.sx-7wzq59.sx-u96u03",
+      "notes": "Chat switcher panel",
+      "frame": "frames/001-chat-switcher.html",
+      "jsx": "jsx/001-chat-switcher.jsx",
+      "shot": "shots/001-chat-switcher.png",
+      "shots": {
+        "surface": "shots/001-chat-switcher.png",
+        "context": "shots/001-chat-switcher@context.png"
+      },
+      "bytes": 328863
+    }
+  ]
+}

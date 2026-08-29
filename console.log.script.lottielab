@@ -1,0 +1,138 @@
+// ─── LOTTIELAB CLIPBOARD INSPECTOR ───────────────────────────────────────────
+
+// 1. COPY listener — fires when YOU copy something in the editor
+document.addEventListener('copy', (e) => {
+  console.group('%c📋 COPY EVENT', 'color: #4ade80; font-weight: bold; font-size: 14px');
+  
+  const items = e.clipboardData.items;
+  const types = e.clipboardData.types;
+  
+  console.log('%cAvailable types:', 'color: #facc15', [...types]);
+  
+  for (const type of types) {
+    const data = e.clipboardData.getData(type);
+    console.group(`%c▶ type: "${type}"`, 'color: #60a5fa');
+    console.log('raw length:', data.length);
+    console.log('raw value:', data);
+    
+    // Try to parse as HTML and extract all attributes
+    if (type === 'text/html') {
+      try {
+        const doc = new DOMParser().parseFromString(data, 'text/html');
+        const allElements = doc.body.querySelectorAll('*');
+        console.log('%cParsed HTML elements:', 'color: #a78bfa', allElements.length);
+        allElements.forEach(el => {
+          const attrs = [...el.attributes];
+          if (attrs.length > 0) {
+            console.log(`  <${el.tagName.toLowerCase()}>`, Object.fromEntries(attrs.map(a => [a.name, a.value.length > 100 ? a.value.slice(0, 100) + '...' : a.value])));
+          }
+          // Try base64 decode on every attribute value
+          attrs.forEach(attr => {
+            try {
+              const decoded = atob(attr.value);
+              console.log(`  %c🔓 base64 decoded attr "${attr.name}":`, 'color: #f97316', decoded.slice(0, 200));
+              // Try JSON parse
+              try {
+                const json = JSON.parse(decoded);
+                console.log(`  %c✅ parsed as JSON:`, 'color: #4ade80', json);
+              } catch {}
+            } catch {}
+          });
+        });
+      } catch(err) {
+        console.warn('HTML parse failed:', err);
+      }
+    }
+    
+    // Try to JSON parse plain text directly
+    if (type === 'text/plain') {
+      try {
+        const json = JSON.parse(data);
+        console.log('%c✅ text/plain is valid JSON:', 'color: #4ade80', json);
+      } catch {}
+      // Try base64 decode
+      try {
+        const decoded = atob(data);
+        console.log('%c🔓 text/plain base64 decoded:', 'color: #f97316', decoded.slice(0, 200));
+      } catch {}
+    }
+    
+    console.groupEnd();
+  }
+  
+  // Also dump items (may reveal custom MIME types not in types[])
+  console.group('%cclipboardData.items:', 'color: #e879f9');
+  for (const item of items) {
+    console.log(`kind: "${item.kind}", type: "${item.type}"`);
+    if (item.kind === 'string') {
+      item.getAsString(s => {
+        console.log(`  → string value (${s.length} chars):`, s.slice(0, 300));
+      });
+    }
+  }
+  console.groupEnd();
+  
+  console.groupEnd();
+}, true); // true = capture phase, runs before app handlers
+
+
+// 2. PASTE listener — fires when YOU paste into the editor
+document.addEventListener('paste', (e) => {
+  console.group('%c📌 PASTE EVENT', 'color: #f87171; font-weight: bold; font-size: 14px');
+  
+  const types = e.clipboardData.types;
+  console.log('%cAvailable types:', 'color: #facc15', [...types]);
+  
+  for (const type of types) {
+    const data = e.clipboardData.getData(type);
+    console.group(`%c▶ type: "${type}"`, 'color: #60a5fa');
+    console.log('raw length:', data.length);
+    
+    if (type === 'text/html') {
+      try {
+        const doc = new DOMParser().parseFromString(data, 'text/html');
+        const allElements = doc.body.querySelectorAll('*');
+        allElements.forEach(el => {
+          const attrs = [...el.attributes];
+          if (attrs.length > 0) {
+            console.log(`<${el.tagName.toLowerCase()}>`, Object.fromEntries(attrs.map(a => [a.name, a.value])));
+          }
+          attrs.forEach(attr => {
+            try {
+              const decoded = atob(attr.value);
+              console.log(`%c🔓 base64 decoded "${attr.name}":`, 'color: #f97316', decoded.slice(0, 500));
+              try { console.log('%c✅ JSON:', 'color: #4ade80', JSON.parse(decoded)); } catch {}
+            } catch {}
+          });
+        });
+      } catch {}
+    } else {
+      console.log('value:', data.slice(0, 500));
+    }
+    console.groupEnd();
+  }
+  
+  console.groupEnd();
+}, true);
+
+
+// 3. KEYDOWN sniffer — catch Cmd+C / Cmd+V before anything else
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && (e.key === 'c' || e.key === 'v' || e.key === 'x')) {
+    console.log(`%c⌨️  ${e.key.toUpperCase()} pressed`, 'color: #94a3b8; font-size: 11px', '— active element:', document.activeElement);
+  }
+}, true);
+
+
+console.log('%c✅ Clipboard inspector active. Now copy/paste something in the editor.', 
+  'color: #4ade80; font-weight: bold; padding: 4px 8px; background: #052e16; border-radius: 4px');
+VM180:127 ✅ Clipboard inspector active. Now copy/paste something in the editor.
+undefined
+VM180:122 ⌨️  V pressed — active element: <body style=​"overflow:​ auto;​ overscroll-behavior-x:​ none;​">​…​</body>​<div id=​"__next">​…​</div>​<div class=​"fixed w-full h-screen bg-editor-bg text-gray-200 font-editor overflow-hidden">​…​</div>​<div class=​"absolute w-screen h-screen inset-0 flex flex-col overflow-hidden">​…​</div>​flex<div class=​"flex flex-row flex-1 min-h-0">​…​</div>​flex<div class=​"z-30 pointer-events-none flex flex-row">​…​</div>​flex<div class=​"z-20 pointer-events-none w-side-panel h-full flex flex-col relative">​…​</div>​flex<div class=​"flex-1 p-10 relative">​…​</div>​<div class=​"z-20 pointer-events-none w-side-panel h-full flex flex-col relative">​…​</div>​flex<div class=​"flex-1 h-1">​…​</div>​<section class=​"w-full h-full select-none bg-editor-shell flex max-h-full pointer-events-auto text-xs text-editor-text border-l" aria-label=​"Properties panel">​…​</section>​flex<div class=​"w-full flex flex-col divide-y max-h-full">​…​</div>​flex<section class=​"bg-white rounded-2xl pl-2 flex flex-row gap-1 justify-end">​…​</section>​flex<div class=​"flex-1 min-h-0">​…​</div>​<div class=​"rc-scrollbars-container" style=​"position:​ relative;​ overflow:​ hidden;​ width:​ 100%;​ height:​ 100%;​ min-height:​ 100%;​ max-height:​ 100%;​">​…​</div>​<div class=​"rc-scrollbars-view" style=​"position:​ relative;​ overflow:​ scroll;​ margin-right:​ 0px;​ margin-bottom:​ 0px;​ min-height:​ calc(100% + 0px)​;​ max-height:​ calc(100% + 0px)​;​">​…​</div>​scroll<div class=​"px-1 pb-16">​…​</div>​<div class=​"flex flex-col gap-2 relative">​…​</div>​flex<div class=​"sticky top-0 bg-editor-shell z-10">​…​</div>​<div class=​"flex flex-col gap-2">​…​</div>​flex<ul aria-label=​"Alignment section" class=​"list-none flex items-center justify-between p-2">​…​</ul>​flex<div class=​"flex flex-col gap-2 group/​advtrans">​…​</div>​flex<div class=​"w-full border-t border-gray-200">​</div>​<section aria-labelledby=​"fill-section-title">​…​</section>​<div class=​"w-full border-t border-gray-200">​</div>​<section>​…​</section>​<div class=​"w-full border-t border-gray-200">​</div>​<div class=​"flex flex-col gap-2 group/​advtrans">​…​</div>​flex<div class=​"font-medium px-3 py-1 ">​Orientation​</div>​<div>​…​</div>​<div>​…​</div>​<div class=​"flex justify-between items-center py-1 px-3">​…​</div>​flex<div class=​"text-editor-property-label">​Position​</div>​<div class=​"flex gap-2">​…​</div>​flex<span>​…​</span>​<div class=​"font-mono relative w-[64px]​ h-property-field flex flex-row items-center justify-center rounded bg-editor-bg ring-editor-secondary ring-opacity-50 hover:​ring-1 focus-within:​ring-1 focus-within:​ring-editor-selected">​…​</div>​flex<label class=​"flex flex-row py-0.5">​…​</label>​flex<input type=​"text" class=​"max-w-full w-full bg-transparent outline-none focus:​text-editor-selected ml-2.5" aria-label=​"Position x" value=​"510.83">​</label>​<div class=​"absolute w-full h-full cursor-ew-resize">​</div>​</div>​</span>​<span>​…​</span>​<div class=​"font-mono relative w-[64px]​ h-property-field flex flex-row items-center justify-center rounded bg-editor-bg ring-editor-secondary ring-opacity-50 hover:​ring-1 focus-within:​ring-1 focus-within:​ring-editor-selected">​…​</div>​flex<label class=​"flex flex-row py-0.5">​…​</label>​flex<input type=​"text" class=​"max-w-full w-full bg-transparent outline-none focus:​text-editor-selected ml-2.5" aria-label=​"Position y" value=​"498.38">​</label>​<div class=​"absolute w-full h-full cursor-ew-resize">​</div>​</div>​</span>​</div>​</div>​</div>​<div class=​"flex justify-between items-center py-1 px-3">​…​</div>​flex<div class=​"text-editor-property-label">​Rotation​</div>​<span>​…​</span>​<div class=​"font-mono relative w-[64px]​ h-property-field flex flex-row items-center justify-center rounded bg-editor-bg ring-editor-secondary ring-opacity-50 hover:​ring-1 focus-within:​ring-1 focus-within:​ring-editor-selected">​…​</div>​flex<label class=​"flex flex-row py-0.5">​…​</label>​flex<input type=​"text" class=​"max-w-full w-full bg-transparent outline-none focus:​text-editor-selected ml-2.5" aria-label=​"Rotation" value=​"0 °">​</label>​<div class=​"absolute w-full h-full cursor-ew-resize">​</div>​</div>​</span>​</div>​<div class=​"flex justify-between py-1 px-3 gap-1">​…​</div>​flex<div class=​"flex flex-grow justify-between items-center">​…​</div>​flex<div class=​"flex gap-2">​…​</div>​flex<span>​…​</span>​<div class=​"font-mono relative w-[64px]​ h-property-field flex flex-row items-center justify-center rounded bg-editor-bg ring-editor-secondary ring-opacity-50 hover:​ring-1 focus-within:​ring-1 focus-within:​ring-editor-selected">​…​</div>​flex<label class=​"flex flex-row py-0.5">​…​</label>​flex<input type=​"text" class=​"max-w-full w-full bg-transparent outline-none focus:​text-editor-selected ml-2.5" aria-label=​"Scale x" value=​"100&thinsp;​%">​</label>​<div class=​"absolute w-full h-full cursor-ew-resize">​</div>​</div>​</span>​<span>​…​</span>​<div class=​"font-mono relative w-[64px]​ h-property-field flex flex-row items-center justify-center rounded bg-editor-bg ring-editor-secondary ring-opacity-50 hover:​ring-1 focus-within:​ring-1 focus-within:​ring-editor-selected">​…​</div>​flex<label class=​"flex flex-row py-0.5">​…​</label>​flex<input type=​"text" class=​"max-w-full w-full bg-transparent outline-none focus:​text-editor-selected ml-2.5" aria-label=​"Scale y" value=​"100&thinsp;​%">​</label>​<div class=​"absolute w-full h-full cursor-ew-resize">​</div>​</div>​</span>​</div>​</div>​<div class=​"flex justify-between items-center py-1 px-3">​…​</div>​flex<div class=​"text-editor-property-label">​Skew​</div>​<div class=​"flex gap-2">​…​</div>​flex<span>​…​</span>​<div class=​"font-mono relative w-[64px]​ h-property-field flex flex-row items-center justify-center rounded bg-editor-bg ring-editor-secondary ring-opacity-50 hover:​ring-1 focus-within:​ring-1 focus-within:​ring-editor-selected">​…​</div>​flex<label class=​"flex flex-row py-0.5">​…​</label>​flex<span class=​"w-5 h-5 flex flex-col text-center justify-center mx-1 text-editor-secondary cursor-col-resize">​…​</span>​flex<input type=​"text" class=​"max-w-full w-full bg-transparent outline-none focus:​text-editor-selected" aria-label=​"Skew angle" value=​"0 °">​</label>​<div class=​"absolute w-full h-full cursor-ew-resize">​</div>​</div>​</span>​<span>​…​</span>​<div class=​"font-mono relative w-[64px]​ h-property-field flex flex-row items-center justify-center rounded bg-editor-bg ring-editor-secondary ring-opacity-50 hover:​ring-1 focus-within:​ring-1 focus-within:​ring-editor-selected">​…​</div>​flex<label class=​"flex flex-row py-0.5">​…​</label>​flex<span class=​"w-5 h-5 flex flex-col text-center justify-center mx-1 text-editor-secondary cursor-col-resize">​…​</span>​flex<input type=​"text" class=​"max-w-full w-full bg-transparent outline-none focus:​text-editor-selected" aria-label=​"Skew direction" value=​"0 °">​</label>​<div class=​"absolute w-full h-full cursor-ew-resize">​</div>​</div>​</span>​</div>​</div>​<div>​…​</div>​<div class=​"flex justify-between py-1 px-3 gap-1">​…​</div>​flex<div class=​"flex flex-grow h-fit justify-between">​…​</div>​flex<div class=​"flex gap-2">​…​</div>​flex<div class=​"flex flex-col gap-2">​…​</div>​flex<span>​…​</span>​<div class=​"font-mono relative w-[64px]​ h-property-field flex flex-row items-center justify-center rounded bg-editor-bg ring-editor-secondary ring-opacity-50 bg-gray-100 cursor-not-allowed">​…​</div>​flex<label class=​"flex flex-row py-0.5">​…​</label>​flex<input type=​"text" class=​"max-w-full w-full bg-transparent outline-none focus:​text-editor-selected ml-2.5 text-gray-400" disabled aria-label=​"Anchor x" value=​"510.83">​</label>​<div class=​"absolute w-full h-full cursor-ew-resize">​</div>​</div>​</span>​<span>​…​</span>​<div class=​"font-mono relative w-[64px]​ h-property-field flex flex-row items-center justify-center rounded bg-editor-bg ring-editor-secondary ring-opacity-50 bg-gray-100 cursor-not-allowed">​…​</div>​flex<label class=​"flex flex-row py-0.5">​…​</label>​flex<input type=​"text" class=​"max-w-full w-full bg-transparent outline-none focus:​text-editor-selected ml-2.5 text-gray-400" disabled aria-label=​"Anchor y" value=​"498.38">​</label>​<div class=​"absolute w-full h-full cursor-ew-resize">​</div>​</div>​</span>​</div>​<div class=​"flex justify-center">​…​</div>​flex</div>​</div>​</div>​</div>​</div>​<div class=​"w-full border-t border-gray-200">​</div>​<div class=​"flex flex-col gap-2">​…​</div>​flex<div class=​"font-medium px-3 py-1 ">​Appearance​</div>​<div class=​"flex flex-col">​…​</div>​flex<div class=​"flex justify-between items-center py-1 px-3">​…​</div>​flex<div class=​"text-editor-property-label">​Opacity​</div>​<span>​…​</span>​<div class=​"font-mono relative w-[64px]​ h-property-field flex flex-row items-center justify-center rounded bg-editor-bg ring-editor-secondary ring-opacity-50 hover:​ring-1 focus-within:​ring-1 focus-within:​ring-editor-selected">​…​</div>​flex<label class=​"flex flex-row py-0.5">​…​</label>​flex<input type=​"text" class=​"max-w-full w-full bg-transparent outline-none focus:​text-editor-selected ml-2.5" aria-label=​"Opacity" value=​"100&thinsp;​%">​</label>​<div class=​"absolute w-full h-full cursor-ew-resize">​</div>​</div>​</span>​</div>​<div class=​"flex justify-between items-center py-1 px-3 ">​…​</div>​flex<div class=​"flex justify-between items-center py-1 px-3">​…​</div>​flex</div>​</div>​<div class=​"w-full border-t border-gray-200">​</div>​<section class=​"flex flex-col">​…​</section>​flex<div class=​"w-full border-t border-gray-200">​</div>​<div class=​"pb-1 flex flex-col gap-2">​…​</div>​flex<div class=​"font-medium px-3 py-1 ">​Colors in selected layers (showing 5/15)​</div>​<ol aria-label=​"Colors in use" class=​"px-3 flex flex-col gap-1">​…​</ol>​flex<li class=​"group flex gap-2">​…​</li>​flex<label class=​"flex flex-row rounded bg-editor-bg h-property-field hover:​ring-1 ring-editor-property-label ring-opacity-50 py-0.5 w-24">​…​</label>​flex<div aria-label=​"Color Badge" role=​"button" aria-details=​"#353535" class=​"relative overflow-clip rounded cursor-pointer h-3.5 my-auto ml-[5px]​ mr-2 border border-editor-text" style=​"aspect-ratio:​ 1 /​ 1;​ background:​ rgb(53, 53, 53)​;​">​…​</div>​<input class=​"focus:​text-editor-selected bg-transparent focus:​ring-transparent focus:​outline-none focus:​border-none border-none" placeholder type=​"text" aria-label=​"Hex input" value=​"#353535">​</label>​<button class=​"opacity-0 hover:​text-ui-primary group-hover:​opacity-100" aria-label=​"Select layers using this color">​…​</button>​</li>​<li class=​"group flex gap-2">​…​</li>​flex<label class=​"flex flex-row rounded bg-editor-bg h-property-field hover:​ring-1 ring-editor-property-label ring-opacity-50 py-0.5 w-24">​…​</label>​flex<div aria-label=​"Color Badge" role=​"button" aria-details=​"#727272" class=​"relative overflow-clip rounded cursor-pointer h-3.5 my-auto ml-[5px]​ mr-2 border border-editor-text" style=​"aspect-ratio:​ 1 /​ 1;​ background:​ rgb(114, 114, 114)​;​">​…​</div>​<input class=​"focus:​text-editor-selected bg-transparent focus:​ring-transparent focus:​outline-none focus:​border-none border-none" placeholder type=​"text" aria-label=​"Hex input" value=​"#727272">​</label>​<button class=​"opacity-0 hover:​text-ui-primary group-hover:​opacity-100" aria-label=​"Select layers using this color">​…​</button>​</li>​<li class=​"group flex gap-2">​…​</li>​flex<label class=​"flex flex-row rounded bg-editor-bg h-property-field hover:​ring-1 ring-editor-property-label ring-opacity-50 py-0.5 w-24">​…​</label>​flex<div aria-label=​"Color Badge" role=​"button" aria-details=​"#2c2c2c" class=​"relative overflow-clip rounded cursor-pointer h-3.5 my-auto ml-[5px]​ mr-2 border border-editor-text" style=​"aspect-ratio:​ 1 /​ 1;​ background:​ rgb(44, 44, 44)​;​">​…​</div>​<input class=​"focus:​text-editor-selected bg-transparent focus:​ring-transparent focus:​outline-none focus:​border-none border-none" placeholder type=​"text" aria-label=​"Hex input" value=​"#2c2c2c">​</label>​<button class=​"opacity-0 hover:​text-ui-primary group-hover:​opacity-100" aria-label=​"Select layers using this color">​…​</button>​</li>​<li class=​"group flex gap-2">​…​</li>​flex<label class=​"flex flex-row rounded bg-editor-bg h-property-field hover:​ring-1 ring-editor-property-label ring-opacity-50 py-0.5 w-24">​…​</label>​flex<div aria-label=​"Color Badge" role=​"button" aria-details=​"#ffffff" class=​"relative overflow-clip rounded cursor-pointer h-3.5 my-auto ml-[5px]​ mr-2 border border-editor-text" style=​"aspect-ratio:​ 1 /​ 1;​ background:​ rgb(255, 255, 255)​;​">​…​</div>​<input class=​"focus:​text-editor-selected bg-transparent focus:​ring-transparent focus:​outline-none focus:​border-none border-none" placeholder type=​"text" aria-label=​"Hex input" value=​"#ffffff">​</label>​<button class=​"opacity-0 hover:​text-ui-primary group-hover:​opacity-100" aria-label=​"Select layers using this color">​…​</button>​</li>​<li class=​"group flex gap-2">​…​</li>​flex<label class=​"flex flex-row rounded bg-editor-bg h-property-field hover:​ring-1 ring-editor-property-label ring-opacity-50 py-0.5 w-24">​…​</label>​flex<button class=​"opacity-0 hover:​text-ui-primary group-hover:​opacity-100" aria-label=​"Select layers using this color">​…​</button>​</li>​</ol>​<button class=​"px-3 hover:​text-ui-primary">​…​</button>​</div>​</div>​</div>​</div>​</div>​<div class=​"rc-scrollbars-track rc-scrollbars-track-h" style=​"position:​ absolute;​ right:​ 2px;​ bottom:​ 2px;​ z-index:​ 100;​ border-radius:​ 3px;​ left:​ 2px;​ height:​ 6px;​ transition:​ opacity 200ms;​ opacity:​ 0;​ display:​ none;​">​…​</div>​<div class=​"rc-scrollbars-track rc-scrollbars-track-v" style=​"position:​ absolute;​ right:​ 2px;​ bottom:​ 2px;​ z-index:​ 100;​ border-radius:​ 3px;​ top:​ 2px;​ width:​ 6px;​ transition:​ opacity 200ms;​ opacity:​ 0;​ display:​ none;​">​…​</div>​</div>​</div>​</div>​</section>​</div>​</div>​</div>​<section class=​"group/​timeline flex flex-col relative z-30 select-none text-timeline-normal border-t" aria-label=​"Timeline" style=​"padding-top:​ 56px;​">​…​</section>​flex</div>​<div class=​"touch-none select-none" role=​"application">​…​</div>​<div class=​"top-0 left-0 absolute w-full h-full pointer-events-none z-10 overflow-hidden">​</div>​<div id=​"comments" class=​"text-editor-text text-xs absolute top-0 left-0 w-full h-full z-10 pointer-events-none">​</div>​</div>​<div class=​"sm:​hidden absolute top-0 left-0 flex flex-col min-h-screen w-screen h-screen bg-white items-center justify-center px-8" style=​"z-index:​ 1000;​">​…​</div>​<div class=​"fixed inset-0 bg-gray-100 bg-opacity-60 transition-opacity p-4 pointer-events-none hidden" style=​"z-index:​ 60;​">​…​</div>​<div style=​"position:​ fixed;​ z-index:​ 9999;​ inset:​ 16px;​ pointer-events:​ none;​">​</div>​</div>​<script id=​"__NEXT_DATA__" type=​"application/​json">​…​</script>​<script id=​"_next-gtm-init" data-nscript=​"afterInteractive">​…​</script>​<script src=​"https:​/​/​www.googletagmanager.com/​gtm.js?id=AW-16542354329" id=​"_next-gtm" data-ntpc=​"GTM" data-nscript=​"afterInteractive">​</script>​<script src=​"https:​/​/​accounts.google.com/​gsi/​client" async defer>​</script>​<next-route-announcer>​…​</next-route-announcer>​<script src=​"/​_next/​static/​chunks/​1a31c4b6-4d09bbb541542082.js">​</script>​<script src=​"/​_next/​static/​chunks/​cbdb7765-b28006307cccb652.js">​</script>​<script src=​"/​_next/​static/​chunks/​82f64d96-a488c1da3f90dcc1.js">​</script>​<script src=​"/​_next/​static/​chunks/​9894-306eb66c9b073472.js">​</script>​<script src=​"/​_next/​static/​chunks/​1101-bdf93e791313eaa3.js">​</script>​<script src=​"/​_next/​static/​chunks/​1141-8d1f2470e74180ee.js">​</script>​<script src=​"/​_next/​static/​chunks/​8903-b135d806548a393d.js">​</script>​<script src=​"/​_next/​static/​chunks/​8383-1aad5e85800f4d88.js">​</script>​<script src=​"/​_next/​static/​chunks/​5202-09677c32376aa0c2.js">​</script>​<script src=​"/​_next/​static/​chunks/​2777-5adbceb2b5cddaa4.js">​</script>​<script src=​"/​_next/​static/​chunks/​3054-9c9c922c76b3657c.js">​</script>​<script src=​"/​_next/​static/​chunks/​5225-6757ae7fb2ddb8aa.js">​</script>​<script src=​"/​_next/​static/​chunks/​784-fa1952ad882e1e01.js">​</script>​<script src=​"/​_next/​static/​chunks/​9778-0821deae374a11dd.js">​</script>​<script src=​"/​_next/​static/​chunks/​pages/​dashboard/​team/​%5Bteam_id%5D/​project/​%5Bid%5D-f8cd4ed5d45378b1.js">​</script>​<script src=​"/​_next/​static/​chunks/​ea88be26-b31ca0c979711532.js">​</script>​<script src=​"/​_next/​static/​chunks/​849baa33-fd77fbc4ced43912.js">​</script>​<script src=​"/​_next/​static/​chunks/​456144eb-df036e7bf4cc1884.js">​</script>​<script src=​"/​_next/​static/​chunks/​5145-7d74575ee1ad1ce5.js">​</script>​<script src=​"/​_next/​static/​chunks/​2794-141e1fa48be12f3f.js">​</script>​<script src=​"/​_next/​static/​chunks/​3345-9051dc4621aa0421.js">​</script>​<script src=​"/​_next/​static/​chunks/​686-36f5052514d3648f.js">​</script>​<script src=​"/​_next/​static/​chunks/​6612-931ab6d80d254638.js">​</script>​<script src=​"/​_next/​static/​chunks/​3411-d88ea790ec2ef4fe.js">​</script>​<script src=​"/​_next/​static/​chunks/​6703-21e88e9eb42c3cdb.js">​</script>​<script src=​"/​_next/​static/​chunks/​7203-7d5dd08554e5a84d.js">​</script>​<script src=​"/​_next/​static/​chunks/​94-36f0b01488a08cb1.js">​</script>​<script src=​"/​_next/​static/​chunks/​pages/​editor-fc716eab844a3b86.js">​</script>​<script src=​"/​_next/​static/​chunks/​9393-cfcd0f1c31d9a287.js">​</script>​<script src=​"/​_next/​static/​chunks/​pages/​dashboard/​team/​%5Bteam_id%5D/​home-5cee6359b7f0d2e3.js">​</script>​<script src=​"/​_next/​static/​chunks/​pages/​dashboard/​team/​%5Bteam_id%5D/​templates/​%5Bcategory%5D-4861e32e6c045dc3.js">​</script>​<script src=​"/​_next/​static/​chunks/​pages/​dashboard/​team/​%5Bteam_id%5D/​recent-92c445caf1b2acd8.js">​</script>​<script src=​"/​_next/​static/​chunks/​pages/​upgrade-b0d97c1212c7788f.js">​</script>​<img id=​"file-drag-preview" src=​"data:​image/​gif;​base64,R0lGO…EBAAAACwAAAAAAQABAAACAkQBADs=">​<script src=​"/​_next/​static/​chunks/​3662-7caaf0eba2cbf52b.js">​</script>​<script src=​"/​_next/​static/​chunks/​5110-573500dda7bae6da.js">​</script>​<script src=​"/​_next/​static/​chunks/​3109-ef0207e4a8513ca2.js">​</script>​<script src=​"/​_next/​static/​chunks/​pages/​template/​%5Bslug%5D-222f73501c16c0ab.js">​</script>​</body>​
+VM180:81 📌 PASTE EVENT
+VM180:84 Available types: ['text/html']
+VM180:88 ▶ type: "text/html"
+VM180:89 raw length: 305155
+VM180:98 <div> {id: 'lottielab-paste'}
+VM180:98 <span> {id: 'layers', data-contents: '%5B%7B%22layerType%22%3A%22group-layer%22%2C%22nam…2%3Afalse%7D%5D%2C%22animations%22%3A%5B%5D%7D%5D'}
+VM180:103 🔓 base64 decoded "id": ¬®

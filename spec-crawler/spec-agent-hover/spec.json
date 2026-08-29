@@ -1,0 +1,72 @@
+{
+  "url": "https://linear.app/test-workspace-bb/agent",
+  "section": "Sidebar › Agent — hover + tooltip",
+  "capturedAt": "2026-08-10T13:15:43.352Z",
+  "stateCount": 2,
+  "states": [
+    {
+      "id": "001-sidebar-agent-tooltip",
+      "name": "sidebar-agent-tooltip",
+      "tier": 3,
+      "level": 0,
+      "path": [],
+      "kind": "tooltip",
+      "trigger": {
+        "label": "Hover the sidebar Agent row"
+      },
+      "rect": {
+        "width": 157,
+        "height": 34
+      },
+      "hash": "DIV.sx-ixxii4.sx-r3buco|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.sx-1lmytr0.sx-8du1vd|DIV.sx-78zum5.sx-1q0g3np|DIV.sx-1nzvdvg|SPAN.sx-uxw1ft.sx-3nfvp2",
+      "notes": "Tooltip on hover: \"Go to Agent\" plus its keyboard shortcut. Portals outside the sidebar and needs ~700ms of pointer rest.",
+      "cssStates": {
+        "components": 0,
+        "stateNames": []
+      },
+      "frame": "frames/001-sidebar-agent-tooltip.html",
+      "jsx": "jsx/001-sidebar-agent-tooltip.jsx",
+      "shot": "shots/001-sidebar-agent-tooltip.png",
+      "shots": {
+        "surface": "shots/001-sidebar-agent-tooltip.png",
+        "context": "shots/001-sidebar-agent-tooltip@context.png"
+      },
+      "states": "states/001-sidebar-agent-tooltip.json",
+      "bytes": 14089
+    },
+    {
+      "id": "002-sidebar-agent-hover-with-tooltip",
+      "name": "sidebar-agent-hover-with-tooltip",
+      "tier": 3,
+      "level": 0,
+      "path": [],
+      "kind": "sidebar-item",
+      "trigger": {
+        "label": "Hover the sidebar Agent row"
+      },
+      "rect": {
+        "width": 440,
+        "height": 58
+      },
+      "hash": "DIV.sx-1n2onr6.sx-2u8bby|DIV.|DIV.|DIV.sx-vx4679.sx-1q0g3np|DIV.",
+      "notes": "The hovered row and its tooltip in place",
+      "cssStates": {
+        "components": 3,
+        "stateNames": [
+          "active",
+          "focus-visible",
+          "hover"
+        ]
+      },
+      "frame": "frames/002-sidebar-agent-hover-with-tooltip.html",
+      "jsx": "jsx/002-sidebar-agent-hover-with-tooltip.jsx",
+      "shot": "shots/002-sidebar-agent-hover-with-tooltip.png",
+      "shots": {
+        "surface": "shots/002-sidebar-agent-hover-with-tooltip.png",
+        "context": "shots/002-sidebar-agent-hover-with-tooltip@context.png"
+      },
+      "states": "states/002-sidebar-agent-hover-with-tooltip.json",
+      "bytes": 14589
+    }
+  ]
+}

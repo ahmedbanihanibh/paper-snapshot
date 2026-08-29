@@ -1,0 +1,124 @@
+{
+  "from": "s2629",
+  "to": "s2697",
+  "phases": [
+    {
+      "label": "hover",
+      "phase": 0,
+      "surfaces": []
+    },
+    {
+      "label": "grab",
+      "phase": 0.05,
+      "surfaces": [
+        {
+          "id": "s3164",
+          "role": null,
+          "rect": {
+            "x": 12,
+            "y": 288,
+            "width": 220,
+            "height": 29
+          },
+          "portalled": false,
+          "label": "test ahmed"
+        }
+      ]
+    },
+    {
+      "label": "drag-10%",
+      "phase": 0.1,
+      "surfaces": [
+        {
+          "id": "s3164",
+          "role": null,
+          "rect": {
+            "x": 12,
+            "y": 302,
+            "width": 220,
+            "height": 29
+          },
+          "portalled": false,
+          "label": "test ahmed"
+        }
+      ]
+    },
+    {
+      "label": "drag-50%",
+      "phase": 0.5,
+      "surfaces": [
+        {
+          "id": "s3164",
+          "role": null,
+          "rect": {
+            "x": 12,
+            "y": 359,
+            "width": 220,
+            "height": 29
+          },
+          "portalled": false,
+          "label": "test ahmed"
+        },
+        {
+          "id": "s3175",
+          "role": null,
+          "rect": {
+            "x": 12,
+            "y": 345,
+            "width": 220,
+            "height": 30
+          },
+          "portalled": false,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "label": "drag-100%",
+      "phase": 1,
+      "surfaces": [
+        {
+          "id": "s3164",
+          "role": null,
+          "rect": {
+            "x": 12,
+            "y": 431,
+            "width": 220,
+            "height": 29
+          },
+          "portalled": false,
+          "label": "test ahmed"
+        },
+        {
+          "id": "s3178",
+          "role": null,
+          "rect": {
+            "x": 12,
+            "y": 431,
+            "width": 220,
+            "height": 30
+          },
+          "portalled": false,
+          "label": ""
+        }
+      ]
+    },
+    {
+      "label": "drop",
+      "phase": 1,
+      "surfaces": []
+    },
+    {
+      "label": "settled",
+      "phase": 1,
+      "surfaces": []
+    }
+  ],
+  "dragOverlay": {
+    "ids": [
+      "s3164",
+      "s3175"
+    ],
+    "note": "Surfaces present only while dragging — the overlay/indicator."
+  }
+}

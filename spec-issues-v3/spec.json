@@ -1,0 +1,177 @@
+{
+  "url": "https://linear.app/test-workspace-bb/team/TES/all",
+  "capturedAt": "2026-08-11T00:06:58.401Z",
+  "stateCount": 5,
+  "states": [
+    {
+      "id": "001-issue-row-hover",
+      "name": "issue-row-hover",
+      "tier": 3,
+      "kind": "agent-captured",
+      "notes": "Pointer resting on the TES-27 row in the All issues list. Captures the hover wash and any affordance that only exists while hovered.",
+      "hash": "A._gridRowShared_1bk15_65|DIV.sx-rvj5dj.sx-4w6khx|DIV.|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-1n2onr6|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-vx4679|SPAN.sx-78zum5.sx-vx4679|DIV._deprioritizedRendering_1cau4_1|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-vx4679.sx-1q0g3np|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.",
+      "path": [],
+      "frame": "frames/001-issue-row-hover.html",
+      "jsx": "jsx/001-issue-row-hover.jsx",
+      "shot": "shots/001-issue-row-hover.png",
+      "shots": {
+        "surface": "shots/001-issue-row-hover.png"
+      },
+      "bytes": 65391
+    },
+    {
+      "id": "002-issues-list-in-context",
+      "name": "issues-list-in-context",
+      "tier": 3,
+      "kind": "agent-captured",
+      "notes": "The All issues view at rest, whole viewport — group headers, rows, toolbar and sidebar together, so anchoring and column alignment are visible.",
+      "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-13vifvy.sx-u96u03|DIV.sx-ixxii4.sx-67bb7w|DIV.",
+      "path": [],
+      "frame": "frames/002-issues-list-in-context.html",
+      "jsx": "jsx/002-issues-list-in-context.jsx",
+      "shot": "shots/002-issues-list-in-context.png",
+      "shots": {
+        "surface": "shots/002-issues-list-in-context.png"
+      },
+      "bytes": 2289456
+    },
+    {
+      "id": "003-display-options-panel",
+      "name": "display-options-panel",
+      "tier": 3,
+      "kind": "agent-captured",
+      "notes": "The Display options panel, 300x533 anchored at x=1089 y=93. Opened from the toolbar button. It is an INLINE panel, not a portalled overlay: harvestSurfaces reports no new surface, and the whole-page dedupe hash does not change when it opens, so it must be captured scoped to its own container.",
+      "hash": "DIV.sx-78zum5.sx-vx4679|DIV.sx-1n2onr6.sx-2lah0s|DIV.|DIV.sx-78zum5.sx-vx4679|DIV.|DIV.sx-78zum5.sx-vx4679|DIV.sx-78zum5.sx-vx4679|DIV.sx-78zum5.sx-vx4679|DIV.sx-78zum5.sx-vx4679|DIV.sx-1n2onr6.sx-2lah0s|DIV.|DIV.sx-78zum5.sx-vx4679|DIV.sx-78zum5.sx-vx4679|DIV.sx-78zum5.sx-vx4679|DIV.sx-1n2onr6.sx-2lah0s|DIV.|DIV.sx-78zum5.sx-vx4679|SPAN.sx-1j61x8r.sx-ggjnk3|DIV.sx-78zum5.sx-vx4679|DIV.sx-78zum5.sx-vx4679|DIV.sx-78zum5.sx-vx4679|DIV.|DIV.",
+      "path": [],
+      "frame": "frames/003-display-options-panel.html",
+      "jsx": "jsx/003-display-options-panel.jsx",
+      "shot": "shots/003-display-options-panel.png",
+      "shots": {
+        "surface": "shots/003-display-options-panel.png"
+      },
+      "bytes": 252494
+    },
+    {
+      "id": "004-add-filter",
+      "name": "Add filter",
+      "tier": 2,
+      "level": 0,
+      "path": [],
+      "kind": "listbox",
+      "roleEvidence": {
+        "triggerHasPopup": null,
+        "innerRole": "listbox",
+        "containerRole": "dialog"
+      },
+      "detectedBy": "revealed",
+      "trigger": {
+        "label": "Add filter",
+        "role": null,
+        "hasPopup": null
+      },
+      "rect": {
+        "x": 1222,
+        "y": 57,
+        "width": 207,
+        "height": 834
+      },
+      "anchor": {
+        "side": "left",
+        "align": "center",
+        "gap": -101,
+        "triggerRect": {
+          "x": 1328,
+          "y": 60,
+          "width": 28,
+          "height": 28
+        },
+        "surfaceRect": {
+          "x": 1222,
+          "y": 57,
+          "width": 207,
+          "height": 834
+        }
+      },
+      "hash": "DIV.sx-1lmytr0.sx-8du1vd|DIV.sx-zjhap9.sx-nuq7ks|FORM.sx-rvj5dj.sx-6s0dn4|SPAN.sx-c342km.sx-1hyvwdk|INPUT.sx-889kno.sx-dvlbce|SPAN.sx-uxw1ft.sx-3nfvp2|SPAN.sx-3nfvp2.sx-6s0dn4|DIV.sx-1rohswg.sx-fk6m8|UL.sx-1ghz6dp.sx-g0xzth|DIV.|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.",
+      "cssStates": {
+        "components": 0,
+        "stateNames": []
+      },
+      "frame": "frames/004-add-filter.html",
+      "jsx": "jsx/004-add-filter.jsx",
+      "shot": "shots/004-add-filter.png",
+      "shots": {
+        "surface": "shots/004-add-filter.png",
+        "context": "shots/004-add-filter@context.png",
+        "trigger": "shots/004-add-filter@trigger.png"
+      },
+      "states": "states/004-add-filter.json",
+      "bytes": 390468
+    },
+    {
+      "id": "005-create-new-issue",
+      "name": "Create new issue",
+      "tier": 2,
+      "level": 0,
+      "path": [],
+      "kind": "menu",
+      "roleEvidence": {
+        "triggerHasPopup": "menu",
+        "innerRole": null,
+        "containerRole": "dialog"
+      },
+      "detectedBy": "revealed",
+      "trigger": {
+        "label": "Create new issue",
+        "role": null,
+        "hasPopup": "menu"
+      },
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 900
+      },
+      "anchor": {
+        "side": "left",
+        "align": "end",
+        "gap": -48,
+        "triggerRect": {
+          "x": 1392,
+          "y": 102,
+          "width": 24,
+          "height": 24
+        },
+        "surfaceRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      },
+      "hash": "DIV.sx-10l6tqk.sx-u96u03|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.sx-1lmytr0.sx-xbqdvw|DIV.sx-78zum5.sx-vx4679|FORM.sx-mz0i5r.sx-78zum5",
+      "cssStates": {
+        "components": 24,
+        "stateNames": [
+          "[data-disabled=\"true\"]",
+          "active",
+          "checked",
+          "disabled",
+          "enabled",
+          "focus-visible",
+          "hover"
+        ]
+      },
+      "frame": "frames/005-create-new-issue.html",
+      "jsx": "jsx/005-create-new-issue.jsx",
+      "shot": "shots/005-create-new-issue.png",
+      "shots": {
+        "surface": "shots/005-create-new-issue.png",
+        "context": "shots/005-create-new-issue@context.png",
+        "trigger": "shots/005-create-new-issue@trigger.png"
+      },
+      "states": "states/005-create-new-issue.json",
+      "bytes": 224755
+    }
+  ]
+}

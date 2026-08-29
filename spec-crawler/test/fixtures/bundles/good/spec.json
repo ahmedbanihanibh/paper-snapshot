@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 2,
+  "manifestRevision": 1,
+  "title": "scenario fixture bundle",
+  "provenance": {
+    "sourceSchemaVersion": 2,
+    "format": "spec-crawler-artifact"
+  },
+  "stateCount": 1,
+  "states": [
+    {
+      "id": "001-menu",
+      "name": "menu",
+      "sequence": 1,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 200,
+        "height": 64
+      },
+      "frame": "frames/001-menu.html",
+      "states": "states/001-menu.json",
+      "artifacts": [
+        {
+          "id": "001-menu:frame",
+          "kind": "frame",
+          "path": "frames/001-menu.html",
+          "bytes": 52,
+          "sha256": "13df65c79c26d754ec74e100f1330b4bd3e5dcbb49bd148c0cdb2c95cb9767ec"
+        },
+        {
+          "id": "001-menu:states",
+          "kind": "state-matrix",
+          "path": "states/001-menu.json",
+          "bytes": 82,
+          "sha256": "33287141673cf5f029c151298c93456f804d36b97463e6d21d6675a274f60d48"
+        }
+      ]
+    }
+  ]
+}

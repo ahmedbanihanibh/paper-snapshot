@@ -1,0 +1,1192 @@
+{
+ "url": "https://linear.app/test-workspace-bb/inbox",
+ "capturedAt": "2026-08-11T15:18:24.444Z",
+ "stateCount": 33,
+ "states": [
+  {
+   "id": "001-my-workspace-workspace-menu",
+   "name": "My Workspace Workspace Menu",
+   "tier": 2,
+   "level": 0,
+   "path": [],
+   "kind": "menu",
+   "roleEvidence": {
+    "triggerHasPopup": "menu",
+    "innerRole": "listbox",
+    "containerRole": "dialog"
+   },
+   "detectedBy": "revealed",
+   "trigger": {
+    "label": "My Workspace Workspace Menu",
+    "role": null,
+    "hasPopup": "menu"
+   },
+   "rect": {
+    "x": 12,
+    "y": 48,
+    "width": 225,
+    "height": 197
+   },
+   "anchor": {
+    "side": "bottom",
+    "align": "start",
+    "gap": 4,
+    "triggerRect": {
+     "x": 12,
+     "y": 16,
+     "width": 148,
+     "height": 28
+    },
+    "surfaceRect": {
+     "x": 12,
+     "y": 48,
+     "width": 225,
+     "height": 197
+    }
+   },
+   "hash": "DIV.sx-1lmytr0.sx-8du1vd|SPAN.sx-c342km.sx-1hyvwdk|FORM.sx-rvj5dj.sx-6s0dn4|SPAN.sx-c342km.sx-1hyvwdk|INPUT.sx-889kno.sx-dvlbce|DIV.sx-78zum5.sx-vx4679|DIV.sx-1rohswg.sx-fk6m8|UL.sx-1ghz6dp.sx-g0xzth|DIV.|DIV.|A.sx-1xru068.sx-189xrh|DIV.|A.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.",
+   "cssStates": {
+    "components": 2,
+    "stateNames": [
+     "active",
+     "hover"
+    ]
+   },
+   "frame": "frames/001-my-workspace-workspace-menu.html",
+   "jsx": "jsx/001-my-workspace-workspace-menu.jsx",
+   "shot": "shots/001-my-workspace-workspace-menu.png",
+   "shots": {
+    "surface": "shots/001-my-workspace-workspace-menu.png",
+    "context": "shots/001-my-workspace-workspace-menu@context.png",
+    "trigger": "shots/001-my-workspace-workspace-menu@trigger.png"
+   },
+   "states": "states/001-my-workspace-workspace-menu.json",
+   "bytes": 86806
+  },
+  {
+   "id": "002-add-filter",
+   "name": "Add filter",
+   "tier": 2,
+   "level": 0,
+   "path": [],
+   "kind": "listbox",
+   "roleEvidence": {
+    "triggerHasPopup": null,
+    "innerRole": "listbox",
+    "containerRole": "dialog"
+   },
+   "detectedBy": "revealed",
+   "trigger": {
+    "label": "Add filter",
+    "role": null,
+    "hasPopup": null
+   },
+   "rect": {
+    "x": 1214,
+    "y": 92,
+    "width": 207,
+    "height": 610
+   },
+   "anchor": {
+    "side": "bottom",
+    "align": "center",
+    "gap": 4,
+    "triggerRect": {
+     "x": 1320,
+     "y": 60,
+     "width": 28,
+     "height": 28
+    },
+    "surfaceRect": {
+     "x": 1214,
+     "y": 92,
+     "width": 207,
+     "height": 610
+    }
+   },
+   "hash": "DIV.sx-1lmytr0.sx-8du1vd|DIV.sx-zjhap9.sx-nuq7ks|FORM.sx-rvj5dj.sx-6s0dn4|SPAN.sx-c342km.sx-1hyvwdk|INPUT.sx-889kno.sx-dvlbce|SPAN.sx-uxw1ft.sx-3nfvp2|SPAN.sx-3nfvp2.sx-6s0dn4|DIV.sx-1rohswg.sx-fk6m8|DIV.sx-7wzq59.sx-u96u03|UL.sx-1ghz6dp.sx-g0xzth|DIV.|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-7wzq59.sx-u96u03",
+   "cssStates": {
+    "components": 0,
+    "stateNames": []
+   },
+   "frame": "frames/002-add-filter.html",
+   "jsx": "jsx/002-add-filter.jsx",
+   "shot": "shots/002-add-filter.png",
+   "shots": {
+    "surface": "shots/002-add-filter.png",
+    "context": "shots/002-add-filter@context.png",
+    "trigger": "shots/002-add-filter@trigger.png"
+   },
+   "states": "states/002-add-filter.json",
+   "bytes": 394347
+  },
+  {
+   "id": "003-open-details",
+   "name": "Open details",
+   "tier": 2,
+   "level": 0,
+   "path": [],
+   "kind": "inline",
+   "roleEvidence": {
+    "triggerHasPopup": null,
+    "innerRole": null,
+    "containerRole": null
+   },
+   "detectedBy": "mounted",
+   "trigger": {
+    "label": "Open details",
+    "role": null,
+    "hasPopup": null
+   },
+   "rect": {
+    "x": 984,
+    "y": 96,
+    "width": 440,
+    "height": 591
+   },
+   "anchor": {
+    "side": "bottom",
+    "align": "end",
+    "gap": 8,
+    "triggerRect": {
+     "x": 1388,
+     "y": 60,
+     "width": 28,
+     "height": 28
+    },
+    "surfaceRect": {
+     "x": 984,
+     "y": 96,
+     "width": 440,
+     "height": 591
+    }
+   },
+   "hash": "DIV.sx-1n2onr6.sx-1okw0bk|DIV.sx-10l6tqk.sx-10a8y8t|ASIDE.sx-10l6tqk.sx-10a8y8t|DIV.sx-78zum5.sx-dt5ytf|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.sx-78zum5.sx-vx4679|DIV.sx-10l6tqk.sx-13vifvy",
+   "cssStates": {
+    "components": 12,
+    "stateNames": [
+     "[data-disabled=\"true\"]",
+     "[data-state=\"active\"]",
+     "[data-state=\"inactive\"]",
+     "active",
+     "disabled",
+     "focus-visible",
+     "hover"
+    ]
+   },
+   "frame": "frames/003-open-details.html",
+   "jsx": "jsx/003-open-details.jsx",
+   "shot": "shots/003-open-details.png",
+   "shots": {
+    "surface": "shots/003-open-details.png",
+    "context": "shots/003-open-details@context.png",
+    "trigger": "shots/003-open-details@trigger.png"
+   },
+   "states": "states/003-open-details.json",
+   "bytes": 92928
+  },
+  {
+   "id": "004-create-new-issue",
+   "name": "Create new issue",
+   "tier": 2,
+   "level": 0,
+   "path": [],
+   "kind": "menu",
+   "roleEvidence": {
+    "triggerHasPopup": "menu",
+    "innerRole": null,
+    "containerRole": "dialog"
+   },
+   "detectedBy": "revealed",
+   "trigger": {
+    "label": "Create new issue",
+    "role": null,
+    "hasPopup": "menu"
+   },
+   "rect": {
+    "x": 0,
+    "y": 0,
+    "width": 1432,
+    "height": 723
+   },
+   "anchor": {
+    "side": "left",
+    "align": "center",
+    "gap": -488,
+    "triggerRect": {
+     "x": 944,
+     "y": 102,
+     "width": 24,
+     "height": 24
+    },
+    "surfaceRect": {
+     "x": 0,
+     "y": 0,
+     "width": 1432,
+     "height": 723
+    }
+   },
+   "hash": "DIV.sx-10l6tqk.sx-u96u03|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.sx-1lmytr0.sx-xbqdvw|DIV.sx-78zum5.sx-vx4679|FORM.sx-mz0i5r.sx-78zum5",
+   "cssStates": {
+    "components": 24,
+    "stateNames": [
+     "[data-disabled=\"true\"]",
+     "active",
+     "checked",
+     "disabled",
+     "enabled",
+     "focus-visible",
+     "hover"
+    ]
+   },
+   "frame": "frames/004-create-new-issue.html",
+   "jsx": "jsx/004-create-new-issue.jsx",
+   "shot": "shots/004-create-new-issue.png",
+   "shots": {
+    "surface": "shots/004-create-new-issue.png",
+    "context": "shots/004-create-new-issue@context.png",
+    "trigger": "shots/004-create-new-issue@trigger.png"
+   },
+   "states": "states/004-create-new-issue.json",
+   "bytes": 224759
+  },
+  {
+   "id": "005-collapse-group",
+   "name": "Collapse group",
+   "tier": 2,
+   "level": 0,
+   "path": [],
+   "kind": "inline",
+   "roleEvidence": {
+    "triggerHasPopup": null,
+    "innerRole": null,
+    "containerRole": null
+   },
+   "detectedBy": "mounted",
+   "trigger": {
+    "label": "Collapse group",
+    "role": "button",
+    "hasPopup": null
+   },
+   "rect": {
+    "x": 245,
+    "y": 656,
+    "width": 739,
+    "height": 1228
+   },
+   "anchor": {
+    "side": "bottom",
+    "align": "start",
+    "gap": 12,
+    "triggerRect": {
+     "x": 261,
+     "y": 624,
+     "width": 20,
+     "height": 20
+    },
+    "surfaceRect": {
+     "x": 245,
+     "y": 656,
+     "width": 739,
+     "height": 1228
+    }
+   },
+   "hash": "DIV.sx-rvj5dj.sx-4w6khx|DIV._rowShared_1bk15_8._elementTransition_1bk15_123|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.theme-provider-a8ca965fd51b5b3eba6a185fa5357863dc0919c2|DIV.sx-78zum5.sx-6s0dn4|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|A._gridRowShared_1bk15_65|DIV.sx-rvj5dj.sx-4w6khx|DIV.|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|A._gridRowShared_1bk15_65|DIV.sx-rvj5dj.sx-4w6khx|DIV.|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|A._gridRowShared_1bk15_65|DIV.sx-rvj5dj.sx-4w6khx|DIV.|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-6s0dn4|DIV.|DIV.padBelow",
+   "cssStates": {
+    "components": 168,
+    "stateNames": [
+     "[data-disabled=\"true\"]",
+     "[data-open=\"false\"]",
+     "active",
+     "disabled",
+     "hover"
+    ]
+   },
+   "frame": "frames/005-collapse-group.html",
+   "jsx": "jsx/005-collapse-group.jsx",
+   "shot": "shots/005-collapse-group.png",
+   "shots": {
+    "surface": "shots/005-collapse-group.png",
+    "context": "shots/005-collapse-group@context.png",
+    "trigger": "shots/005-collapse-group@trigger.png"
+   },
+   "states": "states/005-collapse-group.json",
+   "bytes": 253729
+  },
+  {
+   "id": "006-open-help-menu",
+   "name": "Open Help menu",
+   "tier": 2,
+   "level": 0,
+   "path": [],
+   "kind": "menu",
+   "roleEvidence": {
+    "triggerHasPopup": "menu",
+    "innerRole": "listbox",
+    "containerRole": "dialog"
+   },
+   "detectedBy": "revealed",
+   "trigger": {
+    "label": "Open Help menu",
+    "role": "button",
+    "hasPopup": "menu"
+   },
+   "rect": {
+    "x": 12,
+    "y": 290,
+    "width": 318,
+    "height": 395
+   },
+   "anchor": {
+    "side": "top",
+    "align": "start",
+    "gap": 4,
+    "triggerRect": {
+     "x": 10,
+     "y": 689,
+     "width": 24,
+     "height": 24
+    },
+    "surfaceRect": {
+     "x": 12,
+     "y": 290,
+     "width": 318,
+     "height": 395
+    }
+   },
+   "hash": "DIV.sx-1lmytr0.sx-8du1vd|SPAN.sx-c342km.sx-1hyvwdk|FORM.sx-rvj5dj.sx-6s0dn4|SPAN.sx-c342km.sx-1hyvwdk|INPUT.sx-889kno.sx-dvlbce|SPAN.sx-uxw1ft.sx-3nfvp2|SPAN.sx-3nfvp2.sx-6s0dn4|DIV.sx-1rohswg.sx-fk6m8|UL.sx-1ghz6dp.sx-g0xzth|DIV.|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|A.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|A.sx-1xru068.sx-189xrh|DIV.|A.sx-1xru068.sx-189xrh|DIV.|A.sx-1xru068.sx-189xrh|DIV.|A.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1j61x8r.sx-ggjnk3|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|A.sx-1xru068.sx-189xrh|DIV.",
+   "cssStates": {
+    "components": 6,
+    "stateNames": [
+     "active",
+     "hover"
+    ]
+   },
+   "frame": "frames/006-open-help-menu.html",
+   "jsx": "jsx/006-open-help-menu.jsx",
+   "shot": "shots/006-open-help-menu.png",
+   "shots": {
+    "surface": "shots/006-open-help-menu.png",
+    "context": "shots/006-open-help-menu@context.png",
+    "trigger": "shots/006-open-help-menu@trigger.png"
+   },
+   "states": "states/006-open-help-menu.json",
+   "bytes": 192846
+  },
+  {
+   "id": "007-explain-runner-live-message",
+   "name": "Explain runner LIVE message",
+   "tier": 2,
+   "level": 0,
+   "path": [],
+   "kind": "dialog",
+   "roleEvidence": {
+    "triggerHasPopup": null,
+    "innerRole": null,
+    "containerRole": "dialog"
+   },
+   "detectedBy": "mounted",
+   "trigger": {
+    "label": "Explain runner LIVE message",
+    "role": "button",
+    "hasPopup": null
+   },
+   "rect": {
+    "x": 327,
+    "y": 111,
+    "width": 400,
+    "height": 578
+   },
+   "anchor": {
+    "side": "top",
+    "align": "start",
+    "gap": 2,
+    "triggerRect": {
+     "x": 327,
+     "y": 691,
+     "width": 190,
+     "height": 28
+    },
+    "surfaceRect": {
+     "x": 327,
+     "y": 111,
+     "width": 400,
+     "height": 578
+    }
+   },
+   "hash": "DIV.sx-10l6tqk.sx-78zum5|DIV.sx-10l6tqk.sx-u96u03|DIV.sx-10l6tqk.sx-13vifvy|DIV.sx-10l6tqk.sx-n0lweg|DIV.sx-78zum5.sx-98rzlu|DIV.sx-78zum5.sx-98rzlu|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.sx-78zum5.sx-1n2onr6",
+   "cssStates": {
+    "components": 29,
+    "stateNames": [
+     "[data-disabled=\"true\"]",
+     "active",
+     "disabled",
+     "focus-visible",
+     "hover"
+    ]
+   },
+   "frame": "frames/007-explain-runner-live-message.html",
+   "jsx": "jsx/007-explain-runner-live-message.jsx",
+   "shot": "shots/007-explain-runner-live-message.png",
+   "shots": {
+    "surface": "shots/007-explain-runner-live-message.png",
+    "context": "shots/007-explain-runner-live-message@context.png",
+    "trigger": "shots/007-explain-runner-live-message@trigger.png"
+   },
+   "states": "states/007-explain-runner-live-message.json",
+   "bytes": 287968
+  },
+  {
+   "id": "008-chat-history",
+   "name": "Chat history",
+   "tier": 2,
+   "level": 0,
+   "path": [],
+   "kind": "listbox",
+   "roleEvidence": {
+    "triggerHasPopup": null,
+    "innerRole": "listbox",
+    "containerRole": "dialog"
+   },
+   "detectedBy": "revealed",
+   "trigger": {
+    "label": "Chat history",
+    "role": null,
+    "hasPopup": null
+   },
+   "rect": {
+    "x": 1039,
+    "y": 177,
+    "width": 383,
+    "height": 510
+   },
+   "anchor": {
+    "side": "top",
+    "align": "end",
+    "gap": 4,
+    "triggerRect": {
+     "x": 1394,
+     "y": 691,
+     "width": 28,
+     "height": 28
+    },
+    "surfaceRect": {
+     "x": 1039,
+     "y": 177,
+     "width": 383,
+     "height": 510
+    }
+   },
+   "hash": "DIV.sx-1lmytr0.sx-8du1vd|DIV.sx-zjhap9.sx-nuq7ks|FORM.sx-rvj5dj.sx-6s0dn4|SPAN.sx-c342km.sx-1hyvwdk|INPUT.sx-889kno.sx-dvlbce|DIV.sx-78zum5.sx-vx4679|DIV.sx-1rohswg.sx-fk6m8|DIV.sx-7wzq59.sx-u96u03|UL.sx-1ghz6dp.sx-g0xzth|DIV.|DIV.|DIV.sx-1j61x8r.sx-ggjnk3|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|DIV.sx-1j61x8r.sx-ggjnk3|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|DIV.sx-1j61x8r.sx-ggjnk3|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|DIV.sx-1j61x8r.sx-ggjnk3|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|DIV.sx-1j61x8r.sx-ggjnk3|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.sx-7wzq59.sx-u96u03",
+   "cssStates": {
+    "components": 0,
+    "stateNames": []
+   },
+   "frame": "frames/008-chat-history.html",
+   "jsx": "jsx/008-chat-history.jsx",
+   "shot": "shots/008-chat-history.png",
+   "shots": {
+    "surface": "shots/008-chat-history.png",
+    "context": "shots/008-chat-history@context.png",
+    "trigger": "shots/008-chat-history@trigger.png"
+   },
+   "states": "states/008-chat-history.json",
+   "bytes": 342694
+  },
+  {
+   "id": "009-team-issues-list-populated",
+   "name": "team-issues-list-populated",
+   "tier": 3,
+   "kind": "agent-captured",
+   "notes": "Full /team/TES/all list after seeding: In Progress / Todo / Backlog / Done / Canceled groups, all 5 priorities, long-title truncation row, pointer parked in sidebar (no hover state). Dark theme, 1432x723.",
+   "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee",
+   "path": [],
+   "frame": "frames/009-team-issues-list-populated.html",
+   "jsx": "jsx/009-team-issues-list-populated.jsx",
+   "shot": "shots/009-team-issues-list-populated.png",
+   "shots": {
+    "surface": "shots/009-team-issues-list-populated.png"
+   },
+   "bytes": 2045954
+  },
+  {
+   "id": "010-team-issues-list-full-width",
+   "name": "team-issues-list-full-width",
+   "tier": 3,
+   "kind": "agent-captured",
+   "notes": "/team/TES/all, details panel CLOSED, list at full 1179px width. Groups In Progress(6)/Todo(18)/Backlog(27)/Done/Canceled after seed. Pointer parked in sidebar \u2014 rows at rest.",
+   "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-ixxii4.sx-r3buco|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b",
+   "path": [],
+   "frame": "frames/010-team-issues-list-full-width.html",
+   "jsx": "jsx/010-team-issues-list-full-width.jsx",
+   "shot": "shots/010-team-issues-list-full-width.png",
+   "shots": {
+    "surface": "shots/010-team-issues-list-full-width.png"
+   },
+   "bytes": 1954102
+  },
+  {
+   "id": "011-display-options-panel-list-mode",
+   "name": "display-options-panel-list-mode",
+   "tier": 3,
+   "kind": "agent-captured",
+   "notes": "Display options panel on /team/TES/all, List layout: Grouping/Sub-grouping/Ordering block, Completed issues, Show sub-issues, List options block, 14 display-property pills. Opened via real mouse click on the Display options toolbar button (single click \u2014 it toggles, and the MCP click-path settle was closing it, which is why crawler + capture_component reported it inert).",
+   "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-13vifvy.sx-u96u03|DIV.sx-ixxii4.sx-67bb7w|DIV.",
+   "path": [],
+   "frame": "frames/011-display-options-panel-list-mode.html",
+   "jsx": "jsx/011-display-options-panel-list-mode.jsx",
+   "shot": "shots/011-display-options-panel-list-mode.png",
+   "shots": {
+    "surface": "shots/011-display-options-panel-list-mode.png"
+   },
+   "bytes": 1953438
+  },
+  {
+   "id": "012-issue-row-rest",
+   "name": "issue-row-rest",
+   "tier": 3,
+   "kind": "agent-captured",
+   "hash": "MAIN.sx-78zum5.sx-131h156|DIV.|DIV.sx-1hc1fzr.sx-1bdbk01|DIV.sx-vx4679.sx-1q0g3np|DIV.sx-78zum5.sx-131h156|DIV.sx-78zum5.sx-131h156|DIV.sx-78zum5.sx-vx4679|DIV.sx-10l6tqk.sx-13vifvy|DIV.",
+   "path": [],
+   "notes": "The issue list row \u2014 the core primitive of the entire Issues surface. Rest/hover matter for the ::before wash and the checkbox-slot reveal; the row also carries data-selected/data-keyboard-active which are driven separately. \u2014 state: REST. REACHED BY: /team/TES/all, List layout, grouped by Status, details panel closed, dark theme pointer parked at (4, 360), verified clear MEASURED: 1180x679 at (244, 8). background lch(5.52 0.4 272) radius 12px border 0.5px solid lch(13.08 1.48 272) shadow lch(0 0 0 / 0.3) 0px 0.5px 1px 1px type 16px / 24px 400 \"Inter Variable\"",
+   "frame": "frames/012-issue-row-rest.html",
+   "jsx": "jsx/012-issue-row-rest.jsx",
+   "shot": "shots/012-issue-row-rest.png",
+   "shots": {
+    "surface": "shots/012-issue-row-rest.png"
+   },
+   "bytes": 546955
+  },
+  {
+   "id": "013-multi-select-bulk-bar-n3",
+   "name": "multi-select-bulk-bar-n3",
+   "tier": 3,
+   "kind": "agent-captured",
+   "notes": "3 rows selected (x, j x, j x from TES-38): selected washes on rows (two-token model), grouped-run radii, bulk action bar pill at bottom-center (253.8x44, '3 selected', Actions \u2318 / Ask Linear / clear \u2715). Reached: hover row + x + j/x + j/x.",
+   "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv",
+   "path": [],
+   "frame": "frames/013-multi-select-bulk-bar-n3.html",
+   "jsx": "jsx/013-multi-select-bulk-bar-n3.jsx",
+   "shot": "shots/013-multi-select-bulk-bar-n3.png",
+   "shots": {
+    "surface": "shots/013-multi-select-bulk-bar-n3.png"
+   },
+   "bytes": 1300788
+  },
+  {
+   "id": "014-status-palette-recipe",
+   "name": "status-palette-recipe",
+   "tier": 3,
+   "kind": "agent-captured",
+   "notes": "S pressed on hovered row TES-38: command palette pre-scoped to 'Change status\u2026', context line 'TES-38 \u22c5 \u2026', 7 status options with icons. The accelerator-as-palette-recipe pattern.",
+   "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-ixxii4.sx-10a8y8t|DIV.sx-ixxii4.sx-10a8y8t|DIV.sx-67bb7w",
+   "path": [],
+   "frame": "frames/014-status-palette-recipe.html",
+   "jsx": "jsx/014-status-palette-recipe.jsx",
+   "shot": "shots/014-status-palette-recipe.png",
+   "shots": {
+    "surface": "shots/014-status-palette-recipe.png"
+   },
+   "bytes": 1300788
+  },
+  {
+   "id": "015-board-layout-my-issues-created",
+   "name": "board-layout-my-issues-created",
+   "tier": 3,
+   "kind": "agent-captured",
+   "notes": "/my-issues/created in Board layout (Columns: Status, per round-1 display state). Card anatomy, column headers, column widths. Populated with the seeded issues (created by me).",
+   "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv",
+   "path": [],
+   "frame": "frames/015-board-layout-my-issues-created.html",
+   "jsx": "jsx/015-board-layout-my-issues-created.jsx",
+   "shot": "shots/015-board-layout-my-issues-created.png",
+   "shots": {
+    "surface": "shots/015-board-layout-my-issues-created.png"
+   },
+   "bytes": 3507149
+  },
+  {
+   "id": "016-filter-menu-value-search-with-counts",
+   "name": "filter-menu-value-search-with-counts",
+   "tier": 3,
+   "kind": "agent-captured",
+   "notes": "Filter menu (f) after typing 'status': flattens into cross-property VALUE search \u2014 each value row shows a live issue count (Todo 6, Done 26, Backlog 16...). Values with 0 show no count. AI-filter escape hatch last. Reached: f, type 'status'.",
+   "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-10a8y8t.sx-ysyzu8|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.sx-1lmytr0.sx-8du1vd|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b",
+   "path": [],
+   "frame": "frames/016-filter-menu-value-search-with-counts.html",
+   "jsx": "jsx/016-filter-menu-value-search-with-counts.jsx",
+   "shot": "shots/016-filter-menu-value-search-with-counts.png",
+   "shots": {
+    "surface": "shots/016-filter-menu-value-search-with-counts.png"
+   },
+   "bytes": 3506751
+  },
+  {
+   "id": "017-empty-state-filtered-no-results",
+   "name": "empty-state-filtered-no-results",
+   "tier": 3,
+   "kind": "agent-captured",
+   "notes": "'No issues matching the filters' empty state on /my-issues/created (Board layout) after applying Status=Duplicate filter chip. Filter chip visible in toolbar. Reached: f \u2192 type 'status dupl' \u2192 Enter.",
+   "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv",
+   "path": [],
+   "frame": "frames/017-empty-state-filtered-no-results.html",
+   "jsx": "jsx/017-empty-state-filtered-no-results.jsx",
+   "shot": "shots/017-empty-state-filtered-no-results.png",
+   "shots": {
+    "surface": "shots/017-empty-state-filtered-no-results.png"
+   },
+   "bytes": 652556
+  },
+  {
+   "id": "018-issue-row-context-menu",
+   "name": "issue-row-context-menu",
+   "tier": 3,
+   "kind": "agent-captured",
+   "notes": "Right-click on TES row: 192-wide context menu on the shared floating surface (lch(12.72 .85 272), radius 12) \u2014 19 items: 7 property submenus with single-key accels, Create related/Mark as/Remove/Copy/Convert to/Move/Open in, Run loop on\u2026, Favorite, Remind me, Delete \u2318\u232b. Reached: real right-click at row center.",
+   "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv",
+   "path": [],
+   "frame": "frames/018-issue-row-context-menu.html",
+   "jsx": "jsx/018-issue-row-context-menu.jsx",
+   "shot": "shots/018-issue-row-context-menu.png",
+   "shots": {
+    "surface": "shots/018-issue-row-context-menu.png"
+   },
+   "bytes": 1945635,
+   "rect": {
+    "x": 0,
+    "y": 0,
+    "width": 1432,
+    "height": 723
+   }
+  },
+  {
+   "id": "019-composer-collapsed-750",
+   "name": "composer-collapsed-750",
+   "tier": 3,
+   "kind": "agent-captured",
+   "notes": "Create-issue composer, collapsed: panel 750 wide, wrapper py 13vh, all-pill controls, attribute pill row. Reached: c from any authenticated page. Cross-check react-prototype/src/Composer.jsx \u2014 this frame is the live-truth counterpart.",
+   "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-13vifvy.sx-3m8u43|DIV.sx-ixxii4.sx-13vifvy",
+   "path": [],
+   "frame": "frames/019-composer-collapsed-750.html",
+   "jsx": "jsx/019-composer-collapsed-750.jsx",
+   "shot": "shots/019-composer-collapsed-750.png",
+   "shots": {
+    "surface": "shots/019-composer-collapsed-750.png"
+   },
+   "bytes": 718970,
+   "rect": {
+    "x": 0,
+    "y": 0,
+    "width": 1432,
+    "height": 723
+   }
+  },
+  {
+   "id": "015-issue-detail-page",
+   "name": "issue-detail-page",
+   "tier": 3,
+   "kind": "agent-captured",
+   "notes": "TES-51 detail two-pane; main x253 w622; sidebar x1003 w374; title 24/38.4/600; prop rows h28.",
+   "path": [],
+   "frame": "frames/015-issue-detail-page.html",
+   "jsx": "jsx/015-issue-detail-page.jsx",
+   "shot": "shots/015-issue-detail-page.png",
+   "rect": {
+    "x": 0,
+    "y": 0,
+    "width": 1432,
+    "height": 723
+   }
+  },
+  {
+   "id": "015-inbox-two-pane",
+   "name": "inbox-two-pane",
+   "tier": 3,
+   "kind": "agent-captured",
+   "notes": "Inbox list+detail split, seeded notifications.",
+   "path": [],
+   "frame": "frames/015-inbox-two-pane.html",
+   "jsx": "jsx/015-inbox-two-pane.jsx",
+   "shot": "shots/015-inbox-two-pane.png",
+   "rect": {
+    "x": 0,
+    "y": 0,
+    "width": 1432,
+    "height": 723
+   }
+  },
+  {
+   "id": "022-context-menu-status-submenu-open",
+   "name": "context-menu-status-submenu-open",
+   "tier": 3,
+   "kind": "agent-captured",
+   "notes": "Right-click row TES-66 on /team/TES/all (dark), hover Status row ~850ms \u2014 19-item context menu (192\u00d7681 at 648,32) with Status submenu (175\u00d7273 at 838,-4) open showing all 7 states with count badges + accelerator digits 1-7. Menu has NO role=menu \u2014 find via position:fixed sweep.",
+   "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-10a8y8t.sx-ysyzu8|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.sx-1lmytr0.sx-8du1vd|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b",
+   "path": [],
+   "frame": "frames/022-context-menu-status-submenu-open.html",
+   "jsx": "jsx/022-context-menu-status-submenu-open.jsx",
+   "shot": "shots/022-context-menu-status-submenu-open.png",
+   "shots": {
+    "surface": "shots/022-context-menu-status-submenu-open.png"
+   },
+   "bytes": 1619558
+  },
+  {
+   "id": "023-empty-state-cycle-first-run",
+   "name": "empty-state-cycle-first-run",
+   "tier": 3,
+   "kind": "agent-captured",
+   "notes": "/team/TES/cycle/3 (upcoming, zero issues) dark \u2014 first-run cycle empty state: centered 340\u00d7275 block at (444,253): illustration svg (340\u00d780), \"Cycle 3\" title, explainer copy \"Cycles are time-based intervals\u2026\", right Planning sidebar (419\u00d793 at 988,234: Capacity 0% \u00b7 Days to start 28 \u00b7 Scope 0).",
+   "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv",
+   "path": [],
+   "frame": "frames/023-empty-state-cycle-first-run.html",
+   "jsx": "jsx/023-empty-state-cycle-first-run.jsx",
+   "shot": "shots/023-empty-state-cycle-first-run.png",
+   "shots": {
+    "surface": "shots/023-empty-state-cycle-first-run.png"
+   },
+   "bytes": 728966,
+   "rect": {
+    "x": 0,
+    "y": 0,
+    "width": 1432,
+    "height": 723
+   }
+  },
+  {
+   "id": "024-empty-state-issues-first-run",
+   "name": "empty-state-issues-first-run",
+   "tier": 3,
+   "kind": "agent-captured",
+   "notes": "/team/EMP/all (fresh team, zero issues) dark \u2014 TRUE first-run issues empty state: centered 340\u00d7284 block at (664,249): illustration svg 86w, \"All issues\" heading, explainer copy, ghost \"Create new issue \u00b7 C\" CTA. Sibling views measured: backlog 340\u00d7293 + active 340\u00d7284, same anatomy, DISTINCT illustrations + copy per view. SVGs in assets/linear-icons/empty-emp-{all,backlog,active}-illustration.svg.",
+   "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv",
+   "path": [],
+   "frame": "frames/024-empty-state-issues-first-run.html",
+   "jsx": "jsx/024-empty-state-issues-first-run.jsx",
+   "shot": "shots/024-empty-state-issues-first-run.png",
+   "shots": {
+    "surface": "shots/024-empty-state-issues-first-run.png"
+   },
+   "bytes": 726894,
+   "rect": {
+    "x": 0,
+    "y": 0,
+    "width": 1432,
+    "height": 723
+   }
+  },
+  {
+   "id": "025-add-to-favorites",
+   "name": "Add to favorites",
+   "tier": 2,
+   "level": 0,
+   "path": [],
+   "kind": "inline",
+   "roleEvidence": {
+    "triggerHasPopup": null,
+    "innerRole": null,
+    "containerRole": null
+   },
+   "detectedBy": "mounted",
+   "trigger": {
+    "label": "Add to favorites",
+    "role": "switch",
+    "hasPopup": null
+   },
+   "rect": {
+    "x": 12,
+    "y": 286,
+    "width": 220,
+    "height": 695
+   },
+   "anchor": {
+    "side": "bottom",
+    "align": "end",
+    "gap": 242,
+    "triggerRect": {
+     "x": 791,
+     "y": 16,
+     "width": 28,
+     "height": 28
+    },
+    "surfaceRect": {
+     "x": 12,
+     "y": 286,
+     "width": 220,
+     "height": 695
+    }
+   },
+   "hash": "DIV.sx-1kgmq87|DIV.sx-yqdw3p.sx-g8j3zb|DIV.|DIV.sx-1n2onr6|DIV.sx-1n2onr6.sx-ufnvkl|DIV.|DIV.sx-1n2onr6|DIV.sx-1n2onr6.sx-ufnvkl|DIV.|DIV.sx-1n2onr6|DIV.sx-1n2onr6.sx-ufnvkl|DIV.|DIV.|DIV.sx-1n2onr6|DIV.sx-1n2onr6.sx-2lah0s|DIV.|DIV.|DIV.sx-1n2onr6|DIV.sx-1n2onr6.sx-2lah0s|DIV.|DIV.|DIV.sx-1n2onr6|DIV.sx-1n2onr6.sx-2lah0s|DIV.|DIV.|DIV.sx-1n2onr6|DIV.sx-1n2onr6.sx-2lah0s|DIV.|DIV.|DIV.sx-1n2onr6|DIV.sx-1n2onr6.sx-2lah0s|DIV.|DIV.|DIV.sx-1n2onr6|DIV.sx-1n2onr6.sx-2lah0s|DIV.|DIV.|DIV.sx-1n2onr6|DIV.sx-1n2onr6.sx-2lah0s|DIV.|DIV.|DIV.sx-1n2onr6|DIV.sx-1n2onr6.sx-2lah0s|DIV.|DIV.|DIV.sx-1n2onr6|DIV.sx-1n2onr6.sx-2lah0s|DIV.|DIV.sx-1n2onr6|DIV.sx-1n2onr6.sx-ufnvkl|DIV.|DIV.|DIV.sx-1n2onr6|DIV.sx-1n2onr6.sx-2lah0s|DIV.|DIV.|DIV.sx-1n2onr6|DIV.sx-1n2onr6.sx-2lah0s|DIV.|DIV.|DIV.sx-1n2onr6|DIV.sx-1n2onr6.sx-2lah0s|DIV.|DIV.",
+   "cssStates": {
+    "components": 97,
+    "stateNames": [
+     "active",
+     "focus-visible",
+     "focus-within",
+     "hover"
+    ]
+   },
+   "frame": "frames/025-add-to-favorites.html",
+   "jsx": "jsx/025-add-to-favorites.jsx",
+   "shot": "shots/025-add-to-favorites.png",
+   "shots": {
+    "surface": "shots/025-add-to-favorites.png",
+    "context": "shots/025-add-to-favorites@context.png",
+    "trigger": "shots/025-add-to-favorites@trigger.png"
+   },
+   "states": "states/025-add-to-favorites.json",
+   "bytes": 451007
+  },
+  {
+   "id": "026-issue-options",
+   "name": "Issue options",
+   "tier": 2,
+   "level": 0,
+   "path": [],
+   "kind": "menu",
+   "roleEvidence": {
+    "triggerHasPopup": "menu",
+    "innerRole": "listbox",
+    "containerRole": "dialog"
+   },
+   "detectedBy": "revealed",
+   "trigger": {
+    "label": "Issue options",
+    "role": null,
+    "hasPopup": "menu"
+   },
+   "rect": {
+    "x": 825,
+    "y": 48,
+    "width": 225,
+    "height": 521
+   },
+   "anchor": {
+    "side": "bottom",
+    "align": "start",
+    "gap": 4,
+    "triggerRect": {
+     "x": 825,
+     "y": 16,
+     "width": 28,
+     "height": 28
+    },
+    "surfaceRect": {
+     "x": 825,
+     "y": 48,
+     "width": 225,
+     "height": 521
+    }
+   },
+   "hash": "DIV.sx-1lmytr0.sx-8du1vd|SPAN.sx-c342km.sx-1hyvwdk|FORM.sx-rvj5dj.sx-6s0dn4|SPAN.sx-c342km.sx-1hyvwdk|INPUT.sx-889kno.sx-dvlbce|DIV.sx-78zum5.sx-vx4679|DIV.sx-1rohswg.sx-fk6m8|UL.sx-1ghz6dp.sx-g0xzth|DIV.|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.",
+   "cssStates": {
+    "components": 0,
+    "stateNames": []
+   },
+   "frame": "frames/026-issue-options.html",
+   "jsx": "jsx/026-issue-options.jsx",
+   "shot": "shots/026-issue-options.png",
+   "shots": {
+    "surface": "shots/026-issue-options.png",
+    "context": "shots/026-issue-options@context.png",
+    "trigger": "shots/026-issue-options@trigger.png"
+   },
+   "states": "states/026-issue-options.json",
+   "bytes": 284517
+  },
+  {
+   "id": "027-work-on-issue",
+   "name": "Work on issue",
+   "tier": 2,
+   "level": 0,
+   "path": [],
+   "kind": "listbox",
+   "roleEvidence": {
+    "triggerHasPopup": null,
+    "innerRole": "listbox",
+    "containerRole": "dialog"
+   },
+   "detectedBy": "revealed",
+   "trigger": {
+    "label": "Work on issue",
+    "role": null,
+    "hasPopup": null
+   },
+   "rect": {
+    "x": 1210,
+    "y": 93,
+    "width": 209,
+    "height": 611
+   },
+   "anchor": {
+    "side": "bottom",
+    "align": "end",
+    "gap": 4,
+    "triggerRect": {
+     "x": 1391,
+     "y": 61,
+     "width": 28,
+     "height": 28
+    },
+    "surfaceRect": {
+     "x": 1210,
+     "y": 93,
+     "width": 209,
+     "height": 611
+    }
+   },
+   "hash": "DIV.sx-1lmytr0.sx-8du1vd|SPAN.sx-c342km.sx-1hyvwdk|FORM.sx-rvj5dj.sx-6s0dn4|SPAN.sx-c342km.sx-1hyvwdk|INPUT.sx-889kno.sx-dvlbce|SPAN.sx-uxw1ft.sx-3nfvp2|SPAN.sx-3nfvp2.sx-6s0dn4|DIV.sx-1rohswg.sx-fk6m8|UL.sx-1ghz6dp.sx-g0xzth|DIV.|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|DIV.sx-1j61x8r.sx-ggjnk3|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1t0vds8.sx-njsko4|DIV.|LI.sx-1xru068.sx-189xrh|DIV.",
+   "cssStates": {
+    "components": 0,
+    "stateNames": []
+   },
+   "frame": "frames/027-work-on-issue.html",
+   "jsx": "jsx/027-work-on-issue.jsx",
+   "shot": "shots/027-work-on-issue.png",
+   "shots": {
+    "surface": "shots/027-work-on-issue.png",
+    "context": "shots/027-work-on-issue@context.png",
+    "trigger": "shots/027-work-on-issue@trigger.png"
+   },
+   "states": "states/027-work-on-issue.json",
+   "bytes": 340473
+  },
+  {
+   "id": "028-done",
+   "name": "Done",
+   "tier": 2,
+   "level": 0,
+   "path": [],
+   "kind": "listbox",
+   "roleEvidence": {
+    "triggerHasPopup": null,
+    "innerRole": "listbox",
+    "containerRole": "dialog"
+   },
+   "detectedBy": "revealed",
+   "trigger": {
+    "label": "Done",
+    "role": null,
+    "hasPopup": null
+   },
+   "rect": {
+    "x": 1013,
+    "y": 272,
+    "width": 207,
+    "height": 274
+   },
+   "anchor": {
+    "side": "bottom",
+    "align": "start",
+    "gap": 4,
+    "triggerRect": {
+     "x": 1013,
+     "y": 240,
+     "width": 71,
+     "height": 28
+    },
+    "surfaceRect": {
+     "x": 1013,
+     "y": 272,
+     "width": 207,
+     "height": 274
+    }
+   },
+   "hash": "DIV.sx-1lmytr0.sx-8du1vd|DIV.sx-zjhap9.sx-nuq7ks|FORM.sx-rvj5dj.sx-6s0dn4|SPAN.sx-c342km.sx-1hyvwdk|INPUT.sx-889kno.sx-dvlbce|SPAN.sx-uxw1ft.sx-3nfvp2|SPAN.sx-3nfvp2.sx-6s0dn4|DIV.sx-1rohswg.sx-fk6m8|UL.sx-1ghz6dp.sx-g0xzth|DIV.|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.",
+   "cssStates": {
+    "components": 0,
+    "stateNames": []
+   },
+   "frame": "frames/028-done.html",
+   "jsx": "jsx/028-done.jsx",
+   "shot": "shots/028-done.png",
+   "shots": {
+    "surface": "shots/028-done.png",
+    "context": "shots/028-done@context.png",
+    "trigger": "shots/028-done@trigger.png"
+   },
+   "states": "states/028-done.json",
+   "bytes": 152254
+  },
+  {
+   "id": "029-add-labels",
+   "name": "Add labels",
+   "tier": 2,
+   "level": 0,
+   "path": [],
+   "kind": "listbox",
+   "roleEvidence": {
+    "triggerHasPopup": null,
+    "innerRole": "listbox",
+    "containerRole": "dialog"
+   },
+   "detectedBy": "revealed",
+   "trigger": {
+    "label": "Add labels",
+    "role": null,
+    "hasPopup": null
+   },
+   "rect": {
+    "x": 802,
+    "y": 451,
+    "width": 207,
+    "height": 232
+   },
+   "anchor": {
+    "side": "left",
+    "align": "end",
+    "gap": 4,
+    "triggerRect": {
+     "x": 1013,
+     "y": 455,
+     "width": 96,
+     "height": 28
+    },
+    "surfaceRect": {
+     "x": 802,
+     "y": 451,
+     "width": 207,
+     "height": 232
+    }
+   },
+   "hash": "DIV.sx-1lmytr0.sx-8du1vd|DIV.sx-zjhap9.sx-nuq7ks|FORM.sx-rvj5dj.sx-6s0dn4|SPAN.sx-c342km.sx-1hyvwdk|INPUT.sx-889kno.sx-dvlbce|SPAN.sx-uxw1ft.sx-3nfvp2|SPAN.sx-3nfvp2.sx-6s0dn4|DIV.sx-1rohswg.sx-fk6m8|UL.sx-1ghz6dp.sx-g0xzth|DIV.|DIV.|DIV.sx-1j61x8r.sx-ggjnk3|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|DIV.sx-1j61x8r.sx-ggjnk3|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|LI.sx-1xru068.sx-189xrh|DIV.",
+   "cssStates": {
+    "components": 4,
+    "stateNames": [
+     "active",
+     "hover"
+    ]
+   },
+   "frame": "frames/029-add-labels.html",
+   "jsx": "jsx/029-add-labels.jsx",
+   "shot": "shots/029-add-labels.png",
+   "shots": {
+    "surface": "shots/029-add-labels.png",
+    "context": "shots/029-add-labels@context.png",
+    "trigger": "shots/029-add-labels@trigger.png"
+   },
+   "states": "states/029-add-labels.json",
+   "bytes": 108566
+  },
+  {
+   "id": "030-cursor",
+   "name": "Cursor",
+   "tier": 2,
+   "level": 0,
+   "path": [],
+   "kind": "listbox",
+   "roleEvidence": {
+    "triggerHasPopup": null,
+    "innerRole": "listbox",
+    "containerRole": "dialog"
+   },
+   "detectedBy": "revealed",
+   "trigger": {
+    "label": "Cursor",
+    "role": null,
+    "hasPopup": null
+   },
+   "rect": {
+    "x": 1036,
+    "y": 368,
+    "width": 175,
+    "height": 109
+   },
+   "anchor": {
+    "side": "bottom",
+    "align": "start",
+    "gap": 4,
+    "triggerRect": {
+     "x": 1036,
+     "y": 336,
+     "width": 79,
+     "height": 28
+    },
+    "surfaceRect": {
+     "x": 1036,
+     "y": 368,
+     "width": 175,
+     "height": 109
+    }
+   },
+   "hash": "DIV.sx-1lmytr0.sx-8du1vd|SPAN.sx-c342km.sx-1hyvwdk|FORM.sx-rvj5dj.sx-6s0dn4|SPAN.sx-c342km.sx-1hyvwdk|INPUT.sx-889kno.sx-dvlbce|DIV.sx-78zum5.sx-vx4679|DIV.sx-1rohswg.sx-fk6m8|UL.sx-1ghz6dp.sx-g0xzth|DIV.|DIV.|LI.sx-1xru068.sx-189xrh|DIV.|A.sx-1xru068.sx-189xrh|DIV.|A.sx-1xru068.sx-189xrh|DIV.",
+   "cssStates": {
+    "components": 2,
+    "stateNames": [
+     "active",
+     "hover"
+    ]
+   },
+   "frame": "frames/030-cursor.html",
+   "jsx": "jsx/030-cursor.jsx",
+   "shot": "shots/030-cursor.png",
+   "shots": {
+    "surface": "shots/030-cursor.png",
+    "context": "shots/030-cursor@context.png",
+    "trigger": "shots/030-cursor@trigger.png"
+   },
+   "states": "states/030-cursor.json",
+   "bytes": 146533
+  },
+  {
+   "id": "031-inbox-row-context-menu",
+   "name": "inbox-row-context-menu",
+   "tier": 3,
+   "kind": "agent-captured",
+   "notes": "/inbox dark \u2014 right-click first notification row (hold at 444,88-ish): 232\u00d7229 context menu: Mark as unread U \u00b7 Delete notification \u232b \u00b7 Snooze H \u25b6 \u00b7 Unfavorite \u2325F \u00b7 Copy \u25b6 \u00b7 Open in desktop app ^\u2318,. Notification vocabulary, distinct from issue context menu.",
+   "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-10a8y8t.sx-ysyzu8|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.sx-1lmytr0.sx-8du1vd|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b|DIV.|DIV.theme-provider-0b37436d5163d46cc1fcabe0709a1f7c394cd11b",
+   "path": [],
+   "frame": "frames/031-inbox-row-context-menu.html",
+   "jsx": "jsx/031-inbox-row-context-menu.jsx",
+   "shot": "shots/031-inbox-row-context-menu.png",
+   "shots": {
+    "surface": "shots/031-inbox-row-context-menu.png"
+   },
+   "bytes": 1186912
+  },
+  {
+   "id": "032-group-header-collapsed",
+   "name": "group-header-collapsed",
+   "tier": 3,
+   "kind": "agent-captured",
+   "notes": "/team/TES/all dark \u2014 group collapsed via hover-revealed chevron (aria \"Collapse group\", appears only on header hover). Collapsed group renders header-only (no rows); sibling groups (Todo 7, Backlog 17, Done 27) unchanged. Collapse chevron is HOVER-REVEALED \u2014 not in DOM aria scan at rest.",
+   "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-895392d4f73ac23930c37d5a37dba3f61fb1e6a9|DIV.sx-ixxii4.sx-r3buco|DIV.theme-provider-72619f99c1dc2f52afd1e799eb972993f3e4b2a9",
+   "path": [],
+   "frame": "frames/032-group-header-collapsed.html",
+   "jsx": "jsx/032-group-header-collapsed.jsx",
+   "shot": "shots/032-group-header-collapsed.png",
+   "shots": {
+    "surface": "shots/032-group-header-collapsed.png"
+   },
+   "bytes": 2340932,
+   "rect": {
+    "x": 0,
+    "y": 0,
+    "width": 1432,
+    "height": 900
+   }
+  },
+  {
+   "id": "033-selection-run-3-adjacent-radii",
+   "name": "selection-run-3-adjacent-radii",
+   "tier": 3,
+   "kind": "agent-captured",
+   "notes": "/team/TES/all dark \u2014 3 adjacent rows selected (hover row1 + x, j x, j x): shows the selected-run wash with rounded top/bottom corners on the run boundary rows and the bulk bar \"3 selected \u00b7 Actions\" floating bottom-center. One group still collapsed from frame 032 (expand chevron is also hover-revealed; not re-expanded here).",
+   "hash": "BODY.content-loaded.is-bootstrapped|SCRIPT.|DIV.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.|svg.|defs.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|AUDIO.sx-1qvwoe0.sx-10l6tqk|DIV.sx-qtp20y.sx-1pju0fl|DIV.|A.sx-c342km.sx-eh89do|DIV.sx-78zum5.sx-131h156|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.sx-78zum5.sx-dt5ytf|DIV.sx-ixxii4.sx-1355n6m|SECTION.|SPAN.sx-c342km.sx-1hyvwdk|DIV.|DIV.|DIV.|DIV.|DIV.|SCRIPT.|SCRIPT.|SCRIPT.|SCRIPT.|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-b0573d48be7e85967e33743e857e2aa63606688d|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.theme-provider-33cdddc3be89b54f211a488e75669902e60d95ee|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv|DIV.|DIV.theme-provider-30df9d5b4e5bf09fbc0b518b7744c76022d13532|DIV.sx-jp7ctv",
+   "path": [],
+   "frame": "frames/033-selection-run-3-adjacent-radii.html",
+   "jsx": "jsx/033-selection-run-3-adjacent-radii.jsx",
+   "shot": "shots/033-selection-run-3-adjacent-radii.png",
+   "shots": {
+    "surface": "shots/033-selection-run-3-adjacent-radii.png"
+   },
+   "bytes": 2120327,
+   "rect": {
+    "x": 0,
+    "y": 0,
+    "width": 1432,
+    "height": 900
+   }
+  }
+ ]
+}

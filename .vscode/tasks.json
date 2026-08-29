@@ -1,0 +1,96 @@
+{
+  // Spec-session tasks.
+  //
+  // "Spec: environment" runs automatically when this folder is opened, so the
+  // debug browser is up before you think about it. The session itself is never
+  // auto-started — Claude Code is interactive and an agent that launches without
+  // you asking is an agent you did not decide to run.
+  //
+  //   Run Task…            ⇧⌘P → "Run Task"
+  //   Bind a key           Keyboard Shortcuts → workbench.action.tasks.runTask
+  //                        with { "args": "Spec: start session" }
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Spec: environment",
+      "detail": "Debug browser on :9222 with the signed-in profile, plus reference and candidate tabs",
+      "type": "shell",
+      "command": "${workspaceFolder}/spec-crawler/bin/spec-up.sh",
+      "runOptions": { "runOn": "folderOpen" },
+      "presentation": {
+        "reveal": "silent",
+        "panel": "dedicated",
+        "clear": true,
+        "close": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Spec: start session",
+      "detail": "Brings the environment up, then starts Claude here with the spec role",
+      "type": "shell",
+      "command": "${workspaceFolder}/spec-crawler/bin/spec-session.sh",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true,
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Spec: resume session",
+      "detail": "Same, but reopens a previous session in this repo",
+      "type": "shell",
+      "command": "${workspaceFolder}/spec-crawler/bin/spec-session.sh --resume",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true,
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Spec: verify implementation",
+      "detail": "Pixel-diff a localhost surface against its capture — set bundle/state/selector first",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "${workspaceFolder}/spec-crawler/verify-implementation.mjs",
+        "--bundle", "${input:bundle}",
+        "--state", "${input:state}",
+        "--url", "${input:url}",
+        "--selector", "${input:selector}"
+      ],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "bundle",
+      "type": "promptString",
+      "description": "Capture bundle directory",
+      "default": "./spec-composer"
+    },
+    {
+      "id": "state",
+      "type": "promptString",
+      "description": "State id within the bundle",
+      "default": "001"
+    },
+    {
+      "id": "url",
+      "type": "promptString",
+      "description": "Candidate URL",
+      "default": "http://localhost:3000"
+    },
+    {
+      "id": "selector",
+      "type": "promptString",
+      "description": "CSS selector for the element to compare",
+      "default": "[data-part=\"panel\"]"
+    }
+  ]
+}

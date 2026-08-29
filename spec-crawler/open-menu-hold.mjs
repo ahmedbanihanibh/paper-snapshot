@@ -1,0 +1,28 @@
+import WebSocket from 'ws';
+const tabs = await (await fetch('http://127.0.0.1:9222/json/list')).json();
+const tab = tabs.find(t=>t.type==='page'&&/linear\.app/.test(t.url));
+const ws = new WebSocket(tab.webSocketDebuggerUrl);
+await new Promise(r=>ws.on('open',r));
+let id=0; const send=(m,p)=>new Promise(res=>{const mid=++id;ws.send(JSON.stringify({id:mid,method:m,params:p}));const h=x=>{const d=JSON.parse(x);if(d.id===mid){ws.off('message',h);res(d)}};ws.on('message',h)});
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const evalJs=async(e)=>{const r=await send('Runtime.evaluate',{expression:e,returnByValue:true,awaitPromise:true});return r.result?.result?.value};
+await send('Page.navigate',{url:'https://linear.app/test-workspace-bb/team/TES/all'});
+await sleep(6500);
+const pt = JSON.parse(await evalJs(`(()=>{const r=[...document.querySelectorAll('a[href*="/issue/"]')][1];const b=r.getBoundingClientRect();return JSON.stringify({x:b.x+400,y:b.y+22})})()`));
+await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:pt.x,y:pt.y}); await sleep(300);
+await send('Input.dispatchMouseEvent',{type:'mousePressed',x:pt.x,y:pt.y,button:'right',clickCount:1});
+await send('Input.dispatchMouseEvent',{type:'mouseReleased',x:pt.x,y:pt.y,button:'right',clickCount:1});
+await sleep(900);
+const st = await evalJs(`(()=>{
+  const fixed=[...document.querySelectorAll('*')].filter(e=>getComputedStyle(e).position==='fixed');
+  const cand=fixed.filter(e=>{const r=e.getBoundingClientRect();return r.width>150&&r.width<400&&r.height>300});
+  const m=cand[cand.length-1]; if(!m)return null;
+  const rows=[...m.querySelectorAll('div,button,a,[role]')].filter(x=>{const r=x.getBoundingClientRect();return r.height>24&&r.height<40&&r.width>150});
+  const s=rows.find(x=>/^Status/.test(x.textContent)); if(!s)return 'no-status';
+  const b=s.getBoundingClientRect();
+  return JSON.stringify({x:Math.round(b.x),y:Math.round(b.y),h:Math.round(b.height)});
+})()`);
+const it = JSON.parse(st);
+await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:it.x+50,y:it.y+it.h/2}); await sleep(900);
+console.log('submenu open:', await evalJs(`document.querySelectorAll('*').length`) > 0 ? 'yes' : '?');
+ws.close();

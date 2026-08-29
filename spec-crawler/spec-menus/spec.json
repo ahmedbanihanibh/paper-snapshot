@@ -1,0 +1,72 @@
+{
+  "url": "https://linear.app/test-workspace-bb/agent",
+  "section": "Folder menu + Switch agent chat",
+  "capturedAt": "2026-08-10T13:49:59.219Z",
+  "stateCount": 2,
+  "states": [
+    {
+      "id": "001-favorites-folder-menu",
+      "name": "favorites-folder-menu",
+      "tier": 3,
+      "level": 0,
+      "path": [],
+      "kind": "menu",
+      "trigger": {
+        "label": "Folder menu from a favorites row (hover row → click ⋯)"
+      },
+      "rect": {
+        "x": 206,
+        "y": 348,
+        "width": 175,
+        "height": 90
+      },
+      "hash": "s2563",
+      "notes": "Folder menu from a favorites row (hover row → click ⋯)",
+      "cssStates": {
+        "components": 0,
+        "stateNames": []
+      },
+      "frame": "frames/001-favorites-folder-menu.html",
+      "jsx": "jsx/001-favorites-folder-menu.jsx",
+      "shot": "shots/001-favorites-folder-menu.png",
+      "shots": {
+        "surface": "shots/001-favorites-folder-menu.png",
+        "context": "shots/001-favorites-folder-menu@context.png"
+      },
+      "states": "states/001-favorites-folder-menu.json",
+      "bytes": 46227
+    },
+    {
+      "id": "002-switch-agent-chat-listbox",
+      "name": "switch-agent-chat-listbox",
+      "tier": 3,
+      "level": 0,
+      "path": [],
+      "kind": "listbox",
+      "trigger": {
+        "label": "Switch agent chat listbox (click \"New chat ▾\")"
+      },
+      "rect": {
+        "x": 263,
+        "y": 49,
+        "width": 384,
+        "height": 512
+      },
+      "hash": "s2551",
+      "notes": "Switch agent chat listbox (click \"New chat ▾\")",
+      "cssStates": {
+        "components": 0,
+        "stateNames": []
+      },
+      "frame": "frames/002-switch-agent-chat-listbox.html",
+      "jsx": "jsx/002-switch-agent-chat-listbox.jsx",
+      "shot": "shots/002-switch-agent-chat-listbox.png",
+      "shots": {
+        "surface": "shots/002-switch-agent-chat-listbox.png",
+        "context": "shots/002-switch-agent-chat-listbox@context.png"
+      },
+      "states": "states/002-switch-agent-chat-listbox.json",
+      "bytes": 342696
+    }
+  ]
+}

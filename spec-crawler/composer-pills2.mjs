@@ -1,0 +1,13 @@
+import WebSocket from 'ws';
+const tabs = await (await fetch('http://127.0.0.1:9222/json/list')).json();
+const tab = tabs.find(t=>t.type==='page'&&/linear\.app/.test(t.url));
+const ws = new WebSocket(tab.webSocketDebuggerUrl);
+await new Promise(r=>ws.on('open',r));
+let id=0; const send=(m,p)=>new Promise(res=>{const mid=++id;ws.send(JSON.stringify({id:mid,method:m,params:p}));const h=x=>{const d=JSON.parse(x);if(d.id===mid){ws.off('message',h);res(d)}};ws.on('message',h)});
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const evalJs=async(e)=>{const r=await send('Runtime.evaluate',{expression:e,returnByValue:true,awaitPromise:true});return r.result?.result?.value};
+const key=async(k,code,kc)=>{await send('Input.dispatchKeyEvent',{type:'keyDown',key:k,code,windowsVirtualKeyCode:kc});await send('Input.dispatchKeyEvent',{type:'keyUp',key:k,code,windowsVirtualKeyCode:kc});};
+console.log('path:', await evalJs('location.pathname'), 'active:', await evalJs('document.activeElement?.tagName'));
+await key('c','KeyC',67); await sleep(1500);
+console.log('fixed after c:', await evalJs(`JSON.stringify([...document.querySelectorAll('*')].filter(e=>getComputedStyle(e).position==='fixed').map(e=>{const r=e.getBoundingClientRect();return {t:e.tagName,x:r.x|0,y:r.y|0,w:r.width|0,h:r.height|0}}).filter(r=>r.w>200&&r.h>80))`));
+ws.close();

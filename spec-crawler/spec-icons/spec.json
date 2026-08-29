@@ -1,0 +1,62 @@
+{
+  "url": "https://linear.app/test-workspace-bb/agent/write-snmp-development-surface-project-update-09a52bcd3bdef",
+  "section": "Icon sources",
+  "capturedAt": "2026-08-10T14:23:50.877Z",
+  "stateCount": 2,
+  "states": [
+    {
+      "id": "001-agent-header-unstarred",
+      "name": "agent-header-unstarred",
+      "tier": 3,
+      "level": 0,
+      "path": [],
+      "kind": "header",
+      "trigger": {
+        "label": "Chat header: title, favourite star (outline), ⋯, chevron"
+      },
+      "rect": {
+        "x": 253,
+        "y": 9,
+        "width": 1170,
+        "height": 43
+      },
+      "hash": "DIV.sx-78zum5.sx-vx4679|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-vx4679|DIV.sx-78zum5.sx-vx4679|BUTTON.sx-3nfvp2.sx-16dsc37|DIV.sx-78zum5.sx-vx4679|BUTTON.sx-3nfvp2.sx-16dsc37|DIV.sx-78zum5.sx-vx4679|BUTTON.sx-3nfvp2.sx-16dsc37|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-vx4679|BUTTON.sx-3nfvp2.sx-16dsc37|SPAN.sx-3nfvp2.sx-6s0dn4",
+      "notes": "Chat header: title, favourite star (outline), ⋯, chevron",
+      "frame": "frames/001-agent-header-unstarred.html",
+      "jsx": "jsx/001-agent-header-unstarred.jsx",
+      "shot": "shots/001-agent-header-unstarred.png",
+      "shots": {
+        "surface": "shots/001-agent-header-unstarred.png",
+        "context": "shots/001-agent-header-unstarred@context.png"
+      },
+      "bytes": 45050
+    },
+    {
+      "id": "002-agent-header-starred",
+      "name": "agent-header-starred",
+      "tier": 3,
+      "level": 0,
+      "path": [],
+      "kind": "header",
+      "trigger": {
+        "label": "Chat header with favourite set (solid star)"
+      },
+      "rect": {
+        "x": 253,
+        "y": 9,
+        "width": 1170,
+        "height": 43
+      },
+      "hash": "DIV.sx-78zum5.sx-vx4679|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-vx4679|DIV.sx-78zum5.sx-vx4679|BUTTON.sx-3nfvp2.sx-16dsc37|DIV.sx-78zum5.sx-vx4679|BUTTON.sx-3nfvp2.sx-16dsc37|DIV.sx-78zum5.sx-vx4679|BUTTON.sx-3nfvp2.sx-16dsc37|DIV.sx-78zum5.sx-6s0dn4|DIV.sx-78zum5.sx-vx4679|BUTTON.sx-3nfvp2.sx-16dsc37|SPAN.sx-3nfvp2.sx-6s0dn4",
+      "notes": "Chat header with favourite set (solid star)",
+      "frame": "frames/002-agent-header-starred.html",
+      "jsx": "jsx/002-agent-header-starred.jsx",
+      "shot": "shots/002-agent-header-starred.png",
+      "shots": {
+        "surface": "shots/002-agent-header-starred.png",
+        "context": "shots/002-agent-header-starred@context.png"
+      },
+      "bytes": 43517
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+<meta charset="utf-8">
+<title>repeatability fixture — deterministic</title>
+<!--
+  Every byte of this page is fixed. No script, no random, no clock, no network,
+  no web font: the only inputs to a capture are the layout engine and the
+  crawler itself. Anything that differs between two captures of this page is a
+  determinism bug in the pipeline, not in the page.
+-->
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.4 system-ui, sans-serif; background: #fff; color: #111; }
+
+  /* A subgrid row: subgrid resolution is a rewrite-and-restore step, so it is
+     the most plausible place for run-to-run drift to enter a frame. */
+  #list {
+    display: grid;
+    grid-template-columns: [icon] 24px [title] 320px [meta] 80px;
+    column-gap: 12px;
+    width: 460px;
+    padding: 8px;
+  }
+  #row {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: icon / meta;
+    align-items: center;
+    height: 36px;
+    border-radius: 6px;
+    background: #f4f5f8;
+  }
+  #row .icon { justify-self: center; width: 14px; height: 14px; border-radius: 3px; background: #6b7bb5; }
+  #row .title { font-weight: 600; }
+  #row .meta { color: #7b8194; text-align: right; }
+
+  #panel {
+    position: fixed; left: 40px; top: 120px;
+    width: 260px; height: 96px;
+    border-radius: 10px;
+    border: 1px solid #d7dae4;
+    box-shadow: 0 8px 24px rgba(16, 20, 40, 0.14);
+    background: #fff;
+    padding: 12px;
+  }
+
+  #card {
+    position: fixed; left: 340px; top: 120px;
+    width: 200px; height: 120px;
+    background: linear-gradient(180deg, #eef1f8 0%, #dfe4f2 100%);
+    border-radius: 8px;
+    padding: 10px;
+  }
+  #card b { display: block; margin-bottom: 4px; }
+
+  /* Hover styled purely in CSS. Rest and hover share a DOM, so the two frames
+     are only distinguishable by paint — and their ORDER in the manifest is what
+     this suite is really hunting. */
+  #css-hover {
+    position: fixed; left: 340px; top: 260px; width: 200px; height: 48px;
+    background: #eef1f8; border-radius: 8px; padding: 8px;
+  }
+  #css-hover:hover { background: #c9d4f2; }
+</style>
+
+<div id="list">
+  <div id="row" role="row" data-list-row="true" data-list-key="issue-123">
+    <span class="icon"></span>
+    <span class="title">Issue ABC-123 — subgrid row</span>
+    <span class="meta">2d</span>
+  </div>
+</div>
+
+<div id="panel" role="dialog" aria-label="Details panel">Details panel body</div>
+
+<div id="card"><b>Fixed card</b>Nothing on this page depends on the clock, the RNG, or the network.</div>
+
+<div id="css-hover">CSS-only hover</div>

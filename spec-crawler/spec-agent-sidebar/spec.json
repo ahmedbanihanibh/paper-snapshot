@@ -1,0 +1,149 @@
+{
+  "url": "https://linear.app/test-workspace-bb/agent/write-snmp-development-surface-project-update-09a52bcd3bdef",
+  "section": "Sidebar › Agent (from another route)",
+  "capturedAt": "2026-08-10T13:28:35.040Z",
+  "stateCount": 4,
+  "states": [
+    {
+      "id": "001-agent-hover-tooltip",
+      "name": "agent-hover-tooltip",
+      "tier": 3,
+      "level": 0,
+      "path": [],
+      "kind": "tooltip",
+      "trigger": {
+        "label": "Sidebar Agent row"
+      },
+      "rect": {
+        "x": 240,
+        "y": 173,
+        "width": 157,
+        "height": 34
+      },
+      "hash": "s2827",
+      "notes": "Tooltip after ~900ms of pointer rest; portals right of the sidebar",
+      "cssStates": {
+        "components": 198,
+        "stateNames": [
+          "[data-disabled=\"true\"]",
+          "active",
+          "disabled",
+          "focus",
+          "focus-visible",
+          "focus-within",
+          "hover"
+        ]
+      },
+      "frame": "frames/001-agent-hover-tooltip.html",
+      "jsx": "jsx/001-agent-hover-tooltip.jsx",
+      "shot": "shots/001-agent-hover-tooltip.png",
+      "shots": {
+        "surface": "shots/001-agent-hover-tooltip.png",
+        "context": "shots/001-agent-hover-tooltip@context.png"
+      },
+      "states": "states/001-agent-hover-tooltip.json",
+      "bytes": 14089
+    },
+    {
+      "id": "002-agent-hover-affordance",
+      "name": "agent-hover-affordance",
+      "tier": 3,
+      "level": 0,
+      "path": [],
+      "kind": "affordance",
+      "trigger": {
+        "label": "Sidebar Agent row"
+      },
+      "rect": {
+        "x": 206,
+        "y": 178,
+        "width": 24,
+        "height": 24
+      },
+      "hash": "s2041",
+      "notes": "The + affordance revealed inside the row on hover",
+      "cssStates": {
+        "components": 2,
+        "stateNames": [
+          "active",
+          "focus",
+          "focus-visible",
+          "hover"
+        ]
+      },
+      "frame": "frames/002-agent-hover-affordance.html",
+      "jsx": "jsx/002-agent-hover-affordance.jsx",
+      "shot": "shots/002-agent-hover-affordance.png",
+      "shots": {
+        "surface": "shots/002-agent-hover-affordance.png",
+        "context": "shots/002-agent-hover-affordance@context.png"
+      },
+      "states": "states/002-agent-hover-affordance.json",
+      "bytes": 9430
+    },
+    {
+      "id": "003-agent-context-menu",
+      "name": "agent-context-menu",
+      "tier": 3,
+      "level": 0,
+      "path": [],
+      "kind": "menu",
+      "trigger": {
+        "label": "Sidebar Agent row"
+      },
+      "rect": {
+        "x": 126,
+        "y": 190,
+        "width": 175,
+        "height": 166
+      },
+      "hash": "s2844",
+      "notes": "Right-click: New chat · Visibility ▸ · Customize sidebar · Copy link",
+      "cssStates": {
+        "components": 0,
+        "stateNames": []
+      },
+      "frame": "frames/003-agent-context-menu.html",
+      "jsx": "jsx/003-agent-context-menu.jsx",
+      "shot": "shots/003-agent-context-menu.png",
+      "shots": {
+        "surface": "shots/003-agent-context-menu.png",
+        "context": "shots/003-agent-context-menu@context.png"
+      },
+      "states": "states/003-agent-context-menu.json",
+      "bytes": 78021
+    },
+    {
+      "id": "004-agent-visibility-submenu",
+      "name": "agent-visibility-submenu",
+      "tier": 3,
+      "level": 0,
+      "path": [],
+      "kind": "menu",
+      "trigger": {
+        "label": "Sidebar Agent row"
+      },
+      "rect": {
+        "x": 298,
+        "y": 234,
+        "width": 175,
+        "height": 78
+      },
+      "hash": "s2908",
+      "notes": "Visibility ▸ submenu, revealed by dwelling on the item",
+      "cssStates": {
+        "components": 0,
+        "stateNames": []
+      },
+      "frame": "frames/004-agent-visibility-submenu.html",
+      "jsx": "jsx/004-agent-visibility-submenu.jsx",
+      "shot": "shots/004-agent-visibility-submenu.png",
+      "shots": {
+        "surface": "shots/004-agent-visibility-submenu.png",
+        "context": "shots/004-agent-visibility-submenu@context.png"
+      },
+      "states": "states/004-agent-visibility-submenu.json",
+      "bytes": 34477
+    }
+  ]
+}

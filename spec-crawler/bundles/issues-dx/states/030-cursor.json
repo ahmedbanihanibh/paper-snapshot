@@ -1,0 +1,107 @@
+{
+  "url": "https://linear.app/test-workspace-bb/issue/TES-52/enhance-onboarding-and-align-it-with-brand-colors",
+  "scannedRules": 7259,
+  "unreadableSheets": 0,
+  "stateNames": [
+    "active",
+    "hover"
+  ],
+  "components": [
+    {
+      "label": "a#1cursor.sx-1xru068.sx-189xrh.sx-zjhap9",
+      "rect": {
+        "x": 1037,
+        "y": 407,
+        "width": 174,
+        "height": 32
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "app.base"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:active"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "app.base",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:hover"
+          ]
+        }
+      ],
+      "id": "s3487"
+    },
+    {
+      "label": "a#2linear.sx-1xru068.sx-189xrh.sx-zjhap9",
+      "rect": {
+        "x": 1037,
+        "y": 439,
+        "width": 174,
+        "height": 32
+      },
+      "visible": true,
+      "states": [
+        {
+          "state": "active",
+          "trigger": "self",
+          "conditions": [
+            "app.base"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:active"
+          ]
+        },
+        {
+          "state": "hover",
+          "trigger": "self",
+          "conditions": [
+            "app.base",
+            "(any-hover: hover) and (any-pointer: fine)"
+          ],
+          "changes": [
+            {
+              "property": "transition-duration",
+              "from": "0.15s",
+              "to": "var(--speed-highlightFadeIn)"
+            }
+          ],
+          "selectors": [
+            "a:hover"
+          ]
+        }
+      ],
+      "id": "s3498"
+    }
+  ]
+}

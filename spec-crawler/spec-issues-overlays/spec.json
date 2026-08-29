@@ -1,0 +1,23 @@
+{
+  "url": "https://linear.app/test-workspace-bb/team/TES/all",
+  "capturedAt": "2026-08-11T13:08:17.376Z",
+  "stateCount": 1,
+  "states": [
+    {
+      "id": "001-dialog-create-issue",
+      "name": "dialog-create-issue",
+      "tier": 3,
+      "kind": "agent-captured",
+      "hash": "DIV.sx-78zum5.sx-vx4679|FORM.sx-mz0i5r.sx-78zum5|DIV.sx-78zum5.sx-vx4679|DIV.theme-provider-ced1ea5de6f65083d48d74e57d09ba29e80ce28a|DIV.sx-78zum5.sx-c7ga6q|DIV.sx-78zum5.sx-vx4679|DIV.sx-78zum5.sx-vx4679|DIV.sx-2lah0s|DIV.|DIV.theme-provider-ced1ea5de6f65083d48d74e57d09ba29e80ce28a|DIV.sx-euugli.sx-1yrsyyn|DIV.theme-provider-ced1ea5de6f65083d48d74e57d09ba29e80ce28a|DIV.sx-od5an3.sx-1n2onr6|DIV.sx-78zum5.sx-aobbuh",
+      "path": [],
+      "notes": "Create-issue dialog — the primary creation surface. REACHED BY: Pressed c. MEASURED: 749x260.2 at (341.5, 94.5). type 16px / 24px 400 \"Inter Variable\"",
+      "frame": "frames/001-dialog-create-issue.html",
+      "jsx": "jsx/001-dialog-create-issue.jsx",
+      "shot": "shots/001-dialog-create-issue.png",
+      "shots": {
+        "surface": "shots/001-dialog-create-issue.png"
+      },
+      "bytes": 220638
+    }
+  ]
+}
