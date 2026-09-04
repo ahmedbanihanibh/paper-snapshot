@@ -48,7 +48,7 @@ export const LEGACY_TOOL_NAMES = Object.freeze([
   'paper_copy',
 ]);
 
-export const ADDED_TOOL_NAMES = Object.freeze(['runtime_handshake', 'scenario_run']);
+export const ADDED_TOOL_NAMES = Object.freeze(['runtime_handshake', 'scenario_run', 'screenshot']);
 
 /**
  * What runtime_handshake does and — more importantly — what it does not do.
@@ -432,6 +432,18 @@ export function createTools({ defaultEndpoint = DEFAULT_ENDPOINT, defaultOut = D
 
     /* ------------------------------------------------------------- added */
 
+    {
+      name: 'screenshot',
+      description: "SEE the page. Returns the actual pixels as an image, not a file path — the agent looks at the browser instead of inferring it from a DOM dump. Use it to confirm you are on the surface you think you are before measuring, to check a state you just drove actually rendered, and to compare your build against the reference by eye BEFORE running the structural gates. It is not a substitute for a measurement: a screenshot cannot tell you a radius or a resolved grid track, and a pixel-perfect look can still be a wrong container. Point it at one element with specId to keep the image small and the subject unambiguous.",
+      inputSchema: {
+        type: 'object',
+        properties: {
+          specId: { type: 'string', description: 'Element to shoot (from page_describe). Omit for the whole viewport.' },
+          fullPage: { type: 'boolean', description: 'Capture the entire scrollable page rather than the viewport. Ignored when specId is given. Default false.' },
+          save: { type: 'string', description: 'Also write the PNG into the bundle under this name, so it survives the conversation.' },
+        },
+      },
+    },
     {
       name: 'runtime_handshake',
       description: HANDSHAKE_DESCRIPTION,

@@ -165,6 +165,35 @@ export function createHandlers({
 
     page_describe: async () => text(await requireDriver().describe()),
 
+    /**
+     * Vision, not measurement. Returns the bytes as an MCP image block so the
+     * model actually sees the page; every other tool here returns numbers.
+     * Kept deliberately thin: it reuses driver.screenshot(), so a subject that
+     * cannot be shot degrades to the full page rather than throwing.
+     */
+    screenshot: async ({ specId, fullPage, save } = {}) => {
+      const driver = requireDriver();
+      const png = specId
+        ? await driver.screenshot(specId)
+        : await driver.page.screenshot({ type: 'png', fullPage: Boolean(fullPage) });
+      let saved = null;
+      if (save) {
+        const bundle = requireBundle();
+        saved = await bundle.saveShot?.(save, png) ?? null;
+      }
+      return {
+        content: [
+          { type: 'image', data: Buffer.from(png).toString('base64'), mimeType: 'image/png' },
+          { type: 'text', text: JSON.stringify({
+              url: driver.page.url(),
+              subject: specId ?? (fullPage ? 'full page' : 'viewport'),
+              bytes: png.length,
+              ...(saved ? { saved } : {}),
+            }, null, 2) },
+        ],
+      };
+    },
+
     list_regions: async () => text(await requireDriver().regions()),
 
     set_region: async ({ include, exclude }) => text({
